@@ -530,7 +530,7 @@ function Gnosis:SetupChanneledSpellsTable()
 	-- mage
 	self:AddChanneledSpellById(10, 8, false, 15, false, true, "frost", false, 2);		-- blizzard
 	self:AddChanneledSpellById(5143, 5, false, 6, false, false, "arcane", false, 2);	-- arcane missiles
-	self:AddChanneledSpellById(12051, 5, false, 4, true, false, "arcane", false, 1);	-- evocation
+	self:AddChanneledSpellById(12051, 4, false, 3, true, false, "arcane", false, 2);	-- evocation
 
 	-- warlock
 	self:AddChanneledSpellById(1120, 5, true, 15, false, false, "shadow", false, 2);	-- drain soul
