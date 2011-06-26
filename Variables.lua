@@ -95,7 +95,7 @@ function Gnosis:StartupVariables()
 
 	local fCurTime = GetTime() * 1000;
 
-	self.ver = 3.00;
+	self.ver = 3.01;
 	self.optver = 2.54;
 	self.build = "@project-version@";
 	self.addonname = "Gnosis";
