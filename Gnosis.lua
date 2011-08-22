@@ -30,7 +30,7 @@ function Gnosis:InitialConfig()
 	self.optCfgs = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Gnosis Configurations", Gnosis.L["TabConfig"], "Gnosis");
 end
 
-function Gnosis:Enable(status)
+function Gnosis:En(status)
 	if(status) then
 		-- enable addon
 		self.bGnosisEnabled = true;
@@ -344,7 +344,7 @@ function Gnosis:OnEnable()
 
 	-- enable/disable addon
 	self:InitialConfig();
-	self:Enable(self.s.bAddonEn);
+	self:En(self.s.bAddonEn);
 
 	-- get player GUID
 	self.guid = UnitGUID("player");
@@ -933,8 +933,8 @@ function Gnosis:RedoLocalization()
 	local hide = self.s.bHideAddonMsgs;
 	self.s.bHideAddonMsgs = true;
 	-- reload most of the addon for localization
-	self:Enable(false);
-	self:Enable(true);
+	self:En(false);
+	self:En(true);
 	self.s.bHideAddonMsgs = hide;
 end
 
