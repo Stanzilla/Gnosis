@@ -103,7 +103,7 @@ function Gnosis:OptCreateBasicTables()
 				get = function(info) return Gnosis.s.bAddonEn; end,
 				set = function(info,val)
 					Gnosis.s.bAddonEn = val;
-					Gnosis:Enable(val);
+					Gnosis:En(val);
 				end,
 			},
 		},
@@ -151,7 +151,7 @@ function Gnosis:OptCreateBasicTables()
 				get = function(info) return Gnosis.s.bAddonEn; end,
 				set = function(info,val)
 					Gnosis.s.bAddonEn = val;
-					Gnosis:Enable(val);
+					Gnosis:En(val);
 				end,
 				width = "full",
 			},
