@@ -1729,11 +1729,11 @@ function Gnosis:RecursiveAddScript(value)
 	if(type(value) == "table") then
 		script_string = script_string .."{";
 		for k, v in pairs(value) do
-			script_string = script_string .. " [" .. self:AddSingleEntry(k) .. "] = ";
+			script_string = script_string .. "[" .. self:AddSingleEntry(k) .. "]=";
 			self:RecursiveAddScript(v);
 			script_string = script_string ..",";
 		end
-		script_string = script_string .." }";
+		script_string = script_string .."}";
 	else
 		script_string = script_string .. self:AddSingleEntry(value) .. "";
 	end
@@ -1741,7 +1741,7 @@ end
 
 function Gnosis:CreateBarValueScript(key, tab)
 	if(key) then
-		script_string = key .. " = ";
+		script_string = key .. "=";
 		self:RecursiveAddScript(tab);
 		script_string = script_string .. ";";
 

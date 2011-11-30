@@ -400,12 +400,24 @@ function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dgu
 				end
 			end
 		end
+		
+		if (self.ti_icd[spellname]) then
+			--print("player", spellname, self.ti_icd[spellname], event);
+			
+			self.ti_icd_active[spellname] = fCurTime + self.ti_icd[spellname];
+		end
 	elseif(dguid == self.guid) then	-- player is target
 		if(event == "SWING_MISSED" and sid == "PARRY") then
 			local fCurTime = GetTime() * 1000;
 			-- parry haste
 			Gnosis:FindSwingTimersParry("sm", fCurTime);
 			Gnosis:FindSwingTimersParry("smr", fCurTime);
+		end
+		
+		if (self.ti_icd[spellname]) then
+			--print("is target", spellname, self.ti_icd[spellname], event);
+			
+			self.ti_icd_active[spellname] = GetTime() * 1000 + self.ti_icd[spellname];
 		end
 	end
 end

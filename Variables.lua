@@ -92,10 +92,9 @@ Gnosis.colClasses = {
 };
 
 function Gnosis:StartupVariables()
-
 	local fCurTime = GetTime() * 1000;
 
-	self.ver = 3.02;
+	self.ver = 3.03;
 	self.optver = 2.54;
 	self.build = "@project-version@";
 	self.addonname = "Gnosis";
@@ -118,6 +117,8 @@ function Gnosis:StartupVariables()
 	self.unusedcastbars = {};	-- table to store deleted castbar frames
 	self.cb_fl = {};		-- castbar fast lookup
 	self.ti_fl = {};		-- timer fast lookup
+	self.ti_icd = {};		-- inner cooldown scan table
+	self.ti_icd_active = {};-- active inner cooldowns
 	self.scan = {};			-- units to scan
 
 	-- (LibSharedMedia)
