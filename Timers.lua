@@ -296,6 +296,36 @@ function Gnosis:Timers_TotemDuration(bar, timer, ti)
 	end
 end
 
+function Gnosis:Timers_InnerCD(bar, timer, ti)
+	ti.unit = "player";
+	local bExist = false;
+	if (Gnosis.ti_icd_active[timer.spell]) then
+		if (GetTime() * 1000 >= Gnosis.ti_icd_active[timer.spell]) then
+			-- inner cd expired
+			Gnosis.ti_icd_active[timer.spell] = nil;
+		else
+			bExist = true;
+		end
+	end
+	
+	if (bExist) then
+		ti.cname = timer.spell;
+		ti.icon = nil;
+		local dur, fin = Gnosis.ti_icd[timer.spell], Gnosis.ti_icd_active[timer.spell];
+		if(timer.brange) then
+			local rem = fin / 1000 - GetTime();
+			ti.ok = in_value_range(rem, rem*100000/dur, timer.range_tab);
+		else
+			ti.ok = true;
+		end
+		set_times(timer, ti, dur, fin, true);
+	elseif (timer.bNot) then
+		ti.cname = timer.spell;
+		ti.icon = nil;
+		set_not(ti);
+	end
+end
+
 function Gnosis:Timers_WeaponEnchant(bar, timer, ti, exists, expires, charges)
 	-- weapon enchant (player only)
 	if(exists) then
@@ -587,6 +617,7 @@ local SelectedTimerInfo = {
 
 function Gnosis:CreateSingleTimerTable()
 	wipe(self.ti_fl);
+	wipe(self.ti_icd);
 
 	for key, value in pairs(self.castbars) do
 		local conf = Gnosis.s.cbconf[key];
@@ -676,6 +707,12 @@ function Gnosis:CreateSingleTimerTable()
 						elseif(w == "enchoh") then
 							tiType = 7;
 							cfinit = Gnosis.Timers_WeaponEnchantOff;
+						elseif(w == "innercd") then
+							if (staticdur) then
+								tiType = 8;
+								cfinit = Gnosis.Timers_InnerCD;
+								self.ti_icd[spell] = staticdur;
+							end
 						elseif(w == "fixed") then
 							tiType = 10;
 							cfinit = Gnosis.Timers_Fixed;
