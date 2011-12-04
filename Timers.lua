@@ -707,12 +707,10 @@ function Gnosis:CreateSingleTimerTable()
 						elseif(w == "enchoh") then
 							tiType = 7;
 							cfinit = Gnosis.Timers_WeaponEnchantOff;
-						elseif(w == "innercd") then
-							if (staticdur) then
-								tiType = 8;
-								cfinit = Gnosis.Timers_InnerCD;
-								self.ti_icd[spell] = staticdur;
-							end
+						elseif(w == "icd") then
+							tiType = 8;
+							cfinit = Gnosis.Timers_InnerCD;
+							self.ti_icd[spell] = staticdur or 5.0;
 						elseif(w == "fixed") then
 							tiType = 10;
 							cfinit = Gnosis.Timers_Fixed;
