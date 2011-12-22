@@ -1799,7 +1799,7 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 
 	-- set statusbar value
 	local val = (cb.endTime - fCurTime) / (cb.duration);
-	val = cb.channel and val or (1 - val);
+	val = (cb.channel and (not cfg.bChanAsNorm)) and val or (1 - val);
 	cb.bar:SetValue(val);
 	cb:SetAlpha(cfg.alpha);
 	cb:Show();
@@ -1842,46 +1842,17 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 			totalticks = cs.binit and (noninitticks+1) or noninitticks;
 		end
 
-		local ftbt = 1 / noninitticks;
-		local valLBperc = ((cfg.unit == "player") and max(min(self.lag / cb.duration, cfg.latbarsize), cfg.latbarfixed) or cfg.latbarfixed);
-		-- never create latency box larger than half of distance between ticks
-		-- vital for long channels with high number of ticks (e.g. hellfire with 15 ticks)
-		valLBperc = min(valLBperc, ftbt * 0.5);
-		local valLB = (cfg.orient == 2 and cb.barheight or cb.barwidth) * valLBperc;
-
-		if(cfg.bShowTicks) then
-			for i = 1, totalticks do
-				if(i <= shownticks) then
-					cb.lb[i]:ClearAllPoints();
-					if(cfg.orient == 2) then
-						if(cfg.bInvDir) then
-							cb.lb[i]:SetPoint("TOP", 0, -cb.barheight * (i-1) * ftbt);
-						else
-							cb.lb[i]:SetPoint("BOTTOM", 0, cb.barheight * (i-1) * ftbt);
-						end
-						cb.lb[i]:SetHeight(valLB);
-					else
-						if(cfg.bInvDir) then
-							cb.lb[i]:SetPoint("RIGHT", -cb.barwidth * (i-1) * ftbt, 0);
-						else
-							cb.lb[i]:SetPoint("LEFT", cb.barwidth * (i-1) * ftbt, 0);
-						end
-						cb.lb[i]:SetWidth(valLB);
-					end
-					cb.lb[i]:Show();
-				end
-			end
-		end
-
-		-- spell is channeled, store tick information for possible clip test
+		-- spell is channeled, store tick information for spell update and possible clip test
 		wipe(cb.ticks);
-		cb.channelticktime = ftbt * cb.duration;
+		cb.channelticktime = (1 / noninitticks) * cb.duration;
 		for i = 1, totalticks do
 			cb.ticks[i] = cb.endTime - (i-1) * cb.channelticktime;
 		end
 
 		cb.totalticks = cfg.bShowTicks and totalticks or 0;
 		cb.shownticks = cfg.bShowTicks and shownticks or 0;
+		
+		self:DrawTicks(cb, cfg);
 	else
 		cb.totalticks = 0;
 		cb.shownticks = 0;
@@ -1895,19 +1866,17 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 		if(not(cs and cs.ben and cfg.bShowTicks) and cfg.bShowLat) then
 			cb.lb[1]:ClearAllPoints();
 			if(cfg.orient == 2) then
-				cb.lb[1]:SetHeight(cb.barheight * min(self.lag / cb.duration, cfg.latbarsize));
-				if(cfg.bInvDir) then
-					cb.lb[1]:SetPoint(cb.channel and "TOP" or "BOTTOM");
-				else
-					cb.lb[1]:SetPoint(cb.channel and "BOTTOM" or "TOP");
-				end
+				local direction = (cb.channel and (not cfg.bChanAsNorm)) and "BOTTOM" or "TOP";
+				if (cfg.bInvDir) then
+					direction = (direction == "BOTTOM") and "TOP" or "BOTTOM";
+				end				
+				cb.lb[1]:SetPoint(direction);
 			else
-				cb.lb[1]:SetWidth(cb.barwidth * min(self.lag / cb.duration, cfg.latbarsize));
-				if(cfg.bInvDir) then
-					cb.lb[1]:SetPoint(cb.channel and "RIGHT" or "LEFT");
-				else
-					cb.lb[1]:SetPoint(cb.channel and "LEFT" or "RIGHT");
-				end
+				local direction = (cb.channel and (not cfg.bChanAsNorm)) and "LEFT" or "RIGHT";
+				if (cfg.bInvDir) then
+					direction = (direction == "LEFT") and "RIGHT" or "LEFT";
+				end				
+				cb.lb[1]:SetPoint(direction);
 			end
 			cb.lb[1]:Show();
 		end
@@ -1920,10 +1889,18 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 			elseif(cfg.alignlat == "RIGHT") then
 				cb.brtext:SetText(string_format("%d", self.lag));
 			else
-				if(cb.channel) then
-					cb.bltext:SetText(string_format("%d", self.lag));
+				if (cfg.bInvDir) then
+					if (cb.channel and (not cfg.bChanAsNorm)) then
+						cb.brtext:SetText(string_format("%d", self.lag));
+					else
+						cb.bltext:SetText(string_format("%d", self.lag));
+					end
 				else
-					cb.brtext:SetText(string_format("%d", self.lag));
+					if (cb.channel and (not cfg.bChanAsNorm)) then
+						cb.bltext:SetText(string_format("%d", self.lag));
+					else
+						cb.brtext:SetText(string_format("%d", self.lag));
+					end
 				end
 			end
 		end
@@ -1978,42 +1955,8 @@ function Gnosis:UpdateCastbar(cb, startTime, endTime, spell)
 					cb.totalticks = cb.totalticks + 1;
 					cb.ticks[cb.totalticks] = cb.ticks[cb.totalticks-1] - cb.channelticktime;
 				end
-
-				-- calculate new tick marker size
-				local valLBperc = ((cfg.unit == "player") and max(min(self.lag / cb.duration, cfg.latbarsize), cfg.latbarfixed) or cfg.latbarfixed);
-				-- never create latency box larger than half of distance between ticks
-				-- vital for long channels with high number of ticks (e.g. hellfire with 15 ticks)
-				valLBperc = min(valLBperc, 1 / cb.totalticks * 0.5);
-
-				-- redraw tick markers
-				for i = 1, cb.totalticks do
-					-- box size
-					local p = (cb.endTime - cb.ticks[i]) / cb.duration;
-					-- draw marker
-					if(i <= cb.shownticks) then
-						if(cb.ticks[i] > cb.endTime) then
-							cb.lb[i]:Hide();
-						else
-							cb.lb[i]:ClearAllPoints();
-							if(cfg.orient == 2) then
-								if(cfg.bInvDir) then
-									cb.lb[i]:SetPoint("TOP", 0, -cb.barheight * p);
-								else
-									cb.lb[i]:SetPoint("BOTTOM", 0, cb.barheight * p);
-								end
-								cb.lb[i]:SetHeight(min(valLBperc, 1.0 - p) * cb.barheight);
-							else
-								if(cfg.bInvDir) then
-									cb.lb[i]:SetPoint("RIGHT", -cb.barwidth * p, 0);
-								else
-									cb.lb[i]:SetPoint("LEFT", cb.barwidth * p, 0);
-								end
-								cb.lb[i]:SetWidth(min(valLBperc, 1.0 - p) * cb.barwidth);
-							end
-							cb.lb[i]:Show();
-						end
-					end
-				end
+				
+				self:DrawTicks(cb, cfg);
 			end
 		end
 	-- "negative" pushback
@@ -2021,25 +1964,59 @@ function Gnosis:UpdateCastbar(cb, startTime, endTime, spell)
 		cb.pushback = cb.pushback + fSPB;
 		cb.endTime = endTime;
 
-		if(cb.shownticks and cb.shownticks > 0) then
-			for i = 1, cb.totalticks do
-				if(i <= cb.shownticks) then
-					if(cb.ticks[i] > cb.endTime) then
-						cb.lb[i]:Hide();
-					else
+		self:DrawTicks(cb, cfg);
+	end
+end
+
+function Gnosis:DrawTicks(cb, cfg)
+	if (cfg.bShowTicks) then
+		-- calculate new tick marker size
+		local valLBperc = ((cfg.unit == "player") and max(min(self.lag / cb.duration, cfg.latbarsize), cfg.latbarfixed) or cfg.latbarfixed);
+		-- never create latency box larger than half of distance between ticks
+		-- vital for long channels with high number of ticks (e.g. hellfire with 15 ticks)
+		valLBperc = min(valLBperc, 1 / cb.totalticks * 0.5);
+				
+		for i = 1, cb.totalticks do
+			if (i <= cb.shownticks) then
+				if (cb.ticks[i] > cb.endTime) then
+					cb.lb[i]:Hide();
+				else
+					local p = (cb.endTime-cb.ticks[i]) / cb.duration;				
+					if (cfg.bChanAsNorm) then
+						-- show channel as normal cast
 						cb.lb[i]:ClearAllPoints();
-						if(cfg.orient == 2) then
+						if (cfg.orient == 2) then
 							if(cfg.bInvDir) then
-								cb.lb[i]:SetPoint("TOP", 0, -cb.barheight * (cb.endTime-cb.ticks[i])/cb.duration);
+								cb.lb[i]:SetPoint("BOTTOM", 0, cb.barheight * p);
 							else
-								cb.lb[i]:SetPoint("BOTTOM", 0, cb.barheight * (cb.endTime-cb.ticks[i])/cb.duration);
+								cb.lb[i]:SetPoint("TOP", 0, -cb.barheight * p);
 							end
+							cb.lb[i]:SetHeight(min(valLBperc, 1.0 - p) * cb.barheight);
 						else
-							if(cfg.bInvDir) then
-								cb.lb[i]:SetPoint("RIGHT", -cb.barwidth * (cb.endTime-cb.ticks[i])/cb.duration, 0);
+							if (cfg.bInvDir) then
+								cb.lb[i]:SetPoint("LEFT", cb.barwidth * p, 0);
 							else
-								cb.lb[i]:SetPoint("LEFT", cb.barwidth * (cb.endTime-cb.ticks[i])/cb.duration, 0);
+								cb.lb[i]:SetPoint("RIGHT", -cb.barwidth * p, 0);
 							end
+							cb.lb[i]:SetWidth(min(valLBperc, 1.0 - p) * cb.barwidth);
+						end
+						cb.lb[i]:Show();
+					else -- show as channel
+						cb.lb[i]:ClearAllPoints();
+						if (cfg.orient == 2) then
+							if (cfg.bInvDir) then
+								cb.lb[i]:SetPoint("TOP", 0, -cb.barheight * p);
+							else
+								cb.lb[i]:SetPoint("BOTTOM", 0, cb.barheight * p);
+							end
+							cb.lb[i]:SetHeight(min(valLBperc, 1.0 - p) * cb.barheight);
+						else
+							if (cfg.bInvDir) then
+								cb.lb[i]:SetPoint("RIGHT", -cb.barwidth * p, 0);
+							else
+								cb.lb[i]:SetPoint("LEFT", cb.barwidth * p, 0);
+							end
+							cb.lb[i]:SetWidth(min(valLBperc, 1.0 - p) * cb.barwidth);
 						end
 						cb.lb[i]:Show();
 					end

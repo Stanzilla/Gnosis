@@ -385,7 +385,18 @@ function Gnosis:HandleChatCommand(cmd)
 			self:LoadConfig(subcmd, false, true, false, false);
 		end
 	else
-		InterfaceOptionsFrame_OpenToCategory(self.optFrame);
+		local bar, text, cnt, spell, iscast;
+		bar, cmd = Gnosis:ExtractRegex(cmd, "bar=(%w+)", "bar=\"([^\"]+)\"");
+		text, cmd = Gnosis:ExtractRegex(cmd, "text=(%w+)", "text=\"([^\"]+)\"");
+		spell, cmd = Gnosis:ExtractRegex(cmd, "spell=(%w+)", "spell=\"([^\"]+)\"", true);
+		cnt, cmd = Gnosis:ExtractRegex(cmd, "time=([+-]?[0-9]*%.?[0-9]*)", "time=\"([+-]?[0-9]*%.?[0-9]*)\"", true);
+		iscast = string_match(cmd, ".*(cast).*");
+				
+		if (bar and text and cnt) then
+			self:InjectTimer(bar, text, cnt, spell, iscast);
+		else
+			InterfaceOptionsFrame_OpenToCategory(self.optFrame);
+		end
 	end
 end
 
