@@ -244,7 +244,6 @@ function Gnosis:StartupVariables()
 		colText = { 1.00, 1.00, 1.00, 1.00 },
 		colTextTime = { 1.00, 1.00, 1.00, 1.00 },
 		colTextLag = { 1.00, 0.00, 0.00, 1.00 },
-		colTextPB = { 1.00, 0.00, 0.00, 1.00 },
 		colInterrupted = { 0.85, 0.85, 0.65, 0.75 },
 		colFailed = { 0.70, 0.30, 0.20, 0.75 },
 		colSpark = { 1.00, 1.00, 1.00, 1.00 },
