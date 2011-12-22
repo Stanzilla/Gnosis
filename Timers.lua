@@ -835,6 +835,56 @@ function Gnosis:CreateSingleTimerTable()
 	end
 end
 
+function Gnosis:InjectTimer(barname, text, cnt, spell, isCast)
+	local fCurTime = GetTime() * 1000;
+	if (self.castbars and self.castbars[barname]) then
+		local cb = self.castbars[barname];
+		local cfg = cb.conf;
+		
+		-- castbar values
+		cb.channel = not isCast;
+		cb.icon:SetTexture(nil);
+		cb.id = 0;
+		
+		if (spell) then
+			local name, _, icon = GetSpellInfo(spell);
+			if (name and icon) then
+				cb.castname = name;
+				cb.icon:SetTexture(icon);
+			end
+		end	
+
+		-- show castbar text
+		cb.ctext:SetText(text);
+		cb.castname = nil;
+		
+		cb.duration = cnt * 1000;
+		cb.endTime = fCurTime + cb.duration;
+
+		-- set statusbar value
+		local val = (cb.endTime - fCurTime) / (cb.duration);
+		val = (cb.channel and (not cfg.bChanAsNorm)) and val or (1 - val);
+		cb.bar:SetValue(val);
+		cb:SetAlpha(cfg.alpha);
+		cb:Show();
+		
+		-- castbar spark
+		if(cfg.bShowCBS) then
+			cb.cbs:SetPoint("CENTER", cb.bar, "LEFT", val * cb.barwidth, 0);
+			cb.cbs:Show();
+		end
+		
+		-- pushback (also vital for clipping test)
+		cb.pushback = 0;
+
+		-- set bar active
+		cb.bActive = true;
+		self.activebars[barname] = cb;
+	else
+		self:Print("bar " .. barname .. "unknown");
+	end
+end
+
 function Gnosis:ScanTimerbar(bar, fCurTime)
 	local bUpdateText = false;
 	local bDelayedShow = false;

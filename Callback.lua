@@ -36,7 +36,7 @@ function Gnosis:Update()
 					(value.dur or value.duration) / 1000,
 					value.pushback and (value.pushback / 1000))
 				);
-				val = value.channel and val or (1 - val);
+				val = (value.channel and (not conf.bChanAsNorm)) and val or (1 - val);
 				value.bar:SetValue(val);
 				if(conf.orient == 2) then
 					if(conf.bInvDir) then
@@ -65,7 +65,7 @@ function Gnosis:Update()
 				value:Hide();
 				value.bBarHidden = true;
 			end
-		elseif(value.bnIsCB or rem < -2000) then
+		else
 			-- cleanup/fade out gcd castbars
 			if(conf.bUnlocked or conf.bShowWNC) then
 				self:CleanupCastbar(value);
