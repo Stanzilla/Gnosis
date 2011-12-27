@@ -1860,18 +1860,19 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 	end
 
 	if(cfg.unit == "player" and self.lag < 10000) then
-		-- < 10000ms should filter latency for most summoning stone timers, also hide latency when just too extreme
-
-		-- latency box, played only
-		if(not(cs and cs.ben and cfg.bShowTicks) and cfg.bShowLat) then
+		-- latency box, player only
+		-- < 10000ms should filter latency for most summoning stone timers, also hide latency when just too extreme		
+		if (not(cs and cs.ben and cfg.bShowTicks) and cfg.bShowLat) then
 			cb.lb[1]:ClearAllPoints();
 			if(cfg.orient == 2) then
+				cb.lb[1]:SetHeight(cb.barheight * min(self.lag / cb.duration, cfg.latbarsize));
 				local direction = (cb.channel and (not cfg.bChanAsNorm)) and "BOTTOM" or "TOP";
 				if (cfg.bInvDir) then
 					direction = (direction == "BOTTOM") and "TOP" or "BOTTOM";
 				end				
 				cb.lb[1]:SetPoint(direction);
 			else
+				cb.lb[1]:SetWidth(cb.barwidth * min(self.lag / cb.duration, cfg.latbarsize));
 				local direction = (cb.channel and (not cfg.bChanAsNorm)) and "LEFT" or "RIGHT";
 				if (cfg.bInvDir) then
 					direction = (direction == "LEFT") and "RIGHT" or "LEFT";
@@ -1882,7 +1883,7 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 		end
 
 		-- latency text
-		if(cfg.bShowPlayerLatency) then
+		if (cfg.bShowPlayerLatency) then
 			-- < 10000ms should filter latency for most summoning stone timers, also hide latency when just too extreme
 			if(cfg.alignlat == "LEFT") then
 				cb.bltext:SetText(string_format("%d", self.lag));
