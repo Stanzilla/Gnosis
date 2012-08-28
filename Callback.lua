@@ -594,7 +594,7 @@ function Gnosis:DISPLAY_SIZE_CHANGED()
 end
 
 function Gnosis:PLAYER_TALENT_UPDATE()
-	self.iCurSpec = GetActiveTalentGroup();
+	self.iCurSpec = GetActiveSpecGroup();
 
 	for key, value in pairs(self.castbars) do
 		local conf = Gnosis.s.cbconf[key];
