@@ -8,8 +8,8 @@ local UnitClass = UnitClass;
 local UnitIsEnemy = UnitIsEnemy;
 local UnitIsPlayer = UnitIsPlayer;
 local GetSpellInfo = GetSpellInfo;
-local GetNumPartyMembers = GetNumPartyMembers;
-local GetNumRaidMembers = GetNumRaidMembers;
+local IsInRaid = IsInRaid;
+local GetNumSubgroupMembers = GetNumSubgroupMembers;
 local tonumber = tonumber;
 local pairs = pairs;
 local ipairs = ipairs;
@@ -54,7 +54,7 @@ function Gnosis:CheckStoredCastbarOptions()
 	local strUpgrade254 = "upgrading bars to v2.54 options:\n  ";
 
 	for cbname, cbopt in pairs(self.s.cbconf) do
-			-- upgrade castbar if needed (v1.50)
+		-- upgrade castbar if needed (v1.50)
 		if(not cbopt.cboptver and cbopt.width and cbopt.height and cbopt.anchor) then
 			iUpgrade150 = iUpgrade150 + 1;
 			strUpgrade150 = strUpgrade150 .. cbname .. "  ";
@@ -969,11 +969,11 @@ function Gnosis:CheckGroupLayout(cfg)
 	if(cfg.ingroupsel == 1) then
 		return true;
 	elseif(cfg.ingroupsel == 2) then
-		return(GetNumPartyMembers() == 0 and GetNumRaidMembers() == 0);
+		return(not IsInRaid() and GetNumSubgroupMembers() == 0);
 	elseif(cfg.ingroupsel == 3) then
-		return(GetNumPartyMembers() > 0 and GetNumRaidMembers() == 0);
+		return(not IsInRaid() and GetNumSubgroupMembers() > 0);
 	elseif(cfg.ingroupsel == 4) then
-		return(GetNumRaidMembers() > 0);
+		return(IsInRaid());
 	end
 
 	return true;
