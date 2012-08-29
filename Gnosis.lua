@@ -65,8 +65,10 @@ function Gnosis:En(status)
 			self:HideBlizzardPetCastbar(true);
 		end
 
-		-- scan table, fast lookup tables
+		-- scan table, fast lookup tablese
 		self:CreateCBTables();
+		-- trigger talent update event (gone with 5.04 sent too early)
+		self:PLAYER_TALENT_UPDATE();
 	else
 		-- disable addon
 		self.bGnosisEnabled = false;
