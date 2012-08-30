@@ -2,6 +2,9 @@
 local GetSpellInfo = GetSpellInfo;
 local string_format = string.format;
 
+-- local variables
+local _;
+
 -- global Gnosis event tables
 Gnosis.tCastbarEvents = {
 	"UNIT_SPELLCAST_CHANNEL_START",
@@ -94,7 +97,7 @@ Gnosis.colClasses = {
 function Gnosis:StartupVariables()
 	local fCurTime = GetTime() * 1000;
 
-	self.ver = 3.12;
+	self.ver = 3.20;
 	self.optver = 2.54;
 	self.build = "@project-version@";
 	self.addonname = "Gnosis";

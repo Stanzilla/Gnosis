@@ -3,6 +3,9 @@ local CreateFrame = CreateFrame;
 local min = min;
 local max = max;
 
+-- local variables
+local _;
+
 function Gnosis:CreateStatusBar(parent)
 	local sbf = CreateFrame("Frame", nil, parent);
 
