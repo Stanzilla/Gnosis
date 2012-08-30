@@ -34,6 +34,9 @@ local string_lower = string.lower;
 local strconcat = strconcat;
 local table_insert = table.insert;
 
+-- local variables
+local _;
+
 local function in_value_range(cur_val, cur_val_perc, range_tab)
 	--[[ range_tab looks like
 		[1] == value lower bound (>=)

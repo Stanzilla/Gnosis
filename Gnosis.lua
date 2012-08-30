@@ -17,6 +17,9 @@ local string_match = string.match;
 local string_trim = strtrim;
 local string_len = strlenutf8;
 
+-- local variables
+local _;
+
 if(Gnosis.lsm) then
 	Gnosis.lsm:Register("statusbar", "Waterline", "Interface\\Addons\\Gnosis\\Textures\\Waterline");
 	Gnosis.lsm:Register("font", "Desyrel", "Interface\\Addons\\Gnosis\\Fonts\\DESYREL_.ttf");

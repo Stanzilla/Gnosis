@@ -12,6 +12,9 @@ local unpack = unpack;
 local min = min;
 local abs = abs;
 
+-- local variables
+local _;
+
 -- init OnUpdate handler, anchoring bars
 function Gnosis:OnUpdate()
 	-- initial bar anchoring

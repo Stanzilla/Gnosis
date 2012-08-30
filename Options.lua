@@ -10,6 +10,9 @@ local string_format = string.format;
 local string_gsub = string.gsub;
 local string_len = strlenutf8;
 
+-- local variables
+local _;
+
 function Gnosis:OptCreateBasicTables()
 	Gnosis.tUnits = { player = "Player", target = "Target", focus = "Focus", pet = "Pet/Vehicle",
 		party1 = "Party 1", party2 = "Party 2", party3 = "Party 3", party4 = "Party 4", party5 = "Party 5",

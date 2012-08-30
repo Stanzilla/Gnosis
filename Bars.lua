@@ -33,6 +33,9 @@ local table_remove = table.remove;
 local table_concat = table.concat;
 local select = select;
 
+-- local variables
+local _;
+
 function Gnosis:UpgradeTable(dst, src)
 	for key, value in pairs(src) do
 		if(dst[key] == nil) then
