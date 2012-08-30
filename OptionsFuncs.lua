@@ -12,6 +12,9 @@ local string_trim = strtrim;
 local string_gmatch = string.gmatch;
 local table_insert = table.insert;
 
+-- local variables
+local _;
+
 function Gnosis:OptColor_Entry(key, idx, namestr, variable, cfgtab, bartab)
 	cfgtab = cfgtab or "cbconf";
 	bartab = bartab or "castbars";
