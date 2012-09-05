@@ -1489,7 +1489,7 @@ function Gnosis:SetPowerbarValue(cb, curpower, maxpower, bShowSpark)
 		cb.cbs:Hide();
 	end
 
-	if(cb.tiType < 11) then
+	if(cb.tiType < 1000) then
 		cb.rtext:SetText("");
 	else
 		cb.rtext:SetText(self:GenerateTime(cb, curpower, maxpower));
