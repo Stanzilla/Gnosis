@@ -1483,7 +1483,20 @@ function Gnosis:SetPowerbarValue(cb, curpower, maxpower, bShowSpark)
 
 	-- castbar spark
 	if(bShowSpark) then
-		cb.cbs:SetPoint("CENTER", cb.bar, "LEFT", val * cb.barwidth, 0);
+		if(cfg.orient == 2) then
+			if(cfg.bInvDir) then
+				cb.cbs:SetPoint("CENTER", cb.bar, "TOP", 0, -val * cb.barheight);
+			else
+				cb.cbs:SetPoint("CENTER", cb.bar, "BOTTOM", 0, val * cb.barheight);
+			end
+		else
+			if(cfg.bInvDir) then
+				cb.cbs:SetPoint("CENTER", cb.bar, "RIGHT", -val * cb.barwidth, 0);
+			else
+				cb.cbs:SetPoint("CENTER", cb.bar, "LEFT", val * cbe.barwidth, 0);
+			end
+		end
+		
 		cb.cbs:Show();
 	else
 		cb.cbs:Hide();

@@ -404,7 +404,7 @@ function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dgu
 			end
 		end
 		
-		if (self.ti_icd[spellname]) then
+		if (self.ti_icd[spellname] and event ~= "SPELL_CAST_FAILED") then
 			--print("player", spellname, self.ti_icd[spellname], event);
 			
 			self.ti_icd_active[spellname] = fCurTime + self.ti_icd[spellname];
@@ -417,7 +417,7 @@ function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dgu
 			Gnosis:FindSwingTimersParry("smr", fCurTime);
 		end
 		
-		if (self.ti_icd[spellname]) then
+		if (self.ti_icd[spellname] and event ~= "SPELL_CAST_FAILED") then
 			--print("is target", spellname, self.ti_icd[spellname], event);
 			
 			self.ti_icd_active[spellname] = GetTime() * 1000 + self.ti_icd[spellname];
