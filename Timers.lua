@@ -703,6 +703,12 @@ function Gnosis:CreateSingleTimerTable()
 
 				-- copy of timer command string
 				local str = v;
+				
+				-- comment
+				if(string_find(str, "^%s*[-][-]")) then
+					str = "";
+				end
+
 				-- unit, recast, staticdur, zoom, spec
 				local unit, recast, staticdur, zoom, spec;
 				unit, str = self:ExtractRegex(str, "unit=(%w+)", "unit=\"([^\"]+)\"", true);
@@ -730,7 +736,7 @@ function Gnosis:CreateSingleTimerTable()
 					end
 				end
 				-- command and spellname
-				local tiType, bSelf, bHarm, bHelp, bShowLag, bShowCasttime, iSort, bExists, bNot, bHideSpark, bHideIcon, cfinit, brange, range_tab;
+				local tiType, bSelf, bHarm, bHelp, bShowLag, bShowCasttime, iSort, bExists, bNot, bHideSpark, bHideIcon, cfinit, brange, range_tab, icon__;
 				local boolop = 0;
 				local cmd, spell = string_match(str, "(.-):(.+)");
 				if(spell) then
@@ -777,10 +783,17 @@ function Gnosis:CreateSingleTimerTable()
 						elseif(w == "enchoh") then
 							tiType = 7;
 							cfinit = Gnosis.Timers_WeaponEnchantOff;
-						elseif(w == "icd") then
+						elseif(w == "icd" or w == "innercd") then
 							tiType = 8;
 							cfinit = Gnosis.Timers_InnerCD;
-							self.ti_icd[spell] = staticdur or 5.0;
+							if(spell) then
+								if(tonumber(spell)) then
+									spell, _, icon__ = GetSpellInfo(tonumber(spell));
+								end
+								if(spell) then
+									self.ti_icd[spell] = staticdur or 5.0;
+								end
+							end
 						elseif(w == "fixed") then
 							tiType = 10;
 							cfinit = Gnosis.Timers_Fixed;
@@ -891,6 +904,7 @@ function Gnosis:CreateSingleTimerTable()
 							brange = brange,
 							range_tab = range_tab,
 							boolop = boolop,
+							icon = icon__
 						};
 						-- targeted unit
 						tTimer.unit = unit and unit or conf.unit;
