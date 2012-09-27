@@ -313,7 +313,7 @@ function Gnosis:Timers_InnerCD(bar, timer, ti)
 	
 	if (bExist) then
 		ti.cname = timer.spell;
-		ti.icon = nil;
+		ti.icon = timer.icon;
 		local dur, fin = Gnosis.ti_icd[timer.spell], Gnosis.ti_icd_active[timer.spell];
 		if(timer.brange) then
 			local rem = fin / 1000 - GetTime();
@@ -324,7 +324,7 @@ function Gnosis:Timers_InnerCD(bar, timer, ti)
 		set_times(timer, ti, dur, fin, true);
 	elseif (timer.bNot) then
 		ti.cname = timer.spell;
-		ti.icon = nil;
+		ti.icon = timer.icon;
 		set_not(ti);
 	end
 end
@@ -786,13 +786,16 @@ function Gnosis:CreateSingleTimerTable()
 						elseif(w == "icd" or w == "innercd") then
 							tiType = 8;
 							cfinit = Gnosis.Timers_InnerCD;
+							-- valid spell or spell id given? (name of spell passed for icd does not
+							-- necessarily have to be a valid spell)
+							local spell_, _, icon_ = GetSpellInfo(spell);
+							if(spell_) then
+								spell = spell_;
+								icon__ = icon_;
+							end							
+							-- staticdur given? otherwise set duration to 5s
 							if(spell) then
-								if(tonumber(spell)) then
-									spell, _, icon__ = GetSpellInfo(tonumber(spell));
-								end
-								if(spell) then
-									self.ti_icd[spell] = staticdur or 5.0;
-								end
+								self.ti_icd[spell] = staticdur or 5.0;
 							end
 						elseif(w == "fixed") then
 							tiType = 10;
