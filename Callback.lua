@@ -405,9 +405,11 @@ function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dgu
 		end
 		
 		if (self.ti_icd[spellname] and event ~= "SPELL_CAST_FAILED") then
-			--print("player", spellname, self.ti_icd[spellname], event);
+			--print("player", spellname, self.ti_icd[spellname].duration, event);
 			
-			self.ti_icd_active[spellname] = fCurTime + self.ti_icd[spellname];
+			if (self.ti_icd_active[spellname] == nil or not self.ti_icd[spellname].norefresh) then
+				self.ti_icd_active[spellname] = fCurTime + self.ti_icd[spellname].duration;
+			end
 		end
 	elseif(dguid == self.guid) then	-- player is target
 		if(event == "SWING_MISSED" and sid == "PARRY") then
@@ -418,9 +420,11 @@ function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dgu
 		end
 		
 		if (self.ti_icd[spellname] and event ~= "SPELL_CAST_FAILED") then
-			--print("is target", spellname, self.ti_icd[spellname], event);
+			--print("is target", spellname, self.ti_icd[spellname].duration, event);
 			
-			self.ti_icd_active[spellname] = GetTime() * 1000 + self.ti_icd[spellname];
+			if (self.ti_icd_active[spellname] == nil or not self.ti_icd[spellname].norefresh) then
+				self.ti_icd_active[spellname] = GetTime() * 1000 + self.ti_icd[spellname].duration;
+			end
 		end
 	end
 end
