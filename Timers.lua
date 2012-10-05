@@ -314,7 +314,7 @@ function Gnosis:Timers_InnerCD(bar, timer, ti)
 	if (bExist) then
 		ti.cname = timer.spell;
 		ti.icon = timer.icon;
-		local dur, fin = Gnosis.ti_icd[timer.spell], Gnosis.ti_icd_active[timer.spell];
+		local dur, fin = Gnosis.ti_icd[timer.spell].duration, Gnosis.ti_icd_active[timer.spell];
 		if(timer.brange) then
 			local rem = fin / 1000 - GetTime();
 			ti.ok = in_value_range(rem, rem*100000/dur, timer.range_tab);
@@ -737,6 +737,7 @@ function Gnosis:CreateSingleTimerTable()
 				end
 				-- command and spellname
 				local tiType, bSelf, bHarm, bHelp, bShowLag, bShowCasttime, iSort, bExists, bNot, bHideSpark, bHideIcon, cfinit, brange, range_tab, icon__;
+				local norefresh = false;
 				local boolop = 0;
 				local cmd, spell = string_match(str, "(.-):(.+)");
 				if(spell) then
@@ -783,9 +784,7 @@ function Gnosis:CreateSingleTimerTable()
 						elseif(w == "enchoh") then
 							tiType = 7;
 							cfinit = Gnosis.Timers_WeaponEnchantOff;
-						elseif(w == "icd" or w == "innercd") then
-							tiType = 8;
-							cfinit = Gnosis.Timers_InnerCD;
+						elseif(w == "icd" or w == "innercd" or w == "proc") then
 							-- valid spell or spell id given? (name of spell passed for icd does not
 							-- necessarily have to be a valid spell)
 							local spell_, _, icon_ = GetSpellInfo(spell);
@@ -795,7 +794,13 @@ function Gnosis:CreateSingleTimerTable()
 							end							
 							-- staticdur given? otherwise set duration to 5s
 							if(spell) then
-								self.ti_icd[spell] = staticdur or 5.0;
+								tiType = 8;
+								cfinit = Gnosis.Timers_InnerCD;
+							
+								self.ti_icd[spell] = {
+									duration = staticdur or 5.0,
+									norefresh = false
+								};
 							end
 						elseif(w == "fixed") then
 							tiType = 10;
@@ -875,6 +880,8 @@ function Gnosis:CreateSingleTimerTable()
 							elseif(spell == "first") then
 								iSort = 5;
 							end
+						elseif(w == "norefresh") then
+							norefresh = true;
 						end
 					end
 				end
@@ -930,6 +937,12 @@ function Gnosis:CreateSingleTimerTable()
 								tTimer.itex = itex;
 							end
 						end
+						
+						-- inner cooldown/proc (norefresh command)
+						if(tiType == 8) then
+							self.ti_icd[spell].norefresh = norefresh;
+						end
+						
 						-- insert entry
 						table_insert(value.timers, tTimer);
 					elseif(iSort) then
