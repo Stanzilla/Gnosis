@@ -4,7 +4,7 @@
 ## Author: @project-author@
 ## Version: @project-version@
 ## SavedVariables: GnosisDB, GnosisConfigs
-## SavedVariablesPerCharacter: GnosisChar
+## SavedVariablesPerCharacter: GnosisChar, GnosisCharConfig
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets
 ## X-Embeds: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets
 ## LoadOnDemand: 0

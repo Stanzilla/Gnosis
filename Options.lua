@@ -3,6 +3,7 @@ local tonumber = tonumber;
 local type = type;
 local pairs = pairs;
 local ipairs = ipairs;
+local wipe = wipe;
 local table_insert = table.insert;
 local table_sort = table.sort;
 local table_remove = table.remove;
@@ -258,7 +259,7 @@ function Gnosis:OptCreateBasicTables()
 				name = Gnosis.L["OptResetPlayerData"],
 				type = "execute",
 				func = function()
-					Gnosis.db:ResetDB(Gnosis.db:GetCurrentProfile());
+					wipe(GnosisCharConfig);
 					ReloadUI();
 				end,
 				width = "full",
