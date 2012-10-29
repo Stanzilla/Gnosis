@@ -553,7 +553,7 @@ function Gnosis:SetupChanneledSpellsTable()
 	self:AddChanneledSpellById(32000, 5, false, 6, false, true, "shadow", false, 2); 	-- mind sear
 	self:AddChanneledSpellById(47540, 3, false, 2, true, false, "holy", true, 1);		-- penance, first tick instant
 	self:AddChanneledSpellById(64843, 4, true, 15, false, true, "holy", true, 3);		-- divine hymn
-	self:AddChanneledSpellById(64901, 4, true, 15, false, true, "holy", false, 2); 	-- hymn of hope
+	self:AddChanneledSpellById(64901, 4, true, 15, false, true, "holy", false, 2); 		-- hymn of hope
 
 	-- mage
 	self:AddChanneledSpellById(10, 8, false, 15, false, true, "frost", false, 2);		-- blizzard
@@ -562,15 +562,19 @@ function Gnosis:SetupChanneledSpellsTable()
 
 	-- warlock
 	self:AddChanneledSpellById(1120, 5, true, 15, false, false, "shadow", false, 2);	-- drain soul
-	self:AddChanneledSpellById(689, 3, false, 4, false, false, "shadow", false, 2);	-- drain life
-	self:AddChanneledSpellById(4629, 4, false, 15, false, true, "fire", false, 2);	-- rain of fire
-	self:AddChanneledSpellById(1949, 15, false, 15, false, true, "fire", false, 1);	-- hellfire
-	self:AddChanneledSpellById(755, 3, false, 4, false, false, "shadow", false, 2);	-- health funnel
+	self:AddChanneledSpellById(689, 3, false, 4, false, false, "shadow", false, 2);		-- drain life
+	self:AddChanneledSpellById(4629, 4, false, 15, false, true, "fire", false, 2);		-- rain of fire
+	self:AddChanneledSpellById(1949, 15, false, 15, false, true, "fire", false, 1);		-- hellfire
+	self:AddChanneledSpellById(755, 3, false, 4, false, false, "shadow", false, 2);		-- health funnel
 	self:AddChanneledSpellById(79268, 3, true, 15, false, false, "shadow", true, 4);	-- soul harvest
+	self:AddChanneledSpellById(103103, 4, false, 5, false, false, "shadow", false, 1);	-- malefic grasp
 
 	-- druid
-	self:AddChanneledSpellById(740, 4, false, 15, false, true, "nature", true, 3);	-- tranquility
-	self:AddChanneledSpellById(16914, 10, false, 15, false, true, "nature", false, 2);-- hurricane
+	self:AddChanneledSpellById(740, 4, false, 15, false, true, "nature", true, 3);		-- tranquility
+	self:AddChanneledSpellById(16914, 10, false, 15, false, true, "nature", false, 2);	-- hurricane
+	
+	-- monk
+	self:AddChanneledSpellById(101546, 3, false, 4, false, true, nil, false, 1);		-- spinning crane kick
 end
 
 function Gnosis:CreateColorString(r, g, b, a)
