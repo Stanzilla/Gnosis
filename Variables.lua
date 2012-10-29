@@ -97,8 +97,8 @@ Gnosis.colClasses = {
 function Gnosis:StartupVariables()
 	local fCurTime = GetTime() * 1000;
 
-	self.ver = 3.23;
-	self.optver = 2.54;
+	self.ver = 3.25;
+	self.optver = 3.25;
 	self.build = "@project-version@";
 	self.addonname = "Gnosis";
 	local strVer = string_format("v%.2f", self.ver);
