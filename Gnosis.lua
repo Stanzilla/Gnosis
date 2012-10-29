@@ -260,8 +260,15 @@ function Gnosis:OnInitialize()
 		end
 	end
 
-	self.db = LibStub("AceDB-3.0"):New("GnosisChar", defaults);
-	self.s = self.db.profile;
+	if(not GnosisCharConfig) then GnosisCharConfig = {}; end
+	self.db = LibStub("AceDB-3.0"):New("GnosisChar", defaults);	
+	if(self.db and self.db.profile and self:tsize(self.db.profile) ~= 0) then
+		-- copy AceDB profile to GnosisCharConfig
+		GnosisCharConfig = self:deepcopy(self.db.profile);
+		-- empty GnosisChar table (removing AceDB character specific profile)
+		wipe(GnosisChar);
+	end
+	self.s = GnosisCharConfig;
 
 	self:RegisterChatCommand("gnosis", "HandleChatCommand");
 
@@ -325,6 +332,11 @@ function Gnosis:OnEnable()
 
 	-- check castbar options
 	self:CheckStoredCastbarOptions();
+	
+	-- upgrade character specific options version number?
+	if(self.s.optver < self.optver) then
+		self.s.optver = self.optver;
+	end
 
 	-- first start?
 	local bFirstStart = self:CheckForFirstStart();
@@ -880,7 +892,7 @@ function Gnosis:ClipTest(fCurTime)
 	end
 end
 
-function Gnosis:AddBasicCastbar(name, unit, movefactor_y, movefactor_x)
+function Gnosis:AddBasicCastbar(name, unit, movefactor_y, movefactor_x, scale)
 	local fScale = UIParent:GetScale();
 	local cfg;
 
@@ -891,17 +903,23 @@ function Gnosis:AddBasicCastbar(name, unit, movefactor_y, movefactor_x)
 	self:OptCreateNewCastbar(name, unit);
 
 	cfg = self.s.cbconf[name];
+	
+	if(scale ~= self.tCastbarDefaults.scale) then
+		cfg.scale = scale;
+		Gnosis:SetBarParams(name);
+	end
+	
 	cfg.anchor.py = cfg.anchor.py + movefactor_y * (self.tCastbarDefaults.height/GetScreenHeight() + 0.01) * fScale;
 	cfg.anchor.px = cfg.anchor.px + movefactor_x * (self.tCastbarDefaults.height/GetScreenHeight()*2.5 + self.tCastbarDefaults.width/GetScreenWidth() + 0.01) * fScale;
 	self:AnchorBar(name);
 end
 
 function Gnosis:CreateBasicCastbarSet()
-	self:AddBasicCastbar(self.L["CBSetPlayer"], "player", 2, 0);
-	self:AddBasicCastbar(self.L["CBSetTarget"], "target", 1, 0);
-	self:AddBasicCastbar(self.L["CBSetFocus"], "focus", 0, 0);
-	self:AddBasicCastbar(self.L["CBSetPet"], "pet", -2, 0);
-	self:AddBasicCastbar(self.L["CBSetMirror"], "mirror", 4, 0);
+	self:AddBasicCastbar(self.L["CBSetPlayer"], "player", 2, 0, 1.35);
+	self:AddBasicCastbar(self.L["CBSetTarget"], "target", 1, 0, 1.0);
+	self:AddBasicCastbar(self.L["CBSetFocus"], "focus", 0, 0, 1.0);
+	self:AddBasicCastbar(self.L["CBSetPet"], "pet", -2, 0, 1.0);
+	self:AddBasicCastbar(self.L["CBSetMirror"], "mirror", 4, 0, 1.0);
 end
 
 function Gnosis:CreateMadnessSet()
