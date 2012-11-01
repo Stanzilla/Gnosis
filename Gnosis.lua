@@ -262,7 +262,6 @@ function Gnosis:OnInitialize()
 
 	-- remove character specific profile name in character specific configuration file
 	if(not GnosisCharConfig) then
-		print("Create GnosisCharConfig");
 		GnosisCharConfig = {};
 		
 		self.db = LibStub("AceDB-3.0"):New("GnosisChar", defaults);	
