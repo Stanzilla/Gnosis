@@ -260,14 +260,30 @@ function Gnosis:OnInitialize()
 		end
 	end
 
-	if(not GnosisCharConfig) then GnosisCharConfig = {}; end
-	self.db = LibStub("AceDB-3.0"):New("GnosisChar", defaults);	
-	if(self.db and self.db.profile and self:tsize(self.db.profile) ~= 0) then
-		-- copy AceDB profile to GnosisCharConfig
-		GnosisCharConfig = self:deepcopy(self.db.profile);
+	-- remove character specific profile name in character specific configuration file
+	if(not GnosisCharConfig) then
+		print("Create GnosisCharConfig");
+		GnosisCharConfig = {};
+		
+		self.db = LibStub("AceDB-3.0"):New("GnosisChar", defaults);	
+		if(self.db and self.db.profile and self:tsize(self.db.profile) > 0) then
+			-- copy AceDB profile to GnosisCharConfig
+			GnosisCharConfig = self:deepcopy(self.db.profile);
+		end
+	elseif(self:tsize(GnosisCharConfig) == 0) then
+		print("Copy to GnosisCharConfig");
+		self.db = LibStub("AceDB-3.0"):New("GnosisChar", defaults);	
+		if(self.db and self.db.profile and self:tsize(self.db.profile) > 0) then
+			-- copy AceDB profile to GnosisCharConfig
+			GnosisCharConfig = self:deepcopy(self.db.profile);
+		end
+	elseif(self:tsize(GnosisCharConfig) > 0 and GnosisChar) then
 		-- empty GnosisChar table (removing AceDB character specific profile)
 		wipe(GnosisChar);
+		GnosisChar = nil;
 	end
+	
+	-- set link to GnosisCharConfig
 	self.s = GnosisCharConfig;
 
 	self:RegisterChatCommand("gnosis", "HandleChatCommand");
