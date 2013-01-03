@@ -22,7 +22,10 @@ local _;
 
 if(Gnosis.lsm) then
 	Gnosis.lsm:Register("statusbar", "Waterline", "Interface\\Addons\\Gnosis\\Textures\\Waterline");
+	Gnosis.lsm:Register("statusbar", "Gnosis_Plain", "Interface\\Addons\\Gnosis\\Textures\\Gnosis_Plain");
+	Gnosis.lsm:Register("statusbar", "Gnosis_Gradient", "Interface\\Addons\\Gnosis\\Textures\\Gnosis_Gradient");
 	Gnosis.lsm:Register("font", "Desyrel", "Interface\\Addons\\Gnosis\\Fonts\\DESYREL_.ttf");
+	Gnosis.lsm:Register("font", "Accidental Presidency", "Interface\\Addons\\Gnosis\\Fonts\\Accidental Presidency\\accid___.ttf");
 end
 
 function Gnosis:InitialConfig()
