@@ -2,6 +2,8 @@ Gnosis = LibStub("AceAddon-3.0"):NewAddon("Gnosis", "AceConsole-3.0", "AceEvent-
 Gnosis.gui = LibStub("AceGUI-3.0");
 Gnosis.lsm = LibStub("LibSharedMedia-3.0", 1);
 Gnosis.smw = LibStub("AceGUISharedMediaWidgets-1.0");
+Gnosis.range = LibStub("LibRangeCheck-2.0");
+Gnosis.dialog = LibStub("LibDialog-1.0");
 
 -- local functions
 local UnitName = UnitName;

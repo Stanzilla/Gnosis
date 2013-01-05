@@ -38,7 +38,7 @@ local table_insert = table.insert;
 local _;
 
 local function in_value_range(cur_val, cur_val_perc, range_tab)
-	--[[ range_tab looks like
+	--[[ range_tab structure
 		[1] == value lower bound (>=)
 		[2] == value upper bound (<=)
 		[3] == stacks lower bound (>=)
@@ -410,6 +410,47 @@ function Gnosis:Timers_ComboPoints(bar, timer, ti)
 			ti.ok = true;
 		end
 		set_times(timer, ti, d, s, true);
+	elseif(timer.bNot) then
+		ti.cname = "";
+		ti.icon = nil;
+		ti.unit = timer.unit;
+		set_not(ti);
+	end
+end
+
+function Gnosis:Timers_Range(bar, timer, ti)
+	-- range between player and selected unit
+	local minRange, maxRange;
+	
+	if(UnitExists(timer.unit)) then
+		minRange, maxRange = Gnosis.range:GetRange(timer.unit);
+	end
+	
+	if(minRange) then
+		ti.unit = timer.unit;
+		ti.bSpecial = true;
+		if(timer.brange) then
+			--[[ range_tab structure
+				[1] == value lower bound (>=)
+				[2] == value upper bound (<=)
+				[3] == stacks lower bound (>=)
+				[4] == stacks upper bound (<=)
+				[5] == value lower bound is in percent (true, nil)
+				[6] == value upper bound is in percent (true, nil) ]]
+			
+			if(timer.range_tab[5] or timer.range_tab[6]) then
+				-- percentages of what??? (not allowed)
+				ti.ok = false;
+			else
+				if(minRange <= (timer.range_tab[2] or 10000) and
+					maxRange >= (timer.range_tab[1] or 0)) then
+					ti.ok = true;
+				end
+			end
+		else
+			ti.ok = true;
+		end
+		set_times(timer, ti, maxRange, minRange, true);
 	elseif(timer.bNot) then
 		ti.cname = "";
 		ti.icon = nil;
@@ -824,6 +865,9 @@ function Gnosis:CreateSingleTimerTable()
 							elseif(spell == "combopoints") then
 								tiType = 1005;
 								cfinit = Gnosis.Timers_ComboPoints;
+							elseif(spell == "range") then
+								tiType = 1006;
+								cfinit = Gnosis.Timers_Range;
 							elseif(spell == "soulshards") then
 								tiType = 2007;
 								cfinit = Gnosis.Timers_PowerGeneric;
