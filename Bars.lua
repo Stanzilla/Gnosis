@@ -925,6 +925,35 @@ function Gnosis:RemoveAllCastbars()
 	self:CreateCBTables();
 end
 
+function Gnosis:RemoveCastbarDialog(key)
+	Gnosis.dialog:Register("GNOSIS_REMOVEBAR",
+		{
+			text = Gnosis.L["OptCBRemCB"] .. " " .. key,
+			buttons = { 
+				{
+					text = Gnosis.L["Yes"],
+					on_click = function(self)
+						Gnosis:RemoveCastbar(key);
+						InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+					end,
+				},
+				{
+					text = Gnosis.L["No"],
+					on_click = function(self)
+					end,
+				},
+			},
+			hide_on_escape = false,
+			show_while_dead = true,
+			exclusive = true,
+			width = 350,
+			strata = 5,
+		}
+	);
+	
+	Gnosis.dialog:Spawn("GNOSIS_REMOVEBAR");
+end
+
 function Gnosis:RemoveCastbar(key)
 	self:CleanupCastbar(self.castbars[key]);
 	self.castbars[key]:Hide();

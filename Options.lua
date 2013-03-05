@@ -710,7 +710,7 @@ function Gnosis:CreateCastbarsOpt()
 					order = self:GetNextTableIndex(),
 					name = Gnosis.L["OptCBRemCB"],
 					type = "execute",
-					func = function() Gnosis:RemoveCastbar(key); end,
+					func = function() Gnosis:RemoveCastbarDialog(key); end,
 					width = "full",
 				},
 				bartype = {
@@ -1632,26 +1632,38 @@ function Gnosis:OptCreateConfigurations()
 			name = Gnosis.L["OptConfUpdConf"],
 			type = "execute",
 			func = function()
-				StaticPopupDialogs["GNOSIS_UPDCFG"] = {
-					text = string_format(Gnosis.L["OptConfUpdConfMBText"], key),
-					button1 = Gnosis.L["Yes"],
-					button2 = Gnosis.L["No"],
-					OnAccept = function()
-						local _def, _cb, _cs, _ct = GnosisConfigs[key].maintab and true or nil,
-							GnosisConfigs[key].cbconf and true or nil,
-							GnosisConfigs[key].channeledspells and true or nil,
-							GnosisConfigs[key].ct and true or nil;
-						GnosisConfigs[key] = nil;
-						Gnosis:OptSaveNewConfig(key, _def, _cb, _cs, _ct);
-						Gnosis:OptCreateConfigurations();
-						InterfaceOptionsFrame_OpenToCategory(Gnosis.optCfgs);
-					end,
-					timeout = 0,
-					whileDead = true,
-					hideOnEscape = true,
-					showAlert = true,
-				};
-				StaticPopup_Show("GNOSIS_UPDCFG");
+				Gnosis.dialog:Register("GNOSIS_UPDCFG",
+					{
+						text = string_format(Gnosis.L["OptConfUpdConfMBText"], key),
+						buttons = { 
+							{
+								text = Gnosis.L["Yes"],
+								on_click = function(self)
+									local _def, _cb, _cs, _ct = GnosisConfigs[key].maintab and true or nil,
+										GnosisConfigs[key].cbconf and true or nil,
+										GnosisConfigs[key].channeledspells and true or nil,
+										GnosisConfigs[key].ct and true or nil;
+									GnosisConfigs[key] = nil;
+									Gnosis:OptSaveNewConfig(key, _def, _cb, _cs, _ct);
+									Gnosis:OptCreateConfigurations();
+									InterfaceOptionsFrame_OpenToCategory(Gnosis.optCfgs);
+								end,
+							},
+							{
+								text = Gnosis.L["No"],
+								on_click = function(self)
+								end,
+							},
+						},
+						hide_on_escape = false,
+						show_while_dead = true,
+						exclusive = true,
+						width = 350,
+						strata = 5,
+					}
+				);
+				
+				Gnosis.dialog:Spawn("GNOSIS_UPDCFG");
 			end,
 		};
 
@@ -1659,22 +1671,34 @@ function Gnosis:OptCreateConfigurations()
 			order = self:GetNextTableIndexInner(),
 			name = Gnosis.L["OptConfDelConf"],
 			type = "execute",
-			func = function()
-				StaticPopupDialogs["GNOSIS_DELCFG"] = {
-					text = string_format(Gnosis.L["OptConfDelConfMBText"], key),
-					button1 = Gnosis.L["Yes"],
-					button2 = Gnosis.L["No"],
-					OnAccept = function()
-						GnosisConfigs[key] = nil;
-						Gnosis:OptCreateConfigurations();
-						InterfaceOptionsFrame_OpenToCategory(Gnosis.optCfgs);
-					end,
-					timeout = 0,
-					whileDead = true,
-					hideOnEscape = true,
-					showAlert = true,
-				};
-				StaticPopup_Show("GNOSIS_DELCFG");
+			func = function()			
+				Gnosis.dialog:Register("GNOSIS_DELCFG",
+					{
+						text = string_format(Gnosis.L["OptConfDelConfMBText"], key),
+						buttons = { 
+							{
+								text = Gnosis.L["Yes"],
+								on_click = function(self)
+									GnosisConfigs[key] = nil;
+									Gnosis:OptCreateConfigurations();
+									InterfaceOptionsFrame_OpenToCategory(Gnosis.optCfgs);
+								end,
+							},
+							{
+								text = Gnosis.L["No"],
+								on_click = function(self)
+								end,
+							},
+						},
+						hide_on_escape = false,
+						show_while_dead = true,
+						exclusive = true,
+						width = 350,
+						strata = 5,
+					}
+				);
+				
+				Gnosis.dialog:Spawn("GNOSIS_DELCFG");
 			end,
 		};
 	end
@@ -1794,19 +1818,29 @@ function Gnosis:ExportAllBars()
 			end
 		end
 		
-		StaticPopupDialogs["GNOSIS_EXPORTCB"] = {
-			text = string_format(Gnosis.L["CpyScriptFromEditBox"], "*");
-			button1 = "Close",
-			OnAccept = function() end,
-			timeout = 0,
-			whileDead = true,
-			hideOnEscape = true,
-			OnShow = function(this)
-				this.editBox:SetText(output);
-			end,
-			hasEditBox = true
-		};
-		StaticPopup_Show("GNOSIS_EXPORTCB");
+		Gnosis.dialog:Register("GNOSIS_EXPORT",
+			{
+				text = string_format(Gnosis.L["CpyScriptFromEditBox"], "*"),
+				editboxes = {
+					{
+						width = 400,
+						height = 200,
+					},
+				},
+				on_show = function(self, data) 
+					self.editboxes[1]:SetText(output);
+					self.editboxes[1]:HighlightText();
+					self.editboxes[1]:SetFocus();
+				end,
+				hide_on_escape = false,
+				show_while_dead = true,
+				exclusive = true,
+				width = 420,
+				strata = 5,
+			}
+		);
+		
+		Gnosis.dialog:Spawn("GNOSIS_EXPORT");
 	end
 end
 
@@ -1816,20 +1850,31 @@ function Gnosis:ExportBar(key)
 		local str = Gnosis:CreateBarValueScript("Gnosis.s.cbconf[\"" .. key_name .. "\"]", Gnosis.s.cbconf[key]);
 
 		if(str) then
-			local dispstr = "Gnosis:ImportBarInit(\"" .. key_name .. "\"); " .. str .. " Gnosis:ImportBarFinalize(\"" .. key_name .. "\");"
-			StaticPopupDialogs["GNOSIS_EXPORTCB"] = {
-				text = string_format(Gnosis.L["CpyScriptFromEditBox"], key);
-				button1 = "Close",
-				OnAccept = function() end,
-				timeout = 0,
-				whileDead = true,
-				hideOnEscape = true,
-				OnShow = function(this)
-					this.editBox:SetText(dispstr);
-				end,
-				hasEditBox = true
-			};
-			StaticPopup_Show("GNOSIS_EXPORTCB");
+			local dispstr = "Gnosis:ImportBarInit(\"" .. key_name .. "\"); " .. str .. " Gnosis:ImportBarFinalize(\"" .. key_name .. "\");";
+			
+			Gnosis.dialog:Register("GNOSIS_EXPORT",
+				{
+					text = string_format(Gnosis.L["CpyScriptFromEditBox"], key),
+					editboxes = {
+						{
+							width = 400,
+							height = 200,
+						},
+					},
+					on_show = function(self, data) 
+						self.editboxes[1]:SetText(dispstr);
+						self.editboxes[1]:HighlightText();
+						self.editboxes[1]:SetFocus();
+					end,
+					hide_on_escape = false,
+					show_while_dead = true,
+					exclusive = true,
+					width = 420,
+					strata = 5,
+				}
+			);
+			
+			Gnosis.dialog:Spawn("GNOSIS_EXPORT");
 		end
 	end
 end
@@ -1845,21 +1890,44 @@ function Gnosis:ImportBarFinalize(key)
 end
 
 function Gnosis:ImportBars()
-	StaticPopupDialogs["GNOSIS_IMPORTCB"] = {
-		text = string_format(Gnosis.L["PasteScript"], key);
-		button1 = Gnosis.L["Import"],
-		button2 = Gnosis.L["NoImport"],
-		OnAccept = function(this)
-			local str = this.editBox:GetText();
-			if(str and string_len(str) > 0) then
-				RunScript(str);
-				ReloadUI();
-			end
-		end,
-		timeout = 0,
-		whileDead = true,
-		hideOnEscape = true,
-		hasEditBox = true
-	};
-	StaticPopup_Show("GNOSIS_IMPORTCB");
+	Gnosis.dialog:Register("GNOSIS_IMPORT",
+		{
+			text = string_format(Gnosis.L["PasteScript"], key),
+			editboxes = {
+				{
+					width = 400,
+					height = 200,
+				},
+			},
+			buttons = { 
+				{
+					text = Gnosis.L["Import"],
+					on_click = function(self)
+						local str = self.editboxes[1]:GetText();
+						if(str and string_len(str) > 0) then
+							RunScript(str);
+							InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+						end
+					end,
+				},
+				{
+					text = Gnosis.L["NoImport"],
+					on_click = function(self)
+					end,
+				},
+			},
+			on_show = function(self, data) 
+				self.editboxes[1]:SetText("");
+				self.editboxes[1]:HighlightText();
+				self.editboxes[1]:SetFocus();
+			end,
+			hide_on_escape = false,
+			show_while_dead = true,
+			exclusive = true,
+			width = 420,
+			strata = 5,
+		}
+	);
+	
+	Gnosis.dialog:Spawn("GNOSIS_IMPORT");
 end
