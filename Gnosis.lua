@@ -22,6 +22,7 @@ local string_len = strlenutf8;
 -- local variables
 local _;
 
+-- LibSharedMedia
 if(Gnosis.lsm) then
 	Gnosis.lsm:Register("statusbar", "Waterline", "Interface\\Addons\\Gnosis\\Textures\\Waterline");
 	Gnosis.lsm:Register("statusbar", "Gnosis_Plain", "Interface\\Addons\\Gnosis\\Textures\\Gnosis_Plain");
@@ -916,7 +917,7 @@ function Gnosis:ClipTest(fCurTime)
 	end
 end
 
-function Gnosis:AddBasicCastbar(name, unit, movefactor_y, movefactor_x, scale)
+function Gnosis:AddCustomBar(name, unit, width, height, scale, movefactor_y, movefactor_x, unlockicon)
 	local fScale = UIParent:GetScale();
 	local cfg;
 
@@ -928,37 +929,30 @@ function Gnosis:AddBasicCastbar(name, unit, movefactor_y, movefactor_x, scale)
 
 	cfg = self.s.cbconf[name];
 	
-	if(scale ~= self.tCastbarDefaults.scale) then
-		cfg.scale = scale;
-		Gnosis:SetBarParams(name);
-	end
+	cfg.scale = scale;
+	cfg.width = width;
+	cfg.height = height;
+	cfg.bIconUnlocked = unlockicon;
+	Gnosis:SetBarParams(name);
 	
 	cfg.anchor.py = cfg.anchor.py + movefactor_y * (self.tCastbarDefaults.height/GetScreenHeight() + 0.01) * fScale;
 	cfg.anchor.px = cfg.anchor.px + movefactor_x * (self.tCastbarDefaults.height/GetScreenHeight()*2.5 + self.tCastbarDefaults.width/GetScreenWidth() + 0.01) * fScale;
-	self:AnchorBar(name);
+	self:AnchorBar(name);	
 end
 
-function Gnosis:CreateBasicCastbarSet()
-	self:AddBasicCastbar(self.L["CBSetPlayer"], "player", 2, 0, 1.35);
-	self:AddBasicCastbar(self.L["CBSetTarget"], "target", 1, 0, 1.0);
-	self:AddBasicCastbar(self.L["CBSetFocus"], "focus", 0, 0, 1.0);
-	self:AddBasicCastbar(self.L["CBSetPet"], "pet", -2, 0, 1.0);
-	self:AddBasicCastbar(self.L["CBSetMirror"], "mirror", 4, 0, 1.0);
-end
-
-function Gnosis:CreateMadnessSet()
-	local i;
-	for i = 1, 99 do
-		self:AddBasicCastbar("Player " .. i, "player", 10-i%20, -2+floor(i/20), 1.0);
-	end
+function Gnosis:CreateCustomCastbarSet()
+	self:AddCustomBar(self.L["CBSetPlayer"], "player", 300, 28, 1.0, 3, 0, true);
+	self:AddCustomBar(self.L["CBSetTarget"], "target", 250, 20, 1.0, 1, 0, false);
+	self:AddCustomBar(self.L["CBSetFocus"], "focus", 250, 20, 1.0, -1, 0, false);
+	self:AddCustomBar(self.L["CBSetPet"], "pet", 250, 20, 1.0, -3, 0, false);
+	self:AddCustomBar(self.L["CBSetMirror"], "mirror", 250, 20, 1.0, 6, 0, false);
 end
 
 function Gnosis:CreateGCDSwingTimers()
-	self:AddBasicCastbar(self.L["CBSetGCD"], "gcd", -3, 0, 1.0);
-	self:AddBasicCastbar(self.L["CBSetSwing"], "smr", -4, 0, 1.0);
+	self:AddCustomBar(self.L["CBSetGCD"], "gcd", 250, 3, 1.0, -5, 0);
+	self:AddCustomBar(self.L["CBSetSwing"], "smr", 250, 3, 1.0, -6, 0);
 
 	local cfg = self.s.cbconf[self.L["CBSetGCD"]];
-	cfg.height = 3;
 	cfg.border = 0;
 	cfg.colBar = { 0.85, 0.85, 0.85, 0.70 };
 	cfg.strNameFormat = "";
@@ -967,7 +961,6 @@ function Gnosis:CreateGCDSwingTimers()
 	self:SetBarParams(self.L["CBSetGCD"]);
 
 	cfg = self.s.cbconf[self.L["CBSetSwing"]];
-	cfg.height = 3;
 	cfg.border = 0;
 	cfg.colBar = { 0.85, 0.85, 0.85, 0.70 };
 	cfg.strNameFormat = "";
@@ -1043,7 +1036,8 @@ function Gnosis:CheckForFirstStart(bForce)
 		btnLCS:SetWidth(230);
 		btnLCS:SetText(Gnosis.L["IfCCSetup"]);
 		btnLCS:SetCallback("OnClick", function()
-				Gnosis:CreateBasicCastbarSet();
+				--Gnosis:CreateBasicCastbarSet();
+				Gnosis:CreateCustomCastbarSet();
 				Gnosis:HideBlizzardCastbarIfStatusChange(true);
 				Gnosis:HideBlizzardMirrorCastbarIfStatusChange(true);
 				Gnosis:HideBlizzardPetCastbarIfStatusChange(true);
