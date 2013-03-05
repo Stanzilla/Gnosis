@@ -86,6 +86,7 @@ Gnosis.colClasses = {
 	DRUID		= "1.00, 0.49, 0.04, 1.00",
 	HUNTER		= "0.67, 0.83, 0.45, 1.00",
 	MAGE		= "0.41, 0.80, 0.94, 1.00",
+	MONK		= "0.33, 0.54, 0.52, 1.00",
 	PALADIN		= "0.96, 0.55, 0.73, 1.00",
 	PRIEST		= "1.00, 1.00, 1.00, 1.00",
 	ROGUE		= "1.00, 0.96, 0.41, 1.00",
@@ -209,20 +210,20 @@ function Gnosis:StartupVariables()
 		-- bar geometry
 		width = 250,
 		height = 20,
-		border = 1.0,
-		bordericon = 1.0,
+		border = 2.0,
+		bordericon = 2.0,
 		scale = 1.0,
 		scaleicon = 1.0,
 		alpha = 1.0,
-		fadeout = 0.3;
+		fadeout = 0.4;
 		latbarsize = 0.15;
-		latbarfixed = 0.02;
+		latbarfixed = 0.03;
 
 		-- coordinates
 		coord = {
-			castname = { x = 2, y = 0 },
-			casttime = { x = -2, y = 0 },
-			casticon = { x = 0, y = 0 },
+			castname = { x = 9, y = 0 },
+			casttime = { x = -9, y = 0 },
+			casticon = { x = -3, y = 0 },
 			latency = { x = -1, y = 1 },
 			shadow = { x = 3, y = -3 },
 		},
@@ -234,27 +235,27 @@ function Gnosis:StartupVariables()
 		alignlat = "ADAPT",		--
 
 		-- spark modifiers
-		fSparkHeightMulti = 1.0,
-		fSparkWidthMulti = 1.0,
+		fSparkHeightMulti = 1.2,
+		fSparkWidthMulti = 0.8,
 
 		-- default bar colors
-		colBar = { 0.20, 0.30, 0.50, 0.70 },
-		colBarNI = { 0.20, 0.30, 0.50, 0.70 },
-		colBarBg = { 0.10, 0.10, 0.35, 0.40 },
-		colLagBar  = { 0.35, 0.65, 0.90, 0.65 },
-		colBorder = { 0.00, 0.00, 0.00, 0.75 },
-		colBorderNI = { 1.00, 0.80, 0.00, 0.75 },
+		colBar = { 0.15, 0.35, 0.35, 0.70 },
+		colBarNI = { 0.15, 0.35, 0.35, 0.70 },
+		colBarBg = { 0.15, 0.42, 0.42, 0.65 },
+		colLagBar  = { 0.90, 0.85, 0.70, 0.65 },
+		colBorder = { 0.00, 0.00, 0.00, 0.85 },
+		colBorderNI = { 1.00, 0.80, 0.00, 0.85 },
 		colText = { 1.00, 1.00, 1.00, 1.00 },
 		colTextTime = { 1.00, 1.00, 1.00, 1.00 },
 		colTextLag = { 1.00, 0.00, 0.00, 1.00 },
-		colInterrupted = { 0.85, 0.85, 0.65, 0.75 },
+		colInterrupted = { 1.00, 0.80, 0.00, 0.70 },
 		colFailed = { 0.70, 0.30, 0.20, 0.75 },
 		colSpark = { 1.00, 1.00, 1.00, 1.00 },
-		colSuccess = { 0.35, 0.60, 0.15, 0.70 },
+		colSuccess = { 0.15, 0.25, 0.10, 0.70 },
 		colShadow = { 0.00, 0.00, 0.00, 0.70 },
 
 		-- default statusbar texture
-		bartexture = "Waterline",
+		bartexture = "Gnosis_Plain",
 		bordertexture = nil,
 
 		-- bar settings
@@ -268,10 +269,10 @@ function Gnosis:StartupVariables()
 		bExtChannels = true,	-- extend channeled spells
 		bUnlocked = true,		-- unlocked when first created
 		bFillup = false,		-- fill bar up at end of cast
-		bShowShield = true,		-- show shielded icon for non-intteruptible casts
+		bShowShield = false,	-- do not show shielded icon for non-intteruptible casts
 		iconside = "LEFT",		-- where to draw icon
 		fontoutline = "OUTLINE",-- font outline
-		font = "",				-- no default font selection (v2.61)
+		font = "Accidental Presidency",		-- "Accidental Presidency", v4.00
 		fontsize = 0,			-- automatic
 		fontsize_timer = 0,		-- automatic
 		fontsize_lat = 0,		-- automatic
@@ -297,7 +298,7 @@ function Gnosis:StartupVariables()
 		bInvDir = false,		-- invert bar direction
 		bColSuc = false,		-- change castbar color when cast finished successfully
 		bEnShadowOffset = false,-- enable changing of text shadow offset
-		bEnShadowCol = false,	-- change text shadow color
+		bEnShadowCol = true,	-- change text shadow color
 
 		-- anchoring
 		anchortype = 1,			-- no anchor
