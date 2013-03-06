@@ -571,6 +571,7 @@ function Gnosis:SetupChanneledSpellsTable()
 
 	-- priest
 	self:AddChanneledSpellById(15407, 3, false, 4, false, false, "shadow", false, 2);	-- mind flay
+	self:AddChanneledSpellById(129197, 3, false, 4, false, false, "shadow", false, 1);	-- mind flay (insanity)
 	self:AddChanneledSpellById(32000, 5, false, 6, false, true, "shadow", false, 2); 	-- mind sear
 	self:AddChanneledSpellById(47540, 3, false, 2, true, false, "holy", true, 1);		-- penance, first tick instant
 	self:AddChanneledSpellById(64843, 4, true, 15, false, true, "holy", true, 3);		-- divine hymn
