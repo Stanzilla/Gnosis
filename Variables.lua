@@ -95,10 +95,21 @@ Gnosis.colClasses = {
 	WARRIOR		= "0.78, 0.61, 0.43, 1.00",
 };
 
+Gnosis.tPremadeNfs = {
+	[1] = "namecol<1,0,0>txm< (>misctxm<)>col<pre>txts< (>tscurtxts</>tstottxts<)>",
+	[2] = "namecol<1,0,0>txeff< (>effecttxeff<)>col<pre>",
+};
+
+Gnosis.tPremadeTfs = {
+	[1] = "col<1,0,0>p<2s>col<pre> r<1m> / t<2m>",
+	[2] = "col<1,0,0>p<2s>col<pre> r<1> / t<2>",
+	[3] = "r<2m> / t<3m>",
+};
+
 function Gnosis:StartupVariables()
 	local fCurTime = GetTime() * 1000;
 
-	self.ver = 4.00;
+	self.ver = 4.01;
 	self.optver = 3.25;
 	self.build = "@project-version@";
 	self.addonname = "Gnosis";
@@ -285,8 +296,8 @@ function Gnosis:StartupVariables()
 		bnwlistnew = "",		-- new entry box
 		bResizeLongName = true,	-- automatic resize of long spell names
 		strata = "MEDIUM",		-- medium frame strata
-		strNameFormat = "namecol<1,0,0>txm< (>misctxm<)>col<pre>txts< (>tscurtxts</>tstottxts<)>",	-- default castname string, rank text in red, tradeskill total cnt
-		strTimeFormat = "col<1,0,0>p<2s>col<pre> r<1m> / t<2m>",	-- default casttime string
+		strNameFormat = Gnosis.tPremadeNfs[1],	-- default nfs
+		strTimeFormat = Gnosis.tPremadeTfs[1],	-- default tfs
 		bShowPlayerLatency = true,	-- do not show text latency information
 		bShowAsMinutes = true,	-- show timer in minutes if longer than 60s
 		bMergeTrade = true,		-- merge tradeskill information
