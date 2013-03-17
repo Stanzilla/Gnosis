@@ -1312,7 +1312,7 @@ function Gnosis:CreateCastnameFromString(name, rank, cb)
 		str = string_gsub(str, "rank<([^>]+)>", "");
 		str = string_gsub(str, "txr<([^>]+)>", "");
 	end
-
+	
 	if(bOther) then
 		str = string_gsub(str, "misc", cb.stacks and cb.stacks or rank);
 		str = string_gsub(str, "txm<([^>]+)>", "%1");
@@ -1321,6 +1321,15 @@ function Gnosis:CreateCastnameFromString(name, rank, cb)
 		str = string_gsub(str, "txm<([^>]+)>", "");
 	end
 
+	-- effect (effect value of various auras like Shield Barrier, Power Word: Shield, ...)
+	if(cb.effect) then
+		str = string_gsub(str, "effect", cb.effect);
+		str = string_gsub(str, "txeff<([^>]+)>", "%1");
+	else
+		str = string_gsub(str, "effect", "");
+		str = string_gsub(str, "txeff<([^>]+)>", "");
+	end
+	
 	if(cb.bIsTrade) then
 		str = string_gsub(str, "tscur", string_format("%.0f", cb.tscnt));
 		str = string_gsub(str, "tstot", string_format("%.0f", cb.tstot));
@@ -1626,7 +1635,8 @@ function Gnosis:SetupTimerbar(cb, fCurTime, tiinfo)
 	cb.icontex = (not curtimer.hideicon) and icon or nil;
 	cb.stacks = stacks;
 	cb.tiUnit = tiunit;
-	cb.tiUnitName = (cb.tiUnit and curtimer.type == 2) and UnitName(cb.tiUnit);
+	--cb.tiUnitName = (cb.tiUnit and curtimer.type == 2) and UnitName(cb.tiUnit);
+	cb.tiUnitName = UnitName(cb.tiUnit);
 	cb.tiType = curtimer.type;
 
 	cb.channel = bChannel;
@@ -2150,6 +2160,7 @@ function Gnosis:CleanupCastbar(cb, bDoNotSetValue, bDoNotOverwriteNfsTfs)
 
 	cb.icontex = nil;
 	cb.stacks = nil;
+	cb.effect = nil;
 	cb.tiUnit = nil;
 	cb.tiUnitName = nil;
 	cb.tiType = nil;

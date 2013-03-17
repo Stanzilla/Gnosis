@@ -19,8 +19,8 @@ function Gnosis:OptCreateBasicTables()
 		party1 = "Party 1", party2 = "Party 2", party3 = "Party 3", party4 = "Party 4", party5 = "Party 5",
 		raid1 = "Raid 1", raid2 = "Raid 2", raid3 = "Raid 3", raid4 = "Raid 4", raid5 = "Raid 5",
 		arena1 = "Arena Opponent 1", arena2 = "Arena Opponent 2", arena3 = "Arena Opponent 3", arena4 = "Arena Opponent 4", arena5 = "Arena Opponent 5",
-		boss1 = "Boss 1", boss2 = "Boss 2", boss3 = "Boss 3", boss4 = "Boss 4",
-		boss1target = "Boss 1's Target", boss2target = "Boss 2's Target", boss3target = "Boss 3's Target", boss4target = "Boss 4's Target",
+		boss1 = "Boss 1", boss2 = "Boss 2", boss3 = "Boss 3", boss4 = "Boss 4", boss5 = "Boss 5",
+		boss1target = "Boss 1's Target", boss2target = "Boss 2's Target", boss3target = "Boss 3's Target", boss4target = "Boss 4's Target", boss5target = "Boss 5's Target",
 		mirror = "Mirror Bar", gcd = "GCD Indicator", sm = "Swing Melee", sr = "Swing Range", smr = "Swing Melee&Range",
 		targettarget = "Target's Target", focustarget = "Focus' Target", pettarget = "Pet's Target",
 		targettargettarget = "Target's Target's Target",
@@ -43,7 +43,7 @@ function Gnosis:OptCreateBasicTables()
 	Gnosis.tAlignName = { LEFT = Gnosis.L["TabCapLEFT"], CENTER = Gnosis.L["TabCapCENTER"], RIGHT = Gnosis.L["TabCapRIGHT"] };
 	Gnosis.tAlignTime = { LEFT = Gnosis.L["TabCapLEFT"], CENTER = Gnosis.L["TabCapCENTER"], RIGHT = Gnosis.L["TabCapRIGHT"] };
 	Gnosis.tAlignLat = { LEFT = Gnosis.L["TabCapLEFT"], RIGHT = Gnosis.L["TabCapRIGHT"], ADAPT = Gnosis.L["TabAdaptToCT"] };
-
+	
 	Gnosis.tStrata = {
 		BACKGROUND = Gnosis.L["Strata_BACK"],
 		LOW = Gnosis.L["Strata_LOW"],
@@ -55,6 +55,17 @@ function Gnosis:OptCreateBasicTables()
 	Gnosis.tOrientation = {
 		[1] = Gnosis.L["Horizontal"],
 		[2] = Gnosis.L["Vertical"],
+	};
+	
+	Gnosis.tPremadeNfsDisplay = {
+		[1] = Gnosis.L["PremadeNfs1"],
+		[2] = Gnosis.L["PremadeNfs2"],
+	};
+
+		Gnosis.tPremadeTfsDisplay = {
+		[1] = Gnosis.L["PremadeTfs1"],
+		[2] = Gnosis.L["PremadeTfs2"],
+		[3] = Gnosis.L["PremadeTfs3"],
 	};
 
 	-- do not localize!!!
@@ -866,6 +877,19 @@ function Gnosis:CreateCastbarsOpt()
 							inline = true,
 							order = self:GetNextTableIndexInner(1),
 							args = {
+								nfsselect = {
+									order = self:GetNextTableIndexInner(),
+									name = Gnosis.L["SelPremadeStr"],
+									type = "select",
+									values = Gnosis.tPremadeNfsDisplay,
+									get = function(info) return nil; end,
+									set = function(info,val)
+										Gnosis.s.cbconf[key].strNameFormat = Gnosis.tPremadeNfs[val];
+										Gnosis:SetBarParams(key);
+									end,
+									style = "dropdown",
+									width = "full",
+								},
 								castnamestring = {
 									order = self:GetNextTableIndexInner(),
 									name = Gnosis.L["OptNameFormatStringName"],
@@ -923,6 +947,19 @@ function Gnosis:CreateCastbarsOpt()
 							inline = true,
 							type = "group",
 							args = {
+								nfsselect = {
+									order = self:GetNextTableIndexInner(),
+									name = Gnosis.L["SelPremadeStr"],
+									type = "select",
+									values = Gnosis.tPremadeTfsDisplay,
+									get = function(info) return nil; end,
+									set = function(info,val)
+										Gnosis.s.cbconf[key].strTimeFormat = Gnosis.tPremadeTfs[val];
+										Gnosis:SetBarParams(key);
+									end,
+									style = "dropdown",
+									width = "full",
+								},
 								casttimestring = {
 									order = self:GetNextTableIndexInner(),
 									name = Gnosis.L["OptTimeFormatStringName"],
