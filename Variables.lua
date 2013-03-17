@@ -98,6 +98,7 @@ Gnosis.colClasses = {
 Gnosis.tPremadeNfs = {
 	[1] = "namecol<1,0,0>txm< (>misctxm<)>col<pre>txts< (>tscurtxts</>tstottxts<)>",
 	[2] = "namecol<1,0,0>txeff< (>effecttxeff<)>col<pre>",
+	[3] = "col<1,1,0>whocol<pre>: name",
 };
 
 Gnosis.tPremadeTfs = {
