@@ -60,6 +60,7 @@ function Gnosis:OptCreateBasicTables()
 	Gnosis.tPremadeNfsDisplay = {
 		[1] = Gnosis.L["PremadeNfs1"],
 		[2] = Gnosis.L["PremadeNfs2"],
+		[3] = Gnosis.L["PremadeNfs3"],
 	};
 
 		Gnosis.tPremadeTfsDisplay = {
