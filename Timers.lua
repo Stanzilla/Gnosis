@@ -174,11 +174,14 @@ end
 function Gnosis:Timers_Aura(bar, timer, ti)
 	-- aura == buff or debuff (== hot or dot)
 	ti.unit = timer.unit;
-	local _, _, ic, sta, _, d, s = UnitAura(timer.unit, timer.spell, nil, timer.filter);
+	local _, _, ic, sta, _, d, s, _, _, _, _, _, _, _, effect = UnitAura(timer.unit, timer.spell, nil, timer.filter);
+	
 	if(s) then
 		ti.cname = timer.spell;
 		ti.stacks = (sta and sta > 0) and sta or nil;
+		ti.effect = effect;	
 		ti.icon = ic;
+		
 		if(s > 0) then
 			-- dynamic aura
 			if(timer.brange) then
@@ -794,6 +797,7 @@ function Gnosis:CreateSingleTimerTable()
 							cfinit = Gnosis.Timers_Spell;
 						elseif(w == "cd") then
 							tiType = 1;
+							unit = "player";
 							cfinit = Gnosis.Timers_SpellCD;
 						elseif(w == "dot" or w == "debuff") then
 							bHarm = true;
@@ -808,22 +812,27 @@ function Gnosis:CreateSingleTimerTable()
 							cfinit = Gnosis.Timers_Aura;
 						elseif(w == "itemcd") then
 							tiType = 3;
+							unit = "player";
 							cfinit = Gnosis.Timers_ItemCD;
 						elseif(w == "runecd") then
+							unit = "player";
 							if(tonumber(spell) and tonumber(spell) > 0 and tonumber(spell) <= 6) then
 								tiType = 4;
 								cfinit = Gnosis.Timers_RuneCD;
 							end
 						elseif(w == "totemdur") then
+							unit = "player";
 							if(tonumber(spell) and tonumber(spell) > 0 and tonumber(spell) <= MAX_TOTEMS) then
 								tiType = 5;
 								cfinit = Gnosis.Timers_TotemDuration;
 							end
 						elseif(w == "enchmh") then
 							tiType = 6;
+							unit = "player";
 							cfinit = Gnosis.Timers_WeaponEnchantMain;
 						elseif(w == "enchoh") then
 							tiType = 7;
+							unit = "player";
 							cfinit = Gnosis.Timers_WeaponEnchantOff;
 						elseif(w == "icd" or w == "innercd" or w == "proc") then
 							-- valid spell or spell id given? (name of spell passed for icd does not
@@ -843,8 +852,10 @@ function Gnosis:CreateSingleTimerTable()
 									norefresh = false
 								};
 							end
+							unit = "player";
 						elseif(w == "fixed") then
 							tiType = 10;
+							unit = "player";
 							cfinit = Gnosis.Timers_Fixed;
 						elseif(w == "resource") then
 							if(spell == "power") then
@@ -1131,6 +1142,7 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 							SelectedTimerInfo.duration = TimerInfo.dur;
 							SelectedTimerInfo.icon = TimerInfo.icon;
 							SelectedTimerInfo.stacks = TimerInfo.stacks;
+							SelectedTimerInfo.effect = TimerInfo.effect;
 							SelectedTimerInfo.tiunit = TimerInfo.unit;
 							SelectedTimerInfo.bChannel = TimerInfo.bChannel;
 							SelectedTimerInfo.curtimer = v;
@@ -1164,12 +1176,15 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 			local dur = bar.dur and bar.dur or bar.duration;
 			local bRecalcTick = (dur ~= SelectedTimerInfo.duration);
 
-			-- stacks text
-			if(bar.stacks ~= SelectedTimerInfo.stacks) then
+			-- redo name text
+				-- stacks; effect value and name of targeted unit (added in 4.01)
+			if(bar.stacks ~= SelectedTimerInfo.stacks or bar.effect ~= SelectedTimerInfo.effect or bar.tiUnitName ~= UnitName(bar.tiUnit)) then
 				bar.stacks = SelectedTimerInfo.stacks;
+				bar.effect = SelectedTimerInfo.effect;
+				bar.tiUnitName = UnitName(bar.tiUnit);
 				bar.ctext:SetText(self:CreateCastname(bar, bar.conf, SelectedTimerInfo.castname, ""));
 			end
-
+			
 			if(SelectedTimerInfo.bSpecial) then
 				if(not SelectedTimerInfo.valIsStatic) then
 					-- power
@@ -1206,7 +1221,7 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 			self:SetupTimerLagBox(bar, SelectedTimerInfo.curtimer.showlag,
 				SelectedTimerInfo.curtimer.showcasttime, SelectedTimerInfo.castname,
 				SelectedTimerInfo.curtimer.recast, bRecalcTick);
-		else
+		else	-- create bar
 			-- id
 			bar.timer_id = SelectedTimerInfo.curtimer.id;
 
