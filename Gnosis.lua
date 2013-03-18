@@ -724,14 +724,14 @@ function Gnosis:GenerateCombattext(cc, cs, bClip)
 
 	-- hits, crits, ticks, dmg, dps, clipped
 	local dpstime = 1000 / (cc.freqtest and min(cc.freqtest-cc.starttime,cc.duration) or cc.duration);
-	local tickscrits = string_format("%d%s", cc.ticks, tick);
+	local tickscrits = string_format("%d%s", cc.ticks + cc.mastery, tick);
 	if(cc.crits > 0) then tickscrits = string_format("%s, %d%s", tickscrits, cc.crits, crit); end
 
 	str = string_gsub(str, "tickscrits", tickscrits);
 	str = string_gsub(str, "spellname", string_format("%s", cc.spell));
 	str = string_gsub(str, "hits", string_format("%d", cc.hits) .. hit);
 	str = string_gsub(str, "crits", string_format("%d", cc.crits) .. crit);
-	str = string_gsub(str, "ticks", string_format("%d", cc.ticks) .. tick);
+	str = string_gsub(str, "ticks", string_format("%d", cc.ticks + cc.mastery) .. tick);
 	str = string_gsub(str, "dmg", string_format("%d", cc.dmg));
 	str = string_gsub(str, "dps", string_format("%d", cc.dmg * dpstime));
 	str = string_gsub(str, "eh", string_format("%d", cc.eh));
@@ -801,12 +801,14 @@ function Gnosis:SetupChannelData()
 		cc.ticks = 0;
 		cc.hits = 0;
 		cc.crits = 0;
+		cc.mastery = 0;
 		cc.bcliptest = cs.bcliptest;
 		cc.baeo = cs.baoe;
 		cc.texture = texture;
 		cc.target = self.strLastTarget;
 		cc.class = self.strLastTargetClass;
 		cc.bticksound = cs.bticksound;
+		cc.lastticktime = nil;
 
 		-- ticks table
 		cc.tticks = {};
