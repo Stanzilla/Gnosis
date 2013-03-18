@@ -18,7 +18,7 @@ Gnosis.tCastbarEvents = {
 	"UNIT_SPELLCAST_INTERRUPTED",
 	"UNIT_SPELLCAST_FAILED",
 	"UNIT_SPELLCAST_FAILED_QUIET",
-	"UNIT_SPELLCAST_SUCCEEDED"
+	"UNIT_SPELLCAST_SUCCEEDED",
 };
 
 Gnosis.tMiscEvents = {
@@ -38,6 +38,30 @@ Gnosis.tMirrorEvents = {
 	"MIRROR_TIMER_STOP",
 	"PLAYER_UNGHOST",
 	"PLAYER_ALIVE",
+};
+
+Gnosis.tBlizzCastbar = {
+	"UNIT_SPELLCAST_START",
+	"UNIT_SPELLCAST_STOP",
+	"UNIT_SPELLCAST_FAILED",
+	"UNIT_SPELLCAST_INTERRUPTED",
+	"UNIT_SPELLCAST_DELAYED",
+	"UNIT_SPELLCAST_CHANNEL_START",
+	"UNIT_SPELLCAST_CHANNEL_UPDATE",
+	"UNIT_SPELLCAST_CHANNEL_STOP",
+	"UNIT_SPELLCAST_INTERRUPTIBLE",
+	"UNIT_SPELLCAST_NOT_INTERRUPTIBLE",
+	"PLAYER_ENTERING_WORLD",
+};
+
+Gnosis.tBlizzMirrorUiParent = {
+	"MIRROR_TIMER_START",
+};
+
+Gnosis.tBlizzMirror123 = {
+	"MIRROR_TIMER_STOP",
+	"MIRROR_TIMER_PAUSE",
+	"PLAYER_ENTERING_WORLD",
 };
 
 Gnosis.tSwingEvents = {
@@ -150,7 +174,10 @@ function Gnosis:StartupVariables()
 	self.petcastbar = {};
 
 	-- events registered to blizzard mirror castbar
-	self.blizzmirrorcastbar = {};
+	self.blizzmirroruiparent = {};
+	self.blizzmirror1 = {};
+	self.blizzmirror2 = {};
+	self.blizzmirror3 = {};
 
 	-- clip test
 	self.curchannel = nil;	-- currently channeling spell

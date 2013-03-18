@@ -73,7 +73,7 @@ function Gnosis:En(status)
 		if(self.s.bHidePetVeh) then
 			self:HideBlizzardPetCastbar(true);
 		end
-
+		
 		-- scan table, fast lookup tablese
 		self:CreateCBTables();
 		-- trigger talent update event (gone with 5.04 sent too early)
@@ -126,18 +126,13 @@ end
 
 function Gnosis:HideBlizzardCastbar(status)
 	if(status) then	-- hide castbar
-		for key, value in pairs(self.tCastbarEvents) do
+		for key, value in pairs(self.tBlizzCastbar) do
 			if(CastingBarFrame:IsEventRegistered(value)) then
 				table_insert(self.blizzcastbar, value);
-			end
-			CastingBarFrame:UnregisterEvent(value);
+				CastingBarFrame:UnregisterEvent(value);
+			end			
 		end
-		for key, value in pairs(self.tMiscEvents) do
-			if(CastingBarFrame:IsEventRegistered(value)) then
-				table_insert(self.blizzcastbar, value);
-			end
-			CastingBarFrame:UnregisterEvent(value);
-		end
+		
 		if(#self.blizzcastbar > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgDisBlizCB"]);
@@ -151,6 +146,7 @@ function Gnosis:HideBlizzardCastbar(status)
 		for key, value in pairs(self.blizzcastbar) do
 			CastingBarFrame:RegisterEvent(value);
 		end
+		
 		if(#self.blizzcastbar > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgBlizCBRestored"]);
@@ -180,18 +176,13 @@ end
 
 function Gnosis:HideBlizzardPetCastbar(status)
 	if(status) then	-- hide pet castbar
-		for key, value in pairs(self.tCastbarEvents) do
+		for key, value in pairs(self.tBlizzCastbar) do
 			if(PetCastingBarFrame:IsEventRegistered(value)) then
 				table_insert(self.petcastbar, value);
-			end
-			PetCastingBarFrame:UnregisterEvent(value);
+				PetCastingBarFrame:UnregisterEvent(value);
+			end			
 		end
-		for key, value in pairs(self.tMiscEvents) do
-			if(PetCastingBarFrame:IsEventRegistered(value)) then
-				table_insert(self.petcastbar, value);
-			end
-			PetCastingBarFrame:UnregisterEvent(value);
-		end
+		
 		if(#self.petcastbar > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgDisPetCB"]);
@@ -205,24 +196,42 @@ function Gnosis:HideBlizzardPetCastbar(status)
 		for key, value in pairs(self.petcastbar) do
 			PetCastingBarFrame:RegisterEvent(value);
 		end
+		
 		if(#self.petcastbar > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgPetCBRestored"]);
 			end
 		end
+		
 		self.petcastbar = {};
 	end
 end
 
 function Gnosis:HideBlizzardMirrorCastbar(status)
 	if(status) then	-- hide castbar
-		for key, value in pairs(self.tMirrorEvents) do
+		for key, value in pairs(self.tBlizzMirrorUiParent) do
 			if(UIParent:IsEventRegistered(value)) then
-				table_insert(self.blizzmirrorcastbar, value);
-			end
-			UIParent:UnregisterEvent(value);
+				table_insert(self.blizzmirroruiparent, value);
+				UIParent:UnregisterEvent(value);
+			end			
 		end
-		if(#self.blizzmirrorcastbar > 0) then
+		
+		for key, value in pairs(self.tBlizzMirror123) do
+			if(MirrorTimer1:IsEventRegistered(value)) then
+				table_insert(self.blizzmirror1, value);
+				MirrorTimer1:UnregisterEvent(value);
+			end
+			if(MirrorTimer2:IsEventRegistered(value)) then
+				table_insert(self.blizzmirror2, value);
+				MirrorTimer2:UnregisterEvent(value);
+			end
+			if(MirrorTimer3:IsEventRegistered(value)) then
+				table_insert(self.blizzmirror3, value);
+				MirrorTimer3:UnregisterEvent(value);
+			end
+		end
+		
+		if(#self.blizzmirroruiparent > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgDisMirrCB"]);
 			end
@@ -232,15 +241,29 @@ function Gnosis:HideBlizzardMirrorCastbar(status)
 			end
 		end
 	else	-- restore mirror castbar events, it might not actually enable the blizzard mirror castbar if another addon hides it
-		for key, value in pairs(self.blizzmirrorcastbar) do
+		for key, value in pairs(self.blizzmirroruiparent) do
 			UIParent:RegisterEvent(value);
 		end
-		if(#self.blizzmirrorcastbar > 0) then
+		for key, value in pairs(self.blizzmirror1) do
+			MirrorTimer1:RegisterEvent(value);
+		end
+		for key, value in pairs(self.blizzmirror2) do
+			MirrorTimer2:RegisterEvent(value);
+		end
+		for key, value in pairs(self.blizzmirror3) do
+			MirrorTimer3:RegisterEvent(value);
+		end
+		
+		if(#self.blizzmirroruiparent > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgMirrCBRestored"]);
 			end
 		end
-		self.blizzmirrorcastbar = {};
+		
+		self.blizzmirroruiparent = {};
+		self.blizzmirror1 = {};
+		self.blizzmirror2 = {};
+		self.blizzmirror3 = {};
 	end
 end
 
