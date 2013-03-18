@@ -413,6 +413,7 @@ end
 function Gnosis:FontString(bar, height)
 	local fs = bar:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmallOutline");
 	fs:SetFont(GameFontNormal:GetFont(), height);
+	
 	return fs;
 end
 
