@@ -21,7 +21,7 @@ function Gnosis:OptCreateBasicTables()
 		arena1 = "Arena Opponent 1", arena2 = "Arena Opponent 2", arena3 = "Arena Opponent 3", arena4 = "Arena Opponent 4", arena5 = "Arena Opponent 5",
 		boss1 = "Boss 1", boss2 = "Boss 2", boss3 = "Boss 3", boss4 = "Boss 4", boss5 = "Boss 5",
 		boss1target = "Boss 1's Target", boss2target = "Boss 2's Target", boss3target = "Boss 3's Target", boss4target = "Boss 4's Target", boss5target = "Boss 5's Target",
-		mirror = "Mirror Bar", gcd = "GCD Indicator", sm = "Swing Melee", sr = "Swing Range", smr = "Swing Melee&Range",
+		mirror = "Mirror Bar", gcd = "GCD Indicator", gcd2 = "GCD Indicator (non casttime spells)", sm = "Swing Melee", sr = "Swing Range", smr = "Swing Melee&Range",
 		targettarget = "Target's Target", focustarget = "Focus' Target", pettarget = "Pet's Target",
 		targettargettarget = "Target's Target's Target",
 		arena1target = "Arena Op. 1's Target", arena2target = "Arena Op. 2's Target", arena3target = "Arena Op. 3's Target",

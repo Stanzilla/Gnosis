@@ -376,6 +376,12 @@ function Gnosis:FindGCDBars(spell, rank, fCurTime)
 		self:SetupGCDbar(cb, spell, rank, fCurTime, false);
 		cb = self:FindCBNext("gcd");
 	end
+	
+	local cb = self:FindCB("gcd2");
+	while(cb) do
+		self:SetupGCDbar(cb, spell, rank, fCurTime, false);
+		cb = self:FindCBNext("gcd2");
+	end
 end
 
 function Gnosis:FindSwingTimers(unit, spell, icon, fCurTime, bType)
@@ -715,8 +721,8 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 	self:GenerateTimeTable(bar, true);
 
 	-- castbar? if not set bnIsCB to true
-	if(tParams.unit == "gcd" or tParams.unit == "sm" or tParams.unit == "sr"
-		or tParams.unit == "smr") then
+	if(tParams.unit == "gcd" or tParams.unit == "gcd2" or
+		tParams.unit == "sm" or tParams.unit == "sr" or tParams.unit == "smr") then
 		bar.bnIsCB = true;
 	else
 		bar.bnIsCB = nil;
@@ -1099,6 +1105,17 @@ function Gnosis:SetupGCDbar(cb, spell, rank, fCurTime, right2left)
 		return;
 	end
 
+	-- non casttime spell GCD Indicator?
+	if (cfg.unit == "gcd2") then
+		local spellcasttime = select(7, GetSpellInfo(spell));
+		local playerischanneling = UnitChannelInfo("player");
+		--local playeriscasting = UnitCastingInfo("player"); -- tested: casting often starts too late to detect correctly
+		
+		if (playerischanneling or not (spellcasttime and spellcasttime == 0)) then
+			return;
+		end
+	end
+	
 		-- valid group layout?
 	if(not self:CheckGroupLayout(cfg)) then
 		return;
