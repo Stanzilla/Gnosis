@@ -370,7 +370,7 @@ function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dgu
 				selcc.eh = selcc.eh + (event == "SPELL_HEAL" and (dmg - oh) or 0);
 				selcc.oh = selcc.oh + (event == "SPELL_HEAL" and oh or 0);
 
-				if(selcc.lastticktime and (GetTime() * 1000) - selcc.lastticktime < 100) then
+				if(not selcc.baeo and selcc.lastticktime and (GetTime() * 1000) - selcc.lastticktime < 100) then
 					-- mastery tick
 					selcc.mastery = selcc.mastery + 1;
 				else
