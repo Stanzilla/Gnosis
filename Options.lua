@@ -666,7 +666,6 @@ function Gnosis:CreateCastbarsOpt()
 	table_sort(tSorted);
 
 	for keyindex, key in ipairs(tSorted) do
-		iCurCnt = 0;
 		iCount = iCount + 1;
 		tCBs[key] = {
 			order = iCount,
