@@ -370,17 +370,26 @@ function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dgu
 				selcc.eh = selcc.eh + (event == "SPELL_HEAL" and (dmg - oh) or 0);
 				selcc.oh = selcc.oh + (event == "SPELL_HEAL" and oh or 0);
 
-				selcc.ticks = selcc.ticks + 1;
+				if(selcc.lastticktime and (GetTime() * 1000) - selcc.lastticktime < 100) then
+					-- mastery tick
+					selcc.mastery = selcc.mastery + 1;
+				else
+					-- non mastery tick
+					selcc.ticks = selcc.ticks + 1;
+					
+					if(selcc.bticksound) then
+						self:PlaySounds();
+					end
+				end
+
+				selcc.lastticktime = GetTime() * 1000;
 				selcc.hits = (bcrit or (event == "SPELL_MISSED" or event == "SPELL_PERIODIC_MISSED")) and selcc.hits or (selcc.hits + 1);
 				selcc.crits = (bcrit and (event == "SPELL_DAMAGE" or event == "SPELL_PERIODIC_DAMAGE")) and (selcc.crits + 1) or selcc.crits;
 				selcc.crits = (bcritheal and event == "SPELL_HEAL") and (selcc.crits + 1) or selcc.crits;
-
-				if(selcc.bticksound) then
-					self:PlaySounds();
-				end
+				
 				-- cliptest enable and non aoe spell?
 				if(selcc.bcliptest and not selcc.baeo) then
-					if((not selccnext and (cc and nc)) or selcc.ticks == selcc.maxticks) then
+					if((not selccnext and (cc and nc)) or selcc.ticks >= selcc.maxticks) then
 						-- max ticks or last tick for current channel
 						-- check channeled spell out at once
 						selcc.freqtest = selcc.freqtest and min(selcc.freqtest,fCurTime) or fCurTime;
