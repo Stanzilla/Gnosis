@@ -361,7 +361,7 @@ function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dgu
 			local cc, nc = self.curchannel, self.nextchannel;
 			local selcc = (cc and cc.spell == spellname) and cc or ((nc and nc.spell == spellname) and nc or nil);
 			local selccnext = (cc and cc.spell == spellname) and false or ((nc and nc.spell == spellname) and true or false);
-
+			
 			if(selcc) then
 				-- tick
 				local dmgdone = (event == "SPELL_DAMAGE" or event == "SPELL_PERIODIC_DAMAGE" or event == "SPELL_HEAL") and dmg or 0;
@@ -370,9 +370,11 @@ function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dgu
 				selcc.eh = selcc.eh + (event == "SPELL_HEAL" and (dmg - oh) or 0);
 				selcc.oh = selcc.oh + (event == "SPELL_HEAL" and oh or 0);
 
-				if(not selcc.baeo and selcc.lastticktime and (GetTime() * 1000) - selcc.lastticktime < 100) then
+				local isNormalTick = true;
+				if(not selcc.baeo and selcc.lastticktime and (fCurTime - selcc.lastticktime) < 250) then
 					-- mastery tick
 					selcc.mastery = selcc.mastery + 1;
+					isNormalTick = false;
 				else
 					-- non mastery tick
 					selcc.ticks = selcc.ticks + 1;
@@ -382,18 +384,18 @@ function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dgu
 					end
 				end
 
-				selcc.lastticktime = GetTime() * 1000;
+				selcc.lastticktime = fCurTime;
 				selcc.hits = (bcrit or (event == "SPELL_MISSED" or event == "SPELL_PERIODIC_MISSED")) and selcc.hits or (selcc.hits + 1);
 				selcc.crits = (bcrit and (event == "SPELL_DAMAGE" or event == "SPELL_PERIODIC_DAMAGE")) and (selcc.crits + 1) or selcc.crits;
 				selcc.crits = (bcritheal and event == "SPELL_HEAL") and (selcc.crits + 1) or selcc.crits;
 				
 				-- cliptest enable and non aoe spell?
-				if(selcc.bcliptest and not selcc.baeo) then
+				if(isNormalTick and selcc.bcliptest and not selcc.baeo) then
 					if((not selccnext and (cc and nc)) or selcc.ticks >= selcc.maxticks) then
 						-- max ticks or last tick for current channel
 						-- check channeled spell out at once
-						selcc.freqtest = selcc.freqtest and min(selcc.freqtest,fCurTime) or fCurTime;
-						selcc.fforcedtest = selcc.fforcedtest and min(selcc.fforcedtest,fCurTime) or fCurTime;
+						selcc.freqtest = fCurTime + 250;
+						selcc.fforcedtest = fCurTime + 250;
 					end
 				end
 			end
