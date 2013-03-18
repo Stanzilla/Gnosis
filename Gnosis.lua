@@ -231,6 +231,10 @@ function Gnosis:HideBlizzardMirrorCastbar(status)
 			end
 		end
 		
+		MirrorTimer1:Hide();
+		MirrorTimer2:Hide();
+		MirrorTimer3:Hide();
+		
 		if(#self.blizzmirroruiparent > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgDisMirrCB"]);
