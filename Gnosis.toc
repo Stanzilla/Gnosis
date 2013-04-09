@@ -24,6 +24,7 @@ Libs\LibSharedMedia-3.0\lib.xml
 Libs\AceGUI-3.0-SharedMediaWidgets\widget.xml
 Libs\LibRangeCheck-2.0\LibRangeCheck-2.0.lua
 Libs\LibDialog-1.0\lib.xml
+Libs\LibBetterBlizzOptions-1.0\lib.xml
 #@end-no-lib-strip@
 
 # xml
