@@ -28,5 +28,8 @@ externals:
 	Libs/CallbackHandler-1.0:
 		url: svn://svn.wowace.com/wow/callbackhandler/mainline/trunk/CallbackHandler-1.0
 		tag: latest
-
+	Libs/LibBetterBlizzOptions-1.0:
+		url: svn://svn.wowace.com/wow/libbetterblizzoptions-1-0/mainline/trunk
+		tag: latest
+		
 enable-nolib-creation: yes
