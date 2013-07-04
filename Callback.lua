@@ -110,7 +110,6 @@ end
 
 -- events
 function Gnosis:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank)
-	local cb;
 	if(unit == "player") then
 		local fCurTime = GetTime() * 1000.0;
 		self:FindGCDBars(spell, rank, fCurTime);
@@ -132,17 +131,17 @@ end
 
 function Gnosis:UNIT_SPELLCAST_START(event, unit, spell, rank)
 	local cb = self:FindCB(unit);
-	if(cb) then
+	if (cb) then
 		local fCurTime = GetTime() * 1000.0;
-		self:CalcLag(fCurTime);
 		repeat
 			self:SetupCastbar(cb, false, fCurTime);
 			cb = self:FindCBNext(unit);
 		until cb == nil;
 	end
-
-	if(unit == "player") then
+	
+	if (unit == "player") then
 		local fCurTime = GetTime() * 1000.0;
+		self:CalcLag(fCurTime);
 		self:FindGCDBars(spell, rank, fCurTime);
 
 		if(self.iLastTradeSkillCnt) then
@@ -290,7 +289,9 @@ function Gnosis:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell, rank, id)
 	if(cb) then
 		local fCurTime = GetTime() * 1000.0;
 		repeat
-			if(cb.bActive) then
+			-- cb.castname == spell : bandaid for classes that can cast spells while running
+			-- the wow api sends interrupt events for previously casted spells...
+			if(cb.bActive and cb.castname == spell) then
 				local conf = cb.conf;
 				cb.bar:SetValue(cb.channel and 0 or 1.0);
 				if(cb.channel) then
