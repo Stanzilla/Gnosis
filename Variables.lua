@@ -134,7 +134,7 @@ Gnosis.tPremadeTfs = {
 function Gnosis:StartupVariables()
 	local fCurTime = GetTime() * 1000;
 
-	self.ver = 4.02;
+	self.ver = 4.03;
 	self.optver = 3.25;
 	self.build = "@project-version@";
 	self.addonname = "Gnosis";
