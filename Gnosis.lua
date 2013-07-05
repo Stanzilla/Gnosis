@@ -610,12 +610,12 @@ function Gnosis:SetupChanneledSpellsTable()
 	self:AddChanneledSpellById(12051, 4, false, 3, true, false, "arcane", false, 2);	-- evocation
 
 	-- warlock
-	self:AddChanneledSpellById(1120, 5, true, 15, false, false, "shadow", false, 2);	-- drain soul
-	self:AddChanneledSpellById(689, 3, false, 4, false, false, "shadow", false, 2);		-- drain life
-	self:AddChanneledSpellById(4629, 4, false, 15, false, true, "fire", false, 2);		-- rain of fire
-	self:AddChanneledSpellById(1949, 15, false, 15, false, true, "fire", false, 1);		-- hellfire
-	self:AddChanneledSpellById(755, 3, false, 4, false, false, "shadow", false, 2);		-- health funnel
-	self:AddChanneledSpellById(79268, 3, true, 15, false, false, "shadow", true, 4);	-- soul harvest
+	self:AddChanneledSpellById(1120, 6, false, 15, false, false, "shadow", false, 3);	-- drain soul
+	self:AddChanneledSpellById(689, 6, false, 15, false, false, "shadow", false, 3);	-- drain life
+	self:AddChanneledSpellById(108371, 6, false, 15, false, true, "shadow", false, 1);	-- harvest life
+	self:AddChanneledSpellById(4629, 6, false, 15, false, true, "fire", false, 3);		-- rain of fire
+	self:AddChanneledSpellById(1949, 15, false, 15, true, true, "fire", false, 3);		-- hellfire, first tick instant
+	self:AddChanneledSpellById(755, 6, false, 6, false, false, "shadow", false, 3);		-- health funnel
 	self:AddChanneledSpellById(103103, 4, false, 5, false, false, "shadow", false, 1);	-- malefic grasp
 
 	-- druid

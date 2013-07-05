@@ -449,11 +449,11 @@ end
 
 function Gnosis:OptCreateNewChanneledSpell()
 	local id = tonumber(self.s.nameNewSpell);
-
+	
 	if(id == nil) then
-		self:AddChanneledSpellByName(self.s.nameNewSpell, 1, 1, false, false);
+		self:AddChanneledSpellByName(self.s.nameNewSpell, 1, false, 1, false, false);
 	else
-		self:AddChanneledSpellById(id, 1, 1, false, false);
+		self:AddChanneledSpellById(id, 1, false, 1, false, false);
 	end
 
 	self:CreateChannelSpellsOpt();
