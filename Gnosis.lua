@@ -1066,7 +1066,6 @@ function Gnosis:CheckForFirstStart(bForce)
 		btnLCS:SetWidth(230);
 		btnLCS:SetText(Gnosis.L["IfCCSetup"]);
 		btnLCS:SetCallback("OnClick", function()
-				--Gnosis:CreateBasicCastbarSet();
 				Gnosis:CreateCustomCastbarSet();
 				Gnosis:HideBlizzardCastbarIfStatusChange(true);
 				Gnosis:HideBlizzardMirrorCastbarIfStatusChange(true);

@@ -262,7 +262,7 @@ function Gnosis:OptCreateBasicTables()
 				name = Gnosis.L["OptCreateCBSet"],
 				type = "execute",
 				func = function()
-					Gnosis:CreateBasicCastbarSet();
+					Gnosis:CreateCustomCastbarSet();
 				end,
 				width = "full",
 			},
