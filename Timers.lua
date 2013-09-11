@@ -182,10 +182,14 @@ function Gnosis:Timers_Aura(bar, timer, ti)
 		ti.effect = effect;	
 		ti.icon = ic;
 		
-		if(s > 0) then
+		local rem = 0;		
+		if (s > 0) then
+			rem = s - GetTime();
+		end
+		
+		if(rem > 0) then
 			-- dynamic aura
 			if(timer.brange) then
-				local rem = s - GetTime();
 				if(in_value_range(rem, rem*100/d, timer.range_tab) and
 						in_stacks_range(sta, timer.range_tab)) then
 					ti.ok = true;

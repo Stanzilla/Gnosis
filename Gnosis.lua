@@ -623,7 +623,7 @@ function Gnosis:SetupChanneledSpellsTable()
 	self:AddChanneledSpellById(16914, 10, false, 15, false, true, "nature", false, 2);	-- hurricane
 	
 	-- monk
-	self:AddChanneledSpellById(101546, 3, false, 4, false, true, nil, false, 1);		-- spinning crane kick
+	--self:AddChanneledSpellById(101546, 3, false, 4, false, true, nil, false, 1);		-- spinning crane kick
 end
 
 function Gnosis:CreateColorString(r, g, b, a)
