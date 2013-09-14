@@ -625,6 +625,21 @@ function Gnosis:Timers_Fixed(bar, timer, ti)
 	set_not(ti);
 end
 
+function Gnosis:Timers_SpellKnown(bar, timer, ti)
+	ti.unit = "player";
+	if (GetSpellLink(timer.spell)) then
+		ti.cname = timer.spell;
+		ti.icon = timer.icon or select(3, GetSpellInfo(timer.spell));
+		ti.ok = true;
+		ti.valIsStatic = true;
+		set_times(timer, ti);
+	elseif (timer.bNot) then
+		ti.cname = timer.spell;
+		ti.icon = timer.icon or select(3, GetSpellInfo(timer.spell));
+		set_not(ti);
+	end
+end
+
 function Gnosis:ExtractRegex(str, regex_a, regex_b, dotrim)
 	local res = string_match(str, regex_a);
 	if(res) then
@@ -861,6 +876,10 @@ function Gnosis:CreateSingleTimerTable()
 							tiType = 10;
 							unit = "player";
 							cfinit = Gnosis.Timers_Fixed;
+						elseif (w == "spellknown") then
+							tiType = 11;
+							unit = "player";
+							cfinit = Gnosis.Timers_SpellKnown;
 						elseif(w == "resource") then
 							if(spell == "power") then
 								tiType = 1000;
@@ -979,7 +998,7 @@ function Gnosis:CreateSingleTimerTable()
 						tTimer.unit = unit and unit or conf.unit;
 
 						-- get icon if aura and passed as id
-						if((tiType == 1 or tiType == 2 or tiType == 10) and tonumber(spell)) then
+						if((tiType == 1 or tiType == 2 or tiType == 10 or tiType == 11) and tonumber(spell)) then
 							local name_, _, icon_ = GetSpellInfo(tonumber(spell));
 							if(name_ and icon_) then
 								tTimer.spell = name_;
