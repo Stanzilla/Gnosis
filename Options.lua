@@ -1567,10 +1567,9 @@ function Gnosis:LoadConfig(name, bMainTab, bCastbars, bChanneledSpells, bClipTes
 			local c = GnosisConfigs[name].maintab;
 			Gnosis.s.bAddonEn = c.bAddonEn;			-- already enabled
 			Gnosis.s.bHideAddonMsgs = c.bHideAddonMsgs;
-			Gnosis.s.bAutoCreateOptions = c.bAutoCreateOptions and c.bAutoCreateOptions or Gnosis.tDefaults.bAutoCreateOptions;
-			Gnosis.s.iTimerScanEvery = c.iTimerScanEvery and c.iTimerScanEvery or Gnosis.tDefaults.iTimerScanEvery;
-
-			Gnosis.s.bResizeOptions = c.bResizeOptions and c.bResizeOptions or Gnosis.tDefaults.bResizeOptions;
+			Gnosis.s.bAutoCreateOptions = c.bAutoCreateOptions == nil and Gnosis.tDefaults.bAutoCreateOptions or c.bAutoCreateOptions;
+			Gnosis.s.iTimerScanEvery = c.iTimerScanEvery == nil and Gnosis.tDefaults.iTimerScanEvery or c.iTimerScanEvery;
+			Gnosis.s.bResizeOptions = c.bResizeOptions == nil and Gnosis.tDefaults.bResizeOptions or c.bResizeOptions;
 			
 			local strLocale = c.strLocale and c.strLocale or nil;
 			if(strLocale and Gnosis.s.strLocale ~= strLocale) then
