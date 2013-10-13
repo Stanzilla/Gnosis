@@ -134,7 +134,7 @@ Gnosis.tPremadeTfs = {
 function Gnosis:StartupVariables()
 	local fCurTime = GetTime() * 1000;
 
-	self.ver = 4.06;
+	self.ver = 4.10;
 	self.optver = 3.25;
 	self.build = "@project-version@";
 	self.addonname = "Gnosis";
@@ -190,9 +190,10 @@ function Gnosis:StartupVariables()
 		bHideMirror = false,
 		bHidePetVeh = false,
 		bHideAddonMsgs = false,
-		-- option settins
+		bResizeOptions = true,
+		-- option settings
 		bAutoCreateOptions = false,
-		iTimerScanEvery = 200,
+		iTimerScanEvery = 150,
 
 		-- castbar configs
 		cbconf = {},
