@@ -1191,11 +1191,11 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 			end
 			
 			-- "shown" command? is given bar actually shown?
-			if (v.shown and Gnosis.castbars[v.shown] and not Gnosis.castbars[v.shown]:IsShown()) then
+			if (v.shown and Gnosis.castbars[v.shown] and not Gnosis.castbars[v.shown].bActive) then
 				checkentry = false;
 			end
 			-- "hidden" command? is given bar actually hidden?
-			if (v.hidden and Gnosis.castbars[v.hidden] and Gnosis.castbars[v.hidden]:IsShown()) then
+			if (v.hidden and Gnosis.castbars[v.hidden] and Gnosis.castbars[v.hidden].bActive) then
 				checkentry = false;
 			end
 			
