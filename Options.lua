@@ -214,8 +214,18 @@ function Gnosis:OptCreateBasicTables()
 				end,
 				width = "full",
 			},
-			autoloadoptions = {
+			resizeoptionsframe = {
 				order = 6,
+				name = Gnosis.L["OptResizeOptions"],
+				type = "toggle",
+				get = function(info) return Gnosis.s.bResizeOptions; end,
+				set = function(info,val)
+					Gnosis.s.bResizeOptions = val;
+				end,
+				width = "full",
+			},
+			autoloadoptions = {
+				order = 7,
 				name = Gnosis.L["OptEnAutoCreateOptons"],
 				type = "toggle",
 				get = function(info) return Gnosis.s.bAutoCreateOptions; end,
@@ -225,7 +235,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			rotctext = {
-				order = 7,
+				order = 8,
 				name = Gnosis.L["OptTimerScanEveryN"],
 				type = "range",
 				min = 10, max = 1000,
@@ -236,7 +246,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			locale = {
-				order = 8,
+				order = 9,
 				name = Gnosis.L["OptLocale"],
 				type = "select",
 				values = Gnosis.LSet,
@@ -249,7 +259,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			fsframe = {
-				order = 9,
+				order = 10,
 				name = Gnosis.L["OptFirstStartFrame"],
 				type = "execute",
 				func = function()
@@ -258,7 +268,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			ccbset = {
-				order = 10,
+				order = 11,
 				name = Gnosis.L["OptCreateCBSet"],
 				type = "execute",
 				func = function()
@@ -267,7 +277,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			impbars = {
-				order = 11,
+				order = 12,
 				name = Gnosis.L["OptImportBar"],
 				type = "execute",
 				func = function()
@@ -276,7 +286,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			expbars = {
-				order = 12,
+				order = 13,
 				name = Gnosis.L["OptExportAllBars"],
 				type = "execute",
 				func = function()
@@ -285,7 +295,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			respd = {
-				order = 13,
+				order = 14,
 				name = Gnosis.L["OptResetPlayerData"],
 				type = "execute",
 				func = function()
@@ -460,7 +470,7 @@ function Gnosis:OptCreateNewChanneledSpell()
 end
 
 function Gnosis:CreateChannelSpellsOpt()
-	local iCount = 4;
+	local iCount = 6;
 	local tCSs = {};
 
 	tCSs.newbarbutton = {
@@ -477,7 +487,7 @@ function Gnosis:CreateChannelSpellsOpt()
 		get = function(info) return Gnosis.s.nameNewSpell; end,
 		set = function(info,val) Gnosis.s.nameNewSpell = val; end,
 	};
-
+	
 	-- created sorted table
 	local tSorted = {};
 	for key, value in pairs(self.s.channeledspells) do
@@ -638,9 +648,17 @@ function Gnosis:GetNextTableIndexInner(resetto)
 end
 
 function Gnosis:CreateCastbarsOpt()
-	local iCount = 4;
+	local iCount = 6;
 	local tCBs = {};
 
+	-- created sorted table
+	local tSorted = {};
+	for key, value in pairs(self.castbars) do
+		table_insert(tSorted, key);
+	end
+	table_sort(tSorted);
+	
+	-- new bar button
 	tCBs.newbarbutton = {
 		order = 1,
 		name = Gnosis.L["OptCBNewCB_N"],
@@ -649,6 +667,7 @@ function Gnosis:CreateCastbarsOpt()
 		func = function() Gnosis:OptCreateNewCastbar(); end,
 	};
 
+	-- new barname text field
 	tCBs.newbarname = {
 		order = 2,
 		name = "",
@@ -657,14 +676,53 @@ function Gnosis:CreateCastbarsOpt()
 		get = function(info) return Gnosis.s.nameNewBar; end,
 		set = function(info,val) Gnosis.s.nameNewBar = val; end,
 	};
-
-	-- created sorted table
-	local tSorted = {};
-	for key, value in pairs(self.castbars) do
-		table_insert(tSorted, key);
-	end
-	table_sort(tSorted);
-
+	
+	-- lock all bars button
+	tCBs.lockallbars = {
+		order = 3,
+		name = Gnosis.L["OptCBLockAll_N"],
+		desc = Gnosis.L["OptCBLockAll_D"],
+		type = "execute",
+		func = function()
+			local bDidLock = false;
+			for k, v in pairs(self.castbars) do
+				if (Gnosis.s.cbconf[k].bUnlocked) then
+					Gnosis.s.cbconf[k].bUnlocked = false;
+					Gnosis:SetBarParams(k);
+					bDidLock = true;
+				end
+			end
+			
+			if (bDidLock) then
+				self:CreateCastbarsOpt();
+			end
+		end,
+		width = "half",
+	};
+	
+	-- unlock all bars button
+	tCBs.unlockallbars = {
+		order = 4,
+		name = Gnosis.L["OptCBUnlockAll_N"],
+		desc = Gnosis.L["OptCBUnlockAll_D"],
+		type = "execute",
+		func = function()
+			local bDidUnlock = false;
+			for k, v in pairs(self.castbars) do
+				if (not Gnosis.s.cbconf[k].bUnlocked) then
+					Gnosis.s.cbconf[k].bUnlocked = true;
+					Gnosis:SetBarParams(k);
+					bDidUnlock = true;
+				end
+			end
+			
+			if (bDidUnlock) then
+				self:CreateCastbarsOpt();
+			end
+		end,
+		width = "half",
+	};
+	
 	for keyindex, key in ipairs(tSorted) do
 		iCount = iCount + 1;
 		tCBs[key] = {
@@ -1512,6 +1570,8 @@ function Gnosis:LoadConfig(name, bMainTab, bCastbars, bChanneledSpells, bClipTes
 			Gnosis.s.bAutoCreateOptions = c.bAutoCreateOptions and c.bAutoCreateOptions or Gnosis.tDefaults.bAutoCreateOptions;
 			Gnosis.s.iTimerScanEvery = c.iTimerScanEvery and c.iTimerScanEvery or Gnosis.tDefaults.iTimerScanEvery;
 
+			Gnosis.s.bResizeOptions = c.bResizeOptions and c.bResizeOptions or Gnosis.tDefaults.bResizeOptions;
+			
 			local strLocale = c.strLocale and c.strLocale or nil;
 			if(strLocale and Gnosis.s.strLocale ~= strLocale) then
 				Gnosis.s.strLocale = strLocale;
@@ -1764,6 +1824,7 @@ function Gnosis:OptSaveNewConfig(_name, _def, _cb, _cs, _ct)
 				GnosisConfigs[name].maintab.bAutoCreateOptions = self.s.bAutoCreateOptions;
 				GnosisConfigs[name].maintab.strLocale = self.s.strLocale;
 				GnosisConfigs[name].maintab.iTimerScanEvery = self.s.iTimerScanEvery;
+				GnosisConfigs[name].maintab.bResizeOptions = self.s.bResizeOptions;				
 			end
 
 			if(bcb) then

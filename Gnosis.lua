@@ -78,6 +78,11 @@ function Gnosis:En(status)
 		self:CreateCBTables();
 		-- trigger talent update event (gone with 5.04 sent too early)
 		self:PLAYER_TALENT_UPDATE();
+		
+		-- resize interface options frame
+		if (self.s.bResizeOptions) then
+			InterfaceOptionsFrame:SetWidth(775);
+		end
 	else
 		-- disable addon
 		self.bGnosisEnabled = false;
@@ -410,7 +415,7 @@ function Gnosis:OnEnable()
 	-- enable/disable addon
 	self:InitialConfig();
 	self:En(self.s.bAddonEn);
-
+	
 	-- get player GUID
 	self.guid = UnitGUID("player");
 end
