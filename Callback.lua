@@ -23,6 +23,17 @@ function Gnosis:OnUpdate()
 	Gnosis.OnUpdate = Gnosis.Update;
 end
 
+-- timer update
+function Gnosis:StartTimerUpdate(fCurTime, bForce)
+	if((fCurTime - self.lastTimerScan) > self.s.iTimerScanEvery or bForce) then
+		self.lastTimerScan = fCurTime;
+
+		for key, value in ipairs(self.ti_fl) do
+			self:ScanTimerbar(value, fCurTime);
+		end
+	end
+end
+
 -- OnUpdate handler
 function Gnosis:Update()
 	local fCurTime = GetTime() * 1000;
@@ -99,25 +110,22 @@ function Gnosis:Update()
 	end
 
 	-- timers
-	if((fCurTime - self.lastTimerScan) > self.s.iTimerScanEvery) then
-		self.lastTimerScan = fCurTime;
-
-		for key, value in ipairs(self.ti_fl) do
-			self:ScanTimerbar(value, fCurTime);
-		end
-	end
+	self:StartTimerUpdate(fCurTime);
 end
 
 -- events
 function Gnosis:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank)
-	if(unit == "player") then
+	if (unit == "player") then
 		local fCurTime = GetTime() * 1000.0;
 		self:FindGCDBars(spell, rank, fCurTime);
-		if(self.iSwing == 2) then
-			if(spell == self.strAutoShot) then
+		-- update timer bars now (to make gcd bars appear instantly)
+		self:StartTimerUpdate(fCurTime, true);
+		
+		if (self.iSwing == 2) then
+			if (spell == self.strAutoShot) then
 				self:FindSwingTimers("sr", spell, self.iconAutoShot, fCurTime, false);
 				self:FindSwingTimers("smr", spell, self.iconAutoShot, fCurTime, false);
-			elseif(spell == self.strShootWand) then
+			elseif (spell == self.strShootWand) then
 				self:FindSwingTimers("sr", spell, self.iconShootWand, fCurTime, false);
 				self:FindSwingTimers("smr", spell, self.iconShootWand, fCurTime, false);
 			end
@@ -143,8 +151,8 @@ function Gnosis:UNIT_SPELLCAST_START(event, unit, spell, rank)
 		local fCurTime = GetTime() * 1000.0;
 		self:CalcLag(fCurTime);
 		self:FindGCDBars(spell, rank, fCurTime);
-
-		if(self.iLastTradeSkillCnt) then
+		
+		if (self.iLastTradeSkillCnt) then
 			self.iLastTradeSkillCnt = self.iLastTradeSkillCnt - 1;
 			self.bNewTradeSkill = nil;
 		end
