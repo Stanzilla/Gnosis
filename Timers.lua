@@ -116,7 +116,7 @@ function Gnosis:Timers_Spell(bar, timer, ti)
 	-- cast
 	local spell, _, _, icon, s, d = UnitCastingInfo(timer.unit);
 	if(d and d > 0) then
-		if(timer.spell == "all" or timer.spell == spell) then
+		if(timer.spell == "all" or timer.spell == "any" or timer.spell == spell) then
 			ti.cname = spell;
 			ti.icon = icon;
 			ti.unit = timer.unit;
@@ -132,7 +132,7 @@ function Gnosis:Timers_Spell(bar, timer, ti)
 	else
 		spell, _, _, icon, s, d = UnitChannelInfo(timer.unit);
 		if(d and d > 0) then
-			if(timer.spell == "all" or timer.spell == spell) then
+			if(timer.spell == "all" or timer.spell == "any" or timer.spell == spell) then
 				ti.cname = spell;
 				ti.icon = icon;
 				ti.unit = timer.unit;
@@ -640,6 +640,44 @@ function Gnosis:Timers_SpellKnown(bar, timer, ti)
 	end
 end
 
+function Gnosis:Timers_UnitName(bar, timer, ti)
+	local n = UnitName(timer.unit);
+	
+	if (n and (timer.spell == "any" or n == timer.spell)) then
+		ti.cname = n;
+		ti.unit = timer.unit;
+		ti.ok = true;
+		ti.valIsStatic = true;
+		set_times(timer, ti);	
+	elseif (timer.bNot) then
+		ti.cname = timer.spell;
+		ti.unit = timer.unit;
+		set_not(ti);
+	end
+end
+
+function Gnosis:Timers_GlobalCD(bar, timer, ti)
+	local gcd = Gnosis.current_gcd;
+	local rem = gcd and (gcd.finish - GetTime()) or 0;
+	
+	if (rem > 0 and (timer.spell == "any" or gcd.spell == timer.spell)) then
+		ti.cname = gcd.spell;
+		ti.unit = "player";
+		ti.icon = timer.icon or select(3, GetSpellInfo(gcd.spell));
+		if (timer.brange) then
+			ti.ok = in_value_range(rem, rem*100/gcd.cd, timer.range_tab);			
+		else
+			ti.ok = true;
+		end
+		set_times(timer, ti, gcd.cd*1000, gcd.finish*1000);
+	elseif (timer.bNot) then
+		ti.cname = timer.spell;
+		ti.unit = "player";
+		ti.icon = timer.icon or select(3, GetSpellInfo(timer.spell));
+		set_not(ti);
+	end
+end
+
 function Gnosis:ExtractRegex(str, regex_a, regex_b, dotrim)
 	local res = string_match(str, regex_a);
 	if(res) then
@@ -772,9 +810,14 @@ function Gnosis:CreateSingleTimerTable()
 					str = "";
 				end
 
-				-- unit, recast, staticdur, zoom, spec
-				local unit, recast, staticdur, zoom, spec;
+				local unit, recast, staticdur, zoom, spec, iconoverride, portraitunit, shown, hidden;
+
+				-- extract commands from current line
 				unit, str = self:ExtractRegex(str, "unit=(%w+)", "unit=\"([^\"]+)\"", true);
+				iconoverride, str = self:ExtractRegex(str, "icon=(%w+)", "icon=\"([^\"]+)\"", true);
+				shown, str = self:ExtractRegex(str, "shown=(%w+)", "shown=\"([^\"]+)\"", true);
+				hidden, str = self:ExtractRegex(str, "hidden=(%w+)", "hidden=\"([^\"]+)\"", true);
+				portraitunit, str = self:ExtractRegex(str, "portrait=(%w+)", "portrait=\"([^\"]+)\"", true);
 				recast, str = self:ExtractRegex(str, "recast=([+-]?[0-9]*%.?[0-9]*)", "recast=\"([+-]?[0-9]*%.?[0-9]*)\"");	-- floating point regex
 				staticdur, str = self:ExtractRegex(str, "staticdur=([+-]?[0-9]*%.?[0-9]*)", "staticdur=\"([+-]?[0-9]*%.?[0-9]*)\"");
 				zoom, str = self:ExtractRegex(str, "zoom=([+-]?[0-9]*%.?[0-9]*)", "zoom=\"([+-]?[0-9]*%.?[0-9]*)\"");
@@ -784,7 +827,11 @@ function Gnosis:CreateSingleTimerTable()
 					staticdur and (tonumber(staticdur) * 1000),
 					zoom and (tonumber(zoom) * 1000),
 					spec and tonumber(spec);
-
+				
+				-- icon override, portrait unit
+				local iconoverride = select(3, GetSpellInfo(iconoverride));
+				local ptun = portraitunit;
+				
 				local nfs, tfs, colstr, tsbcol;
 				-- name format string
 				nfs, str = self:ExtractRegex(str, "nfs=\"([^\"]*)\"", "nfs=(%w+)");
@@ -880,6 +927,13 @@ function Gnosis:CreateSingleTimerTable()
 							tiType = 11;
 							unit = "player";
 							cfinit = Gnosis.Timers_SpellKnown;
+						elseif (w == "unitname") then
+							tiType = 12;
+							cfinit = Gnosis.Timers_UnitName;
+						elseif (w == "gcd") then
+							tiType = 13;
+							unit = "player";
+							cfinit = Gnosis.Timers_GlobalCD;
 						elseif(w == "resource") then
 							if(spell == "power") then
 								tiType = 1000;
@@ -992,13 +1046,17 @@ function Gnosis:CreateSingleTimerTable()
 							brange = brange,
 							range_tab = range_tab,
 							boolop = boolop,
-							icon = icon__
+							icon = icon__,
+							icov = iconoverride,
+							ptun = portraitunit,
+							shown = shown,
+							hidden = hidden,
 						};
 						-- targeted unit
 						tTimer.unit = unit and unit or conf.unit;
 
-						-- get icon if aura and passed as id
-						if((tiType == 1 or tiType == 2 or tiType == 10 or tiType == 11) and tonumber(spell)) then
+						-- get name and icon if cast/aura and passed as spellid
+						if((tiType <= 2 or tiType == 10 or tiType == 11) and tonumber(spell)) then
 							local name_, _, icon_ = GetSpellInfo(tonumber(spell));
 							if(name_ and icon_) then
 								tTimer.spell = name_;
@@ -1123,8 +1181,26 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 			end
 		else
 			wipe(TimerInfo);
+			
+			-- pre checks
+			local checkentry = true;
+			
 			-- selected unit exists?
-			if(UnitExists(v.unit)) then
+			if (not UnitExists(v.unit)) then
+				checkentry = false;
+			end
+			
+			-- "shown" command? is given bar actually shown?
+			if (v.shown and Gnosis.castbars[v.shown] and not Gnosis.castbars[v.shown]:IsShown()) then
+				checkentry = false;
+			end
+			-- "hidden" command? is given bar actually hidden?
+			if (v.hidden and Gnosis.castbars[v.hidden] and Gnosis.castbars[v.hidden]:IsShown()) then
+				checkentry = false;
+			end
+			
+			-- check entry
+			if(checkentry) then
 				-- call related timer function (Timers.lua)
 				v:cfinit(bar, v, TimerInfo);
 
@@ -1168,7 +1244,7 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 							SelectedTimerInfo.effect = TimerInfo.effect;
 							SelectedTimerInfo.tiunit = TimerInfo.unit;
 							SelectedTimerInfo.bChannel = TimerInfo.bChannel;
-							SelectedTimerInfo.curtimer = v;
+							SelectedTimerInfo.curtimer = v;							
 						end
 
 						if(SelectedTimerInfo.bSpecial or not bar.iTimerSort) then

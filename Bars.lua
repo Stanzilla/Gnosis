@@ -371,16 +371,33 @@ function Gnosis:FindCBNext(unit)
 end
 
 function Gnosis:FindGCDBars(spell, rank, fCurTime)
+	local start, cd = GetSpellCooldown(spell);
+	if (not start or not(cd > 0 and cd <= 1.5)) then
+		return;
+	end
+	
 	local cb = self:FindCB("gcd");
-	while(cb) do
-		self:SetupGCDbar(cb, spell, rank, fCurTime, false);
+	while (cb) do
+		self:SetupGCDbar(cb, spell, rank, fCurTime, false, start, cd);
 		cb = self:FindCBNext("gcd");
 	end
 	
 	local cb = self:FindCB("gcd2");
-	while(cb) do
-		self:SetupGCDbar(cb, spell, rank, fCurTime, false);
+	while (cb) do
+		self:SetupGCDbar(cb, spell, rank, fCurTime, false, start, cd);
 		cb = self:FindCBNext("gcd2");
+	end
+	
+	if (self.current_gcd) then
+		self.current_gcd.spell = spell;
+		self.current_gcd.cd = cd;
+		self.current_gcd.finish = start + cd;
+	else
+		self.current_gcd = {
+			spell = spell,
+			cd = cd,
+			finish = start + cd
+		};
 	end
 end
 
@@ -1098,19 +1115,13 @@ function Gnosis:SetupSwingBar(cb, spell, icon, fCurTime, bMeleeSwing)
 	self.activebars[barname] = cb;
 end
 
-function Gnosis:SetupGCDbar(cb, spell, rank, fCurTime, right2left)
+function Gnosis:SetupGCDbar(cb, spell, rank, fCurTime, right2left, start, cd)
 	local barname, cfg = cb.name, cb.conf;
-
-	local start, cd = GetSpellCooldown(spell);
-	if(not start or not(cd > 0 and cd <= 1.5)) then
-		return;
-	end
 
 	-- non casttime spell GCD Indicator?
 	if (cfg.unit == "gcd2") then
 		local spellcasttime = select(7, GetSpellInfo(spell));
 		local playerischanneling = UnitChannelInfo("player");
-		--local playeriscasting = UnitCastingInfo("player"); -- tested: casting often starts too late to detect correctly
 		
 		if (playerischanneling or not (spellcasttime and spellcasttime == 0)) then
 			return;
@@ -1118,33 +1129,33 @@ function Gnosis:SetupGCDbar(cb, spell, rank, fCurTime, right2left)
 	end
 	
 		-- valid group layout?
-	if(not self:CheckGroupLayout(cfg)) then
+	if (not self:CheckGroupLayout(cfg)) then
 		return;
 	end
 
 	-- blacklisted?
-	if(cfg.bnwtypesel == 2 and cfg.bnwlist) then
+	if (cfg.bnwtypesel == 2 and cfg.bnwlist) then
 		for key, value in pairs(cfg.bnwlist) do
-			if(value == spell) then
+			if (value == spell) then
 				return;
 			end
 		end
 	-- not whitelisted?
-	elseif(cfg.bnwtypesel == 3 and cfg.bnwlist) then
+	elseif (cfg.bnwtypesel == 3 and cfg.bnwlist) then
 		local bReturn = true;
 		for key, value in pairs(cfg.bnwlist) do
-			if(value == spell) then
+			if (value == spell) then
 				bReturn = false;
 				break;
 			end
 		end
 
-		if(bReturn) then
+		if (bReturn) then
 			return;
 		end
 	end
 
-	if(self.activebars[barname] ~= nil or self.fadeoutbars[barname] ~= nil) then
+	if (self.activebars[barname] ~= nil or self.fadeoutbars[barname] ~= nil) then
 		self:CleanupCastbar(cb);
 	end
 
@@ -1167,7 +1178,7 @@ function Gnosis:SetupGCDbar(cb, spell, rank, fCurTime, right2left)
 	self:SetupBarString(cb, cfg, fCurTime, true);
 
 	-- castbar spark
-	if(cfg.bShowCBS) then
+	if (cfg.bShowCBS) then
 		cb.cbs:SetPoint("CENTER", cb.bar, "LEFT", (cb.channel and (1-val) or val) * cb.barwidth, 0);
 		cb.cbs:Show();
 	end
@@ -1540,6 +1551,16 @@ function Gnosis:GenerateTime(cb, fValueRem, fValueMax, fP)
 	return table_concat(tGT);
 end
 
+local function selectIcon(cb, curtimer)
+	if (curtimer.ptun and UnitExists(curtimer.ptun)) then
+		SetPortraitTexture(cb.icon, curtimer.ptun);
+	elseif (curtimer.icov) then
+		cb.icon:SetTexture(curtimer.icov);
+	else
+		cb.icon:SetTexture(cb.icontex);
+	end
+end
+
 function Gnosis:SetPowerbarValue(cb, curpower, maxpower, bShowSpark)
 	local cfg = cb.conf;
 
@@ -1603,7 +1624,9 @@ function Gnosis:SetupPowerbar(cb, tiinfo)
 	cb.castname = cname and cname or "";
 
 	cb.channel = true;
-	cb.icon:SetTexture(cb.icontex);
+	
+	selectIcon(cb, curtimer);
+	
 	cb.id = nil;
 
 	-- set current value
@@ -1658,7 +1681,9 @@ function Gnosis:SetupTimerbar(cb, fCurTime, tiinfo)
 	cb.tiType = curtimer.type;
 
 	cb.channel = bChannel;
-	cb.icon:SetTexture(icon);
+	
+	selectIcon(cb, curtimer);
+	
 	cb.id = nil;
 
 	-- show castbar text
@@ -1826,7 +1851,7 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 			return;
 		end
 	end
-
+	
 	-- tradeskill stuff
 	local bDoResize = true;
 	local bnTS = true;
