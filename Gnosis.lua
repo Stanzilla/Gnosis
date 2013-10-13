@@ -628,7 +628,8 @@ function Gnosis:SetupChanneledSpellsTable()
 	self:AddChanneledSpellById(16914, 10, false, 15, false, true, "nature", false, 2);	-- hurricane
 	
 	-- monk
-	--self:AddChanneledSpellById(101546, 3, false, 4, false, true, nil, false, 1);		-- spinning crane kick
+	self:AddChanneledSpellById(113656, 5, false, 4, true, true, "physical", false, 1);	-- fists of fury, first tick instant, aoe
+	self:AddChanneledSpellById(115175, 9, false, 8, true, false, "nature", true, 1);	-- soothing mist, first tick instant
 end
 
 function Gnosis:CreateColorString(r, g, b, a)
