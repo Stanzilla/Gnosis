@@ -176,7 +176,7 @@ function Gnosis:Timers_Aura(bar, timer, ti)
 	ti.unit = timer.unit;
 	local _, _, ic, sta, _, d, s, _, _, _, _, _, _, _, effect = UnitAura(timer.unit, timer.spell, nil, timer.filter);
 	
-	if(s) then
+	if (s) then
 		ti.cname = timer.spell;
 		ti.stacks = (sta and sta > 0) and sta or nil;
 		ti.effect = effect;	
@@ -187,10 +187,10 @@ function Gnosis:Timers_Aura(bar, timer, ti)
 			rem = s - GetTime();
 		end
 		
-		if(rem > 0) then
+		if (rem > 0) then
 			-- dynamic aura
-			if(timer.brange) then
-				if(in_value_range(rem, rem*100/d, timer.range_tab) and
+			if (timer.brange) then
+				if (in_value_range(rem, rem*100/d, timer.range_tab) and
 						in_stacks_range(sta, timer.range_tab)) then
 					ti.ok = true;
 				end
@@ -198,10 +198,10 @@ function Gnosis:Timers_Aura(bar, timer, ti)
 				ti.ok = true;
 			end
 			set_times(timer, ti, d * 1000, s * 1000, true);
-		elseif(s == 0 and d == 0 and not timer.bNot) then
+		elseif (s == 0 and d == 0 and not timer.bNot) then
 			-- static aura
-			if(timer.brange) then
-				if(in_stacks_range(sta, timer.range_tab)) then
+			if (timer.brange) then
+				if (in_stacks_range(sta, timer.range_tab)) then
 					ti.ok = true;
 				end
 			else
@@ -210,7 +210,128 @@ function Gnosis:Timers_Aura(bar, timer, ti)
 			ti.valIsStatic = true;
 			set_times(timer, ti);
 		end
-	elseif(timer.bNot) then
+	elseif (timer.bNot) then
+		ti.cname = timer.spell;
+		ti.icon = timer.icon or select(3, GetSpellInfo(timer.spell));
+		set_not(ti);
+	end
+end
+
+function Gnosis:Timers_GroupAura(bar, timer, ti)
+	ti.unit = nil;
+	
+	-- scan current group for aura, also scan existing pets
+	local _, ic, sta, d, s, effect;
+	local n = GetNumGroupMembers();
+	if (IsInRaid() and n >= 2) then
+		-- scan raid
+		for i = 1, n do
+			local curunit = "raid" .. i;
+			_, _, ic, sta, _, d, s, _, _, _, _, _, _, _, effect = UnitAura(curunit, timer.spell, nil, timer.filter);
+			
+			if (s) then
+				ti.unit = curunit;
+				break;
+			end
+			
+			curunit = "raidpet" .. i;
+			if (UnitExists(curunit)) then
+				_, _, ic, sta, _, d, s, _, _, _, _, _, _, _, effect = UnitAura(curunit, timer.spell, nil, timer.filter);
+			
+				if (s) then
+					ti.unit = curunit;
+					break;
+				end
+			end
+		end
+	elseif (n >= 2) then
+		-- scan player and group members
+		_, _, ic, sta, _, d, s, _, _, _, _, _, _, _, effect = UnitAura("player", timer.spell, nil, timer.filter);
+		
+		if (s) then
+			ti.unit = "player";
+		else
+			if (UnitExists("playerpet")) then
+				_, _, ic, sta, _, d, s, _, _, _, _, _, _, _, effect = UnitAura("playerpet", timer.spell, nil, timer.filter);
+			end
+			
+			if (s) then
+				ti.unit = "playerpet";
+			else
+				for i = 1, (n - 1) do
+					local curunit = "party" .. i;
+					_, _, ic, sta, _, d, s, _, _, _, _, _, _, _, effect = UnitAura(curunit, timer.spell, nil, timer.filter);
+					
+					if (s) then
+						ti.unit = curunit;
+						break;
+					end
+					
+					curunit = "partypet" .. i;
+					if (UnitExists(curunit)) then
+						_, _, ic, sta, _, d, s, _, _, _, _, _, _, _, effect = UnitAura(curunit, timer.spell, nil, timer.filter);
+					
+						if (s) then
+							ti.unit = curunit;
+							break;
+						end
+					end
+				end
+			end
+		end
+	else
+		-- scan player (player not in group)
+		_, _, ic, sta, _, d, s, _, _, _, _, _, _, _, effect = UnitAura("player", timer.spell, nil, timer.filter);
+		
+		if (s) then
+			ti.unit = "player";
+		else
+			if (UnitExists("playerpet")) then
+				_, _, ic, sta, _, d, s, _, _, _, _, _, _, _, effect = UnitAura("playerpet", timer.spell, nil, timer.filter);
+				
+				if (s) then
+					ti.unit = "playerpet";
+				end
+			end
+		end
+	end
+	
+	if (ti.unit) then
+		ti.cname = timer.spell;
+		ti.stacks = (sta and sta > 0) and sta or nil;
+		ti.effect = effect;	
+		ti.icon = ic;
+		
+		local rem = 0;		
+		if (s > 0) then
+			rem = s - GetTime();
+		end
+		
+		if (rem > 0) then
+			-- dynamic aura
+			if (timer.brange) then
+				if (in_value_range(rem, rem*100/d, timer.range_tab) and
+						in_stacks_range(sta, timer.range_tab)) then
+					ti.ok = true;
+				end
+			else
+				ti.ok = true;
+			end
+			set_times(timer, ti, d * 1000, s * 1000, true);
+		elseif (s == 0 and d == 0 and not timer.bNot) then
+			-- static aura
+			if (timer.brange) then
+				if (in_stacks_range(sta, timer.range_tab)) then
+					ti.ok = true;
+				end
+			else
+				ti.ok = true;
+			end
+			ti.valIsStatic = true;
+			set_times(timer, ti);
+		end
+	elseif (timer.bNot) then
+		ti.unit = timer.unit;
 		ti.cname = timer.spell;
 		ti.icon = timer.icon or select(3, GetSpellInfo(timer.spell));
 		set_not(ti);
@@ -219,30 +340,30 @@ end
 
 function Gnosis:Timers_ItemCD(bar, timer, ti)
 	-- itemcd, player only
-	if(not timer.iid) then
+	if (not timer.iid) then
 		local _, link, _, _, _, _, _, _, _, itex = GetItemInfo(timer.spell);
-		if(link and itex) then
+		if (link and itex) then
 			local iid = string_match(link, "|Hitem:(%d+):");
 			timer.iid = iid;
 			timer.itex = itex;
 		end
 	end
 
-	if(timer.iid) then
+	if (timer.iid) then
 		ti.unit = "player";
 		local s, d = GetItemCooldown(timer.iid);
-		if(d and d > 1.5) then	-- duration greater than global cd
+		if (d and d > 1.5) then	-- duration greater than global cd
 			ti.cname = timer.spell;
 			ti.icon = timer.itex;
 			local dur, fin = d, s+d;
-			if(timer.brange) then
+			if (timer.brange) then
 				local rem = fin - GetTime();
 				ti.ok = in_value_range(rem, rem*100/dur, timer.range_tab);
 			else
 				ti.ok = true;
 			end
 			set_times(timer, ti, dur*1000, fin*1000, true);
-		elseif(timer.bNot) then
+		elseif (timer.bNot) then
 			ti.cname = timer.spell;
 			ti.icon = timer.itex;
 			set_not(ti);
@@ -934,6 +1055,17 @@ function Gnosis:CreateSingleTimerTable()
 							tiType = 13;
 							unit = "player";
 							cfinit = Gnosis.Timers_GlobalCD;
+						elseif(w == "groupdot" or w == "groupdebuff") then
+							bHarm = true;
+							tiType = 21;
+							cfinit = Gnosis.Timers_GroupAura;
+						elseif(w == "grouphot" or w == "groupbuff") then
+							bHelp = true;
+							tiType = 21;
+							cfinit = Gnosis.Timers_GroupAura;
+						elseif(w == "groupaura") then
+							tiType = 21;
+							cfinit = Gnosis.Timers_GroupAura;
 						elseif(w == "resource") then
 							if(spell == "power") then
 								tiType = 1000;
@@ -1277,9 +1409,10 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 
 			-- redo name text
 				-- stacks; effect value and name of targeted unit (added in 4.01)
-			if(bar.stacks ~= SelectedTimerInfo.stacks or bar.effect ~= SelectedTimerInfo.effect or bar.tiUnitName ~= UnitName(bar.tiUnit)) then
+			if(bar.stacks ~= SelectedTimerInfo.stacks or bar.effect ~= SelectedTimerInfo.effect or SelectedTimerInfo.tiunit ~= bar.tiUnit or bar.tiUnitName ~= UnitName(bar.tiUnit)) then
 				bar.stacks = SelectedTimerInfo.stacks;
 				bar.effect = SelectedTimerInfo.effect;
+				bar.tiUnit = SelectedTimerInfo.tiunit;
 				bar.tiUnitName = UnitName(bar.tiUnit);
 				bar.ctext:SetText(self:CreateCastname(bar, bar.conf, SelectedTimerInfo.castname, ""));
 			end
