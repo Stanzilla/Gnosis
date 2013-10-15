@@ -81,7 +81,7 @@ function Gnosis:En(status)
 		
 		-- resize interface options frame
 		if (self.s.bResizeOptions) then
-			InterfaceOptionsFrame:SetWidth(775);
+			InterfaceOptionsFrame:SetWidth(835);
 		end
 	else
 		-- disable addon
