@@ -426,9 +426,9 @@ end
 function Gnosis:OptCreateNewCastbar(passedname, passedunit)
 	local name = passedname and passedname or self.s.nameNewBar;
 
-	if(name == "") then
+	if (name == "") then
 		self:Print(self.L["OptCreatenewbarInvalidName"]);
-	elseif(self.castbars[name] ~= nil) then
+	elseif (self.castbars[name] ~= nil) then
 		self:Print(self.L["OptCreatenewbarExists"]);
 	else
 		self.s.cbconf[name] = self:CreateDefaultBarTable(passedunit and passedunit or "player");
@@ -773,6 +773,14 @@ function Gnosis:CreateCastbarsOpt()
 					name = Gnosis.L["OptCBExportBar"],
 					type = "execute",
 					func = function() Gnosis:ExportBar(key); end,
+					width = "full",
+				},
+				exportcblink = {
+					order = self:GetNextTableIndex(),
+					name = Gnosis.L["OptCBExportBarChatlink_N"],
+					desc = Gnosis.L["OptCBExportBarChatlink_D"],
+					type = "execute",
+					func = function() Gnosis:ExportBarChatlink(key); end,
 					width = "full",
 				},				
 				removecb = {
@@ -1973,6 +1981,16 @@ function Gnosis:ExportBar(key)
 			
 			Gnosis.dialog:Spawn("GNOSIS_EXPORT");
 		end
+	end
+end
+
+function Gnosis:ExportBarChatlink(key)
+	local rname = UnitName("player") .. '-' .. GetRealmName();
+	local link = "[[Gnosis:" .. rname .. ":" .. key .. "]]";
+	
+	local eb = GetCurrentKeyBoardFocus();
+	if (eb) then
+		eb:Insert(link);
 	end
 end
 

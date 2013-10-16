@@ -1,9 +1,12 @@
 Gnosis = LibStub("AceAddon-3.0"):NewAddon("Gnosis", "AceConsole-3.0", "AceEvent-3.0");
 Gnosis.gui = LibStub("AceGUI-3.0");
+Gnosis.comm = LibStub("AceComm-3.0");
 Gnosis.lsm = LibStub("LibSharedMedia-3.0", 1);
 Gnosis.smw = LibStub("AceGUISharedMediaWidgets-1.0");
 Gnosis.range = LibStub("LibRangeCheck-2.0");
 Gnosis.dialog = LibStub("LibDialog-1.0");
+Gnosis.libs = LibStub("AceSerializer-3.0");
+Gnosis.libc = LibStub("LibCompress");
 
 -- local functions
 local UnitName = UnitName;
@@ -418,6 +421,9 @@ function Gnosis:OnEnable()
 	
 	-- get player GUID
 	self.guid = UnitGUID("player");
+	
+	-- enable AceComm-3.0 addon communication channel
+	self.comm:RegisterComm("GnosisComm", Gnosis.CommCb);
 end
 
 function Gnosis:CreateOptions()
@@ -1133,3 +1139,170 @@ function Gnosis:CheckForFirstStart(bForce)
 
 	return false;
 end
+
+-- save SetItemRef function
+local oldSetItemRef = SetItemRef;
+-- hook SetItemRef (import Gnosis bar via chatlink)
+function SetItemRef(link, text, ...)
+	-- remove text coloring
+	link = string_gsub(link, "\124c[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]", "");
+	link = string_gsub(link, "\124r", "");
+	text = string_gsub(text, "\124c[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]", "");
+	text = string_gsub(text, "\124r", "");
+
+	local s, f, name, server, barname;
+	if (link and text) then
+		s, f, name, server = link:find("^gnosis([^%s/]+)/(.+)$");
+		s, f, barname = text:find("%[Gnosis: (.-)%]\124h$");
+	end
+	
+	--print(name, server, barname);
+	if (name and server and barname) then
+		Gnosis.comm:SendCommMessage("GnosisComm", "req:" .. barname, "WHISPER", name .. "-" .. server);
+	else
+		oldSetItemRef(link, text, ...);
+	end	
+end
+
+-- communication events
+
+function Gnosis:CommCb(message, distribution, sender)
+	local s, f, barname = message:find("req:(.+)");
+	local hash, serial_tab;
+	s, f, importname, hash, serial_tab = message:find("%[%[%[(.-)%]%]%](.-):(.+)$");
+	
+	if (barname) then
+		-- request received, send bar via addon channel
+		if (Gnosis.s.cbconf[barname]) then
+			-- serialize table
+			local comp = Gnosis.libs:Serialize(Gnosis.s.cbconf[barname]);
+			-- compress and encode for communication via addon channel
+			local lc = Gnosis.libc;
+			comp = lc:Compress(comp);
+			comp = lc:GetAddonEncodeTable():Encode(comp);
+			-- generate 32bit hash
+			local comp_hash = lc:fcs32final(lc:fcs32update(lc:fcs32init(), comp));
+			-- complete message to send
+			local msg = "[[[" .. barname .. "]]]" .. comp_hash .. ":" .. comp;
+			-- send to sender of request
+			Gnosis.comm:SendCommMessage("GnosisComm", msg, distribution, sender);			
+		end	
+	elseif (importname and hash and serial_tab) then
+		-- bar data received
+		local lc = Gnosis.libc;
+		-- compute hash
+		local comp_hash = lc:fcs32final(lc:fcs32update(lc:fcs32init(), serial_tab));
+		
+		-- check hash
+		if (comp_hash == tonumber(hash)) then
+			-- message ok, import
+			local ok;
+			-- decode string
+			local uncomp = lc:GetAddonEncodeTable():Decode(serial_tab);
+			-- decompress
+			uncomp = lc:Decompress(uncomp);
+			-- deserialize, uncomp holds original table afterwards
+			ok, uncomp = Gnosis.libs:Deserialize(uncomp);
+			
+			-- create import dialog
+			Gnosis.dialog:Register("GNOSIS_IMPORT_HYPERLINK",
+			{
+				text = sender .. " -> |cffdddd22" .. importname .. "|r\n\n" .. Gnosis.L["ImportFromHyperlink"],
+				buttons = { 
+					{
+						text = Gnosis.L["Import"],
+						on_click = function(self)
+							Gnosis:ImportBarInit(importname);
+							Gnosis.s.cbconf[importname] = uncomp;
+							Gnosis:ImportBarFinalize(importname);
+						end,
+					},
+					{
+						text = Gnosis.L["NoImport"],
+						on_click = function(self)
+						end,
+					},
+				},
+				hide_on_escape = false,
+				show_while_dead = true,
+				exclusive = true,
+				width = 420,
+				strata = 5,
+			}
+		);
+		
+		Gnosis.dialog:Spawn("GNOSIS_IMPORT_HYPERLINK");
+		end
+	end
+end
+
+local oldSetHyperlink = ItemRefTooltip.SetHyperlink;
+function ItemRefTooltip:SetHyperlink(link, ...)
+	if (link and link:find("^gnosis")) then
+		print("sh: gnosis hyperlink");
+		return
+    end
+	
+    return oldSetHyperlink(self, link, ...);
+end
+
+local function exchangeHyperlink(_, _, msg, ...)
+    local msgToPrint = "";
+	
+	while (true) do
+		local s, f, name, server, barname = msg:find("%[%[Gnosis:([^%s%-]+)-([^%s%-]+):(.-)%]%]");
+		
+		if (name and server and barname) then
+			msgToPrint = msgToPrint .. msg:sub(1, s-1) ..
+				"\124Hgnosis" .. name .. "/" .. server .. "\124h" .. 
+				"\124cffdddd22[Gnosis: " .. barname .. "]\124r\124h";
+			msg = msg:sub(f+1);
+		else
+			msgToPrint = msgToPrint .. msg;
+			break;
+		end
+	end
+	
+	return false, msgToPrint, ...;
+end
+
+ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", exchangeHyperlink);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", exchangeHyperlink);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_WHISPER", exchangeHyperlink);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_WHISPER_INFORM", exchangeHyperlink);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_CONVERSATION", exchangeHyperlink);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", exchangeHyperlink);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", exchangeHyperlink);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", exchangeHyperlink);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_OFFICER", exchangeHyperlink);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY", exchangeHyperlink);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY_LEADER", exchangeHyperlink);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID", exchangeHyperlink);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_LEADER", exchangeHyperlink);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT", exchangeHyperlink);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_INSTANCE_CHAT_LEADER", exchangeHyperlink);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", exchangeHyperlink);
+
+local function repaste_hyperlink(self, link, text, ...)
+	-- remove text coloring
+	link = string_gsub(link, "\124c[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]", "");
+	link = string_gsub(link, "\124r", "");
+	text = string_gsub(text, "\124c[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]", "");
+	text = string_gsub(text, "\124r", "");
+
+	local s, f, name, server, barname;
+	if (link and text) then
+		s, f, name, server = link:find("^gnosis([^%s/]+)/(.+)$");
+		s, f, barname = text:find("%[Gnosis: (.-)%]\124h$");
+	end
+	
+	if (name and server and barname and IsShiftKeyDown()) then
+		local link = "[[Gnosis:" .. name .. "-" .. server .. ":" .. barname .. "]]";	
+		local eb = GetCurrentKeyBoardFocus();
+		if (eb) then
+			eb:Insert(link);
+		end
+	end
+end
+
+hooksecurefunc("ChatFrame_OnHyperlinkShow", repaste_hyperlink);
