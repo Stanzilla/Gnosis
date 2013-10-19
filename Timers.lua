@@ -341,11 +341,11 @@ end
 function Gnosis:Timers_ItemCD(bar, timer, ti)
 	-- itemcd, player only
 	if (not timer.iid) then
-		local _, link, _, _, _, _, _, _, _, itex = GetItemInfo(timer.spell);
-		if (link and itex) then
-			local iid = string_match(link, "|Hitem:(%d+):");
-			timer.iid = iid;
+		local itemname, link, _, _, _, _, _, _, _, itex = GetItemInfo(timer.spell);
+		if (link) then
+			timer.iid = string_match(link, "|Hitem:(%d+):");
 			timer.itex = itex;
+			timer.iname = itemname;
 		end
 	end
 
@@ -353,7 +353,7 @@ function Gnosis:Timers_ItemCD(bar, timer, ti)
 		ti.unit = "player";
 		local s, d = GetItemCooldown(timer.iid);
 		if (d and d > 1.5) then	-- duration greater than global cd
-			ti.cname = timer.spell;
+			ti.cname = timer.iname;
 			ti.icon = timer.itex;
 			local dur, fin = d, s+d;
 			if (timer.brange) then
@@ -364,7 +364,34 @@ function Gnosis:Timers_ItemCD(bar, timer, ti)
 			end
 			set_times(timer, ti, dur*1000, fin*1000, true);
 		elseif (timer.bNot) then
-			ti.cname = timer.spell;
+			ti.cname = timer.iname;
+			ti.icon = timer.itex;
+			set_not(ti);
+		end
+	end
+end
+
+function Gnosis:Timers_ItemEquipped(bar, timer, ti)
+	-- item equipped? player only	
+	if (not timer.iid) then
+		local itemname, link, _, _, _, _, _, _, _, itex = GetItemInfo(timer.spell);
+		if (link) then
+			timer.iid = string_match(link, "|Hitem:(%d+):");
+			timer.itex = itex;
+			timer.iname = itemname;
+		end
+	end
+	
+	if (timer.iname) then
+		ti.unit = "player";
+		if (IsEquippedItem(timer.iname)) then
+			ti.cname = timer.iname;
+			ti.icon = timer.itex;
+			ti.ok = true;
+			ti.valIsStatic = true;
+			set_times(timer, ti);
+		elseif (timer.bNot) then
+			ti.cname = timer.iname;
 			ti.icon = timer.itex;
 			set_not(ti);
 		end
@@ -1055,6 +1082,10 @@ function Gnosis:CreateSingleTimerTable()
 							tiType = 13;
 							unit = "player";
 							cfinit = Gnosis.Timers_GlobalCD;
+						elseif (w == "equipped") then
+							tiType = 14;
+							unit = "player";
+							cfinit = Gnosis.Timers_ItemEquipped;
 						elseif(w == "groupdot" or w == "groupdebuff") then
 							bHarm = true;
 							tiType = 21;
@@ -1197,12 +1228,12 @@ function Gnosis:CreateSingleTimerTable()
 						end
 
 						-- if itemcd try to get item id and texture
-						if(tiType == 3) then
-							local _, link, _, _, _, _, _, _, _, itex = GetItemInfo(spell);
-							if(link and itex) then
-								local iid = string.match(link, "|Hitem:(%d+):");
-								tTimer.iid = iid;
+						if(tiType == 3 or tiType == 14) then
+							local itemname, link, _, _, _, _, _, _, _, itex = GetItemInfo(spell);
+							if(link) then
+								tTimer.iid = string.match(link, "|Hitem:(%d+):");
 								tTimer.itex = itex;
+								tTimer.iname = itemname;
 							end
 						end
 						
