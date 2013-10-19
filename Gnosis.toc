@@ -26,7 +26,7 @@ Libs\AceGUI-3.0-SharedMediaWidgets\widget.xml
 Libs\LibRangeCheck-2.0\LibRangeCheck-2.0.lua
 Libs\LibDialog-1.0\lib.xml
 Libs\LibBetterBlizzOptions-1.0\LibBetterBlizzOptions-1.0\lib.xml
-Libs\AceSerializer-3.0\lib.xml
+Libs\AceSerializer-3.0\AceSerializer-3.0.xml
 Libs\LibCompress\lib.xml
 #@end-no-lib-strip@
 
