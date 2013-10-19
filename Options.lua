@@ -1985,9 +1985,9 @@ function Gnosis:ExportBar(key)
 end
 
 function Gnosis:ExportBarChatlink(key)
-	local rname = UnitName("player") .. '-' .. GetRealmName();
-	local link = "[[Gnosis:" .. rname .. ":" .. key .. "]]";
-	
+	local link = "[Gnosis:" .. UnitName("player") .. '-' .. GetRealmName() .. ":" ..
+		self:ExchangeEscapeSequenceChars(key, "\\%]") .. "]";
+		
 	local eb = GetCurrentKeyBoardFocus();
 	if (eb) then
 		eb:Insert(link);
@@ -1995,7 +1995,9 @@ function Gnosis:ExportBarChatlink(key)
 end
 
 function Gnosis:ImportBarInit(key)
-	self:OptCreateNewCastbar(key);
+	if (self.castbars[key] == nil) then
+		self:OptCreateNewCastbar(key);
+	end
 end
 
 function Gnosis:ImportBarFinalize(key)

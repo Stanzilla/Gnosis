@@ -17,7 +17,9 @@ local wipe = wipe;
 local tonumber = tonumber;
 local table_insert = table.insert;
 local string_format = string.format;
+local string_sub = string.sub;
 local string_gsub = string.gsub;
+local string_find = string.find;
 local string_match = string.match;
 local string_trim = strtrim;
 local string_len = strlenutf8;
@@ -1140,6 +1142,96 @@ function Gnosis:CheckForFirstStart(bForce)
 	return false;
 end
 
+-- returns: embedded match, text before, text after, first match, last match
+function Gnosis:ExtractEmbeddedString(str, first, last, dotrim)
+   -- check parameters
+   if (first and (type(first) ~= "string" or string_len(first) < 1)) then
+      return;
+   end   
+   if (last and (type(last) ~= "string" or string_len(last) < 1)) then
+      return;   
+   end 
+   if (type(str) == "string") then
+      -- trim string (remove leading and trailing whitespace)
+      if (dotrim) then
+         str = string.trim(str);
+      end
+   else
+      return;
+   end
+   
+   -- local variables
+   local first_found = nil;
+   local last_found = nil;
+   local cur = str;
+   local embedded = "";
+   local before = "";
+   local after = "";
+   local pattern_esc = "(\\)";
+   local pattern_first = first and ("(" .. first .. ")") or nil;
+   local pattern_last = last and ("(" .. last .. ")") or nil;
+   
+   -- find first
+   while (first) do
+      local s, f, match_first = string_find(cur, pattern_first); 
+      
+      if (match_first) then -- pattern_first
+         first_found = match_first;
+         before = string_sub(cur, 1, s-1);
+         cur = string_sub(cur, f+1);
+         break;
+      else -- no match
+         return nil;
+      end
+   end
+   
+   -- find last
+   while (true) do
+      local s1, f1, s2, f2, match_esc, match_last;
+      s1, f1, match_esc = string_find(cur, pattern_esc);
+      if (pattern_last) then
+         s2, f2, match_last = string_find(cur, pattern_last); 
+      end
+      
+      -- matched both, pattern_esc < pattern_first?
+      if (s1 and s2 and s1 < s2) then
+         match_last = nil;
+      end
+      
+      if (match_last) then -- pattern_last
+         -- found substring ending
+         last_found = match_last;
+         embedded = embedded .. string_sub(cur, 1, s2-1);
+         after = string_sub(cur, f2+1);
+         return embedded, before, after, first_found, last_found;
+      elseif (match_esc) then -- pattern_esc
+         embedded = embedded .. string_sub(cur, 1, s1-1) .. string_sub(cur, s1+1, s1+1);
+         cur = string_sub(cur, s1+2);
+      else -- no match
+         -- did not find end of embedded string
+         if (last) then
+            return;
+         else
+            if (first_found) then
+               embedded = embedded .. cur;
+            end
+            
+            if (string_len(embedded) > 0) then
+               return embedded, before, after, first_found;
+            else
+               return;
+            end
+         end
+      end
+   end
+end
+
+-- exchanges all chars in charsToEscape string with \char, don't forget % if "magic" character
+function Gnosis:ExchangeEscapeSequenceChars(str, charsToEscape)
+   local pattern = "([" .. charsToEscape .. "])";   
+   return string_gsub(str, pattern, "\\%1");   
+end
+
 -- save SetItemRef function
 local oldSetItemRef = SetItemRef;
 -- hook SetItemRef (import Gnosis bar via chatlink)
@@ -1153,23 +1245,30 @@ function SetItemRef(link, text, ...)
 	local s, f, name, server, barname;
 	if (link and text) then
 		s, f, name, server = link:find("^gnosis([^%s/]+)/(.+)$");
-		s, f, barname = text:find("%[Gnosis: (.-)%]\124h$");
+		s, f, barname = text:find("%[[^:]+: (.-)%]\124h$");
 	end
-	
+		
 	--print(name, server, barname);
 	if (name and server and barname) then
-		Gnosis.comm:SendCommMessage("GnosisComm", "req:" .. barname, "WHISPER", name .. "-" .. server);
+		if (not IsShiftKeyDown()) then
+			Gnosis.comm:SendCommMessage("GnosisComm", "req:" .. barname, "WHISPER", name .. "-" .. server);
+		end
 	else
 		oldSetItemRef(link, text, ...);
 	end	
 end
 
 -- communication events
-
 function Gnosis:CommCb(message, distribution, sender)
 	local s, f, barname = message:find("req:(.+)");
 	local hash, serial_tab;
-	s, f, importname, hash, serial_tab = message:find("%[%[%[(.-)%]%]%](.-):(.+)$");
+	
+	local importname, before, after, match_first, match_last = Gnosis:ExtractEmbeddedString(message, "%[", "%]");
+	if (importname and string_len(after) > 0) then
+		s, f, hash, serial_tab = string_find(after, "(.-):(.+)$");
+	end
+	
+	--s, f, importname, hash, serial_tab = message:find("%[%[%[(.-)%]%]%](.-):(.+)$");
 	
 	if (barname) then
 		-- request received, send bar via addon channel
@@ -1183,7 +1282,7 @@ function Gnosis:CommCb(message, distribution, sender)
 			-- generate 32bit hash
 			local comp_hash = lc:fcs32final(lc:fcs32update(lc:fcs32init(), comp));
 			-- complete message to send
-			local msg = "[[[" .. barname .. "]]]" .. comp_hash .. ":" .. comp;
+			local msg = "[" .. Gnosis:ExchangeEscapeSequenceChars(barname, "\\%]") .. "]" .. comp_hash .. ":" .. comp;
 			-- send to sender of request
 			Gnosis.comm:SendCommMessage("GnosisComm", msg, distribution, sender);			
 		end	
@@ -1239,8 +1338,7 @@ end
 local oldSetHyperlink = ItemRefTooltip.SetHyperlink;
 function ItemRefTooltip:SetHyperlink(link, ...)
 	if (link and link:find("^gnosis")) then
-		print("sh: gnosis hyperlink");
-		return
+		return;
     end
 	
     return oldSetHyperlink(self, link, ...);
@@ -1250,13 +1348,15 @@ local function exchangeHyperlink(_, _, msg, ...)
     local msgToPrint = "";
 	
 	while (true) do
-		local s, f, name, server, barname = msg:find("%[%[Gnosis:([^%s%-]+)-([^%s%-]+):(.-)%]%]");
+		local embedded, before, after, match_first = Gnosis:ExtractEmbeddedString(msg, "%[Gnosis:[^%s%-]+%-[^%s%:]+:", "]");
 		
-		if (name and server and barname) then
-			msgToPrint = msgToPrint .. msg:sub(1, s-1) ..
+		if (embedded) then
+			local s, f, name, server = string_find(match_first, "%[Gnosis:([^%s%-]+)%-([^%s%-]+):");
+			msgToPrint = msgToPrint .. before ..
 				"\124Hgnosis" .. name .. "/" .. server .. "\124h" .. 
-				"\124cffdddd22[Gnosis: " .. barname .. "]\124r\124h";
-			msg = msg:sub(f+1);
+				"\124cffdddd22[" .. name .. "\124r\124cffdddd22: " .. embedded .. "]\124r\124h";
+				
+			msg = after;
 		else
 			msgToPrint = msgToPrint .. msg;
 			break;
@@ -1293,11 +1393,12 @@ local function repaste_hyperlink(self, link, text, ...)
 	local s, f, name, server, barname;
 	if (link and text) then
 		s, f, name, server = link:find("^gnosis([^%s/]+)/(.+)$");
-		s, f, barname = text:find("%[Gnosis: (.-)%]\124h$");
+		s, f, barname = text:find("%[[^:]+: (.-)%]\124h$");
 	end
 	
 	if (name and server and barname and IsShiftKeyDown()) then
-		local link = "[[Gnosis:" .. name .. "-" .. server .. ":" .. barname .. "]]";	
+		local link = "[Gnosis:" .. name .. "-" .. server .. ":" .. Gnosis:ExchangeEscapeSequenceChars(barname, "\\%]") .. "]";
+		
 		local eb = GetCurrentKeyBoardFocus();
 		if (eb) then
 			eb:Insert(link);
