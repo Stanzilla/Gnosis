@@ -131,6 +131,13 @@ Gnosis.tPremadeTfs = {
 	[3] = "r<2m> / t<3m>",
 };
 
+Gnosis.tSoundChannels = {
+	[1] = "Master",
+	[2] = "SFX",
+	[3] = "Ambience",
+	[4] = "Music",
+};
+
 function Gnosis:StartupVariables()
 	local fCurTime = GetTime() * 1000;
 
@@ -206,8 +213,11 @@ function Gnosis:StartupVariables()
 		ct = {
 			bsound = true,
 			bmusic = false,
+			bfile = false,
 			sound = "MONEYFRAMEOPEN",
 			music = nil,
+			file = nil,
+			channel = 1,
 		},
 
 		configs = {

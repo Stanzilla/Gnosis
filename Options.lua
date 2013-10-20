@@ -349,77 +349,138 @@ function Gnosis:OptCreateCTpage()
 			style = "dropdown",
 			width = "full",
 		},
-		bsound = {
+		soundgrp = {
 			order = 2,
-			name = Gnosis.L["OptPSoC"],
-			type = "toggle",
-			get = function(info) return Gnosis.s.ct.bsound; end,
-			set = function(info,val) Gnosis.s.ct.bsound = val; end,
+			name = " ",
+			type = "group",
+			inline = true,
+			args = {
+				bsound = {
+					order = 1,
+					name = Gnosis.L["OptPSoC"],
+					type = "toggle",
+					get = function(info) return Gnosis.s.ct.bsound; end,
+					set = function(info,val) Gnosis.s.ct.bsound = val; end,
+				},
+				sound = {
+					order = 2,
+					name = Gnosis.L["OptSnd"],
+					type = "select",
+					values = Gnosis.BlizzSounds,
+					get = function(info) return Gnosis.s.ct.sound; end,
+					set = function(info,val) Gnosis.s.ct.sound = val; end,
+					style = "dropdown",
+					width = "double",
+				},
+				playsound = {
+					order = 3,
+					name = Gnosis.L["OptPlaySnd"],
+					type = "execute",
+					func = function() if(Gnosis.s.ct.sound) then
+						 PlaySound(Gnosis.s.ct.sound, Gnosis.s.ct.channel and Gnosis.tSoundChannels[Gnosis.s.ct.channel] or Gnosis.tSoundChannels[1]); end
+					end,
+					width = "full",
+				},
+				bmusic = {
+					order = 4,
+					name = Gnosis.L["OptPMoC"],
+					type = "toggle",
+					get = function(info) return Gnosis.s.ct.bmusic; end,
+					set = function(info,val) Gnosis.s.ct.bmusic = val; end,
+				},		
+				music = {
+					order = 5,
+					name = Gnosis.L["OptMusic"],
+					type = "select",
+					dialogControl = "LSM30_Sound",
+					values = AceGUIWidgetLSMlists.sound,
+					get = function(info) return Gnosis.s.ct.music; end,
+					set = function(info,val) Gnosis.s.ct.music = val; end,
+					style = "dropdown",
+					width = "double",
+				},		
+				playmusic = {
+					order = 6,
+					name = Gnosis.L["OptPlayMusic"],
+					type = "execute",
+					func = function() if (Gnosis.s.ct.music) then
+						PlaySoundFile(self.lsm:Fetch("sound", Gnosis.s.ct.music),
+						Gnosis.s.ct.channel and Gnosis.tSoundChannels[Gnosis.s.ct.channel] or Gnosis.tSoundChannels[1]); end
+					end,
+					width = "full",
+				},
+				bfile = {
+					order = 7,
+					name = Gnosis.L["OptPFoC"],
+					type = "toggle",
+					get = function(info) return Gnosis.s.ct.bfile; end,
+					set = function(info,val) Gnosis.s.ct.bfile = val; end,
+				},
+				file = {
+					order = 8,
+					name = Gnosis.L["OptFile"],
+					type = "input",
+					get = function(info) return Gnosis.s.ct.file; end,
+					set = function(info,val)
+						Gnosis.s.ct.file = val;
+					end,
+					width = "double",
+				},
+				playfile = {
+					order = 9,
+					name = Gnosis.L["OptPlayFile"],
+					type = "execute",
+					func = function() if (Gnosis.s.ct.music) then
+						if (Gnosis.s.ct.file) then
+							PlaySoundFile(Gnosis.s.ct.file,
+							Gnosis.s.ct.channel and Gnosis.tSoundChannels[Gnosis.s.ct.channel] or Gnosis.tSoundChannels[1]); end
+						end
+					end,
+					width = "full",
+				},
+				playinchannel = {
+					order = 10,
+					name = "Play sound/music/file in channel",
+					type = "select",
+					values = Gnosis.tSoundChannels,
+					get = function(info) return Gnosis.s.ct.channel and Gnosis.s.ct.channel or 1; end,
+					set = function(info,val) Gnosis.s.ct.channel = val; end,
+					style = "dropdown",
+				},
+			},
 		},
-		bmusic = {
+		ctgroup = {
 			order = 3,
-			name = Gnosis.L["OptPMoC"],
-			type = "toggle",
-			get = function(info) return Gnosis.s.ct.bmusic; end,
-			set = function(info,val) Gnosis.s.ct.bmusic = val; end,
-		},
-		sound = {
-			order = 4,
-			name = Gnosis.L["OptSnd"],
-			type = "select",
-			values = Gnosis.BlizzSounds,
-			get = function(info) return Gnosis.s.ct.sound; end,
-			set = function(info,val) Gnosis.s.ct.sound = val; end,
-			style = "dropdown",
-		},
-		music = {
-			order = 5,
-			name = Gnosis.L["OptMusic"],
-			type = "select",
-			dialogControl = "LSM30_Sound",
-			values = AceGUIWidgetLSMlists.sound,
-			get = function(info) return Gnosis.s.ct.music; end,
-			set = function(info,val) Gnosis.s.ct.music = val; end,
-			style = "dropdown",
-		},
-		playsound = {
-			order = 6,
-			name = Gnosis.L["OptPlaySnd"],
-			type = "execute",
-			func = function() if(Gnosis.s.ct.sound) then
-				 PlaySound(Gnosis.s.ct.sound); end
-			end,
-		},
-		playmusic = {
-			order = 7,
-			name = Gnosis.L["OptPlayMusic"],
-			type = "execute",
-			func = function() if(Gnosis.s.ct.music) then
-				PlaySoundFile(self.lsm:Fetch("sound", Gnosis.s.ct.music)); end
-			end,
-		},
-		wfcl = {
-			order = 9,
-			name = Gnosis.L["OptWfCL_Name"],
-			desc = Gnosis.L["OptWfCL_Desc"],
-			type = "range",
-			min = 0, max = 1500,
-			step = 10, bigStep = 10,
-			get = function(info) return Gnosis.s.wfcl; end,
-			set = function(info,val) Gnosis.s.wfcl = val; end,
-			isPercent = false,
-		},
-		ctt = {
-			order = 10,
-			name = Gnosis.L["OptClipWarn_Name"],
-			desc = Gnosis.L["OptClipWarn_Desc"],
-			type = "range",
-			min = 0, max = 500,
-			step = 10, bigStep = 10,
-			get = function(info) return Gnosis.s.ctt; end,
-			set = function(info,val) Gnosis.s.ctt = val; end,
-			isPercent = false,
-		},
+			name = " ",
+			type = "group",
+			inline = true,
+			args = {
+				wfcl = {
+					order = 1,
+					name = Gnosis.L["OptWfCL_Name"],
+					desc = Gnosis.L["OptWfCL_Desc"],
+					type = "range",
+					min = 0, max = 1500,
+					step = 10, bigStep = 10,
+					get = function(info) return Gnosis.s.wfcl; end,
+					set = function(info,val) Gnosis.s.wfcl = val; end,
+					isPercent = false,
+					width = "full",
+				},
+				ctt = {
+					order = 2,
+					name = Gnosis.L["OptClipWarn_Name"],
+					desc = Gnosis.L["OptClipWarn_Desc"],
+					type = "range",
+					min = 0, max = 500,
+					step = 10, bigStep = 10,
+					get = function(info) return Gnosis.s.ctt; end,
+					set = function(info,val) Gnosis.s.ctt = val; end,
+					isPercent = false,
+					width = "full",
+				},
+			},
+		},			
 	};
 end
 
@@ -509,6 +570,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "toggle",
 					get = function(info) return Gnosis.s.channeledspells[key].ben; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].ben = val; end,
+					width = "full",
 				},
 				ticks = {
 					order = self:GetNextTableIndex(),
@@ -536,6 +598,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "toggle",
 					get = function(info) return Gnosis.s.channeledspells[key].baddticks; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].baddticks = val; end,
+					width = "full",
 				},
 				binit = {
 					order = self:GetNextTableIndex(),
@@ -543,6 +606,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "toggle",
 					get = function(info) return Gnosis.s.channeledspells[key].binit; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].binit = val; end,
+					width = "full",
 				},
 				baoe = {
 					order = self:GetNextTableIndex(),
@@ -550,6 +614,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "toggle",
 					get = function(info) return Gnosis.s.channeledspells[key].baoe; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].baoe = val; end,
+					width = "full",
 				},
 				bhidenp = {
 					order = self:GetNextTableIndex(),
@@ -557,6 +622,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "toggle",
 					get = function(info) return Gnosis.s.channeledspells[key].bhidenonplayer; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].bhidenonplayer = val; end,
+					width = "full",
 				},
 				bclip = {
 					order = self:GetNextTableIndex(),
@@ -564,6 +630,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "toggle",
 					get = function(info) return Gnosis.s.channeledspells[key].bcliptest; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].bcliptest = val; end,
+					width = "full",
 				},
 				bticksound = {
 					order = self:GetNextTableIndex(),
@@ -572,6 +639,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "toggle",
 					get = function(info) return Gnosis.s.channeledspells[key].bticksound; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].bticksound = val; end,
+					width = "full",
 				},
 				bcombattext = {
 					order = self:GetNextTableIndex(),
@@ -579,6 +647,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "toggle",
 					get = function(info) return Gnosis.s.channeledspells[key].bcombattext; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].bcombattext = val; end,
+					width = "full",
 				},
 				ctoutput = {
 					order = self:GetNextTableIndex(),
@@ -587,6 +656,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					type = "input",
 					get = function(info) return  Gnosis.s.channeledspells[key].ctstring; end,
 					set = function(info,val) Gnosis.s.channeledspells[key].ctstring = val; end,
+					width = "full",
 				},
 				bicon = {
 					order = self:GetNextTableIndex(),
@@ -627,6 +697,7 @@ function Gnosis:CreateChannelSpellsOpt()
 					name = Gnosis.L["OptCSRemove"],
 					type = "execute",
 					func = function() Gnosis:RemoveChanneledSpell(key); end,
+					width = "full",
 				},
 			},
 		};
