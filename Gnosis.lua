@@ -379,11 +379,22 @@ function Gnosis:OnEnable()
 		self.s.optver = self.optver;
 	end
 	for key, value in pairs(self.tDefaults) do
-		if(self.s[key] == nil) then
+		if (self.s[key] == nil) then
 			self.s[key] = value;
 		end
 	end
-
+	for key, value in pairs(self.tDefaults.ct) do
+		if (self.s.ct[key] == nil) then
+			self.s.ct[key] = value;
+		end
+	end
+	for key, value in pairs(self.tDefaults.configs) do
+		if (self.s.configs[key] == nil) then
+			self.s.configs[key] = value;
+		end
+	end
+	
+	
 	if(not self.s.bHideAddonMsgs) then
 		self:Print(self.title .. " " .. Gnosis.L["MsgLoaded"] .. " " .. (self.s.bAddonEn and Gnosis.L["MsgEn"] or Gnosis.L["MsgDis"]));
 	end
@@ -906,11 +917,17 @@ function Gnosis:UpdateClipTest()
 end
 
 function Gnosis:PlaySounds()
-	if(self.s.ct.bsound and self.s.ct.sound) then
-		PlaySound(self.s.ct.sound);
+	if (self.s.ct.bsound and self.s.ct.sound) then
+		PlaySound(self.s.ct.sound, self.s.ct.channel and
+			self.tSoundChannels[self.s.ct.channel] or self.tSoundChannels[1]);
 	end
-	if(self.s.ct.bmusic and self.s.ct.music) then
-		PlaySoundFile(self.lsm:Fetch("sound", Gnosis.s.ct.music));
+	if (self.s.ct.bmusic and self.s.ct.music) then
+		PlaySoundFile(self.lsm:Fetch("sound", self.s.ct.music),
+			self.s.ct.channel and self.tSoundChannels[self.s.ct.channel] or self.tSoundChannels[1]);
+	end
+	if (self.s.ct.bfile and self.s.ct.file) then
+		PlaySoundFile(self.s.ct.file,
+			self.s.ct.channel and self.tSoundChannels[self.s.ct.channel] or self.tSoundChannels[1]);
 	end
 end
 

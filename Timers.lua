@@ -679,6 +679,40 @@ function Gnosis:Timers_PowerGeneric(bar, timer, ti)
 	end
 end
 
+function Gnosis:Timers_Experience(bar, timer, ti)
+	local xp = UnitXP("player");
+	local xpmax = UnitXPMax("player");
+	
+	if (xp and xpmax) then
+		ti.icon = nil;
+		ti.unit = "player";
+		ti.bSpecial = true;
+		if (timer.brange) then
+			ti.ok = in_value_range(xp, xp*100/xpmax, timer.range_tab);
+		else
+			ti.ok = true;
+		end
+		set_times(timer, ti, xpmax, xp, true);
+	end
+end
+
+function Gnosis:Timers_RestedXP(bar, timer, ti)
+	local rested = GetXPExhaustion();
+	local xpmax = UnitXPMax("player");
+	
+	if (rested and xpmax) then
+		ti.icon = nil;
+		ti.unit = "player";
+		ti.bSpecial = true;
+		if (timer.brange) then
+			ti.ok = in_value_range(rested, min(rested*100/xpmax, 100), timer.range_tab);
+		else
+			ti.ok = true;
+		end
+		set_times(timer, ti, xpmax, rested, true); 
+	end
+end
+
 function Gnosis:Timers_Health(bar, timer, ti)
 	local s, d = UnitHealth(timer.unit), UnitHealthMax(timer.unit);
 	if(d and d > 0) then
@@ -1006,49 +1040,49 @@ function Gnosis:CreateSingleTimerTable()
 					for w in string_gmatch(cmd, "%w+") do
 						w = string_lower(w);
 
-						if(w == "cast") then
+						if (w == "cast") then
 							tiType = 0;
 							cfinit = Gnosis.Timers_Spell;
-						elseif(w == "cd") then
+						elseif (w == "cd") then
 							tiType = 1;
 							unit = "player";
 							cfinit = Gnosis.Timers_SpellCD;
-						elseif(w == "dot" or w == "debuff") then
+						elseif (w == "dot" or w == "debuff") then
 							bHarm = true;
 							tiType = 2;
 							cfinit = Gnosis.Timers_Aura;
-						elseif(w == "hot" or w == "buff") then
+						elseif (w == "hot" or w == "buff") then
 							bHelp = true;
 							tiType = 2;
 							cfinit = Gnosis.Timers_Aura;
-						elseif(w == "aura") then
+						elseif (w == "aura") then
 							tiType = 2;
 							cfinit = Gnosis.Timers_Aura;
-						elseif(w == "itemcd") then
+						elseif (w == "itemcd") then
 							tiType = 3;
 							unit = "player";
 							cfinit = Gnosis.Timers_ItemCD;
-						elseif(w == "runecd") then
+						elseif (w == "runecd") then
 							unit = "player";
-							if(tonumber(spell) and tonumber(spell) > 0 and tonumber(spell) <= 6) then
+							if (tonumber(spell) and tonumber(spell) > 0 and tonumber(spell) <= 6) then
 								tiType = 4;
 								cfinit = Gnosis.Timers_RuneCD;
 							end
-						elseif(w == "totemdur") then
+						elseif (w == "totemdur") then
 							unit = "player";
 							if(tonumber(spell) and tonumber(spell) > 0 and tonumber(spell) <= MAX_TOTEMS) then
 								tiType = 5;
 								cfinit = Gnosis.Timers_TotemDuration;
 							end
-						elseif(w == "enchmh") then
+						elseif (w == "enchmh") then
 							tiType = 6;
 							unit = "player";
 							cfinit = Gnosis.Timers_WeaponEnchantMain;
-						elseif(w == "enchoh") then
+						elseif (w == "enchoh") then
 							tiType = 7;
 							unit = "player";
 							cfinit = Gnosis.Timers_WeaponEnchantOff;
-						elseif(w == "icd" or w == "innercd" or w == "proc") then
+						elseif (w == "icd" or w == "innercd" or w == "proc") then
 							-- valid spell or spell id given? (name of spell passed for icd does not
 							-- necessarily have to be a valid spell)
 							local spell_, _, icon_ = GetSpellInfo(spell);
@@ -1067,7 +1101,7 @@ function Gnosis:CreateSingleTimerTable()
 								};
 							end
 							unit = "player";
-						elseif(w == "fixed") then
+						elseif (w == "fixed") then
 							tiType = 10;
 							unit = "player";
 							cfinit = Gnosis.Timers_Fixed;
@@ -1086,96 +1120,102 @@ function Gnosis:CreateSingleTimerTable()
 							tiType = 14;
 							unit = "player";
 							cfinit = Gnosis.Timers_ItemEquipped;
-						elseif(w == "groupdot" or w == "groupdebuff") then
+						elseif (w == "groupdot" or w == "groupdebuff") then
 							bHarm = true;
 							tiType = 21;
 							cfinit = Gnosis.Timers_GroupAura;
-						elseif(w == "grouphot" or w == "groupbuff") then
+						elseif (w == "grouphot" or w == "groupbuff") then
 							bHelp = true;
 							tiType = 21;
 							cfinit = Gnosis.Timers_GroupAura;
-						elseif(w == "groupaura") then
+						elseif (w == "groupaura") then
 							tiType = 21;
 							cfinit = Gnosis.Timers_GroupAura;
-						elseif(w == "resource") then
-							if(spell == "power") then
+						elseif (w == "resource") then
+							if (spell == "power") then
 								tiType = 1000;
 								cfinit = Gnosis.Timers_Power;
-							elseif(spell == "health") then
+							elseif (spell == "health") then
 								tiType = 1001;
 								cfinit = Gnosis.Timers_Health;
-							elseif(spell == "altpower") then
+							elseif (spell == "altpower") then
 								tiType = 1002;
 								cfinit = Gnosis.Timers_PowerAlternate;
-							elseif(spell == "heal") then
+							elseif (spell == "heal") then
 								tiType = 1003;
 								cfinit = Gnosis.Timers_IncomingHealth;
-							elseif(spell == "threat") then
+							elseif (spell == "threat") then
 								tiType = 1004;
 								cfinit = Gnosis.Timers_TargetThreat;
-							elseif(spell == "combopoints") then
+							elseif (spell == "combopoints") then
 								tiType = 1005;
 								cfinit = Gnosis.Timers_ComboPoints;
-							elseif(spell == "range") then
+							elseif (spell == "range") then
 								tiType = 1006;
 								cfinit = Gnosis.Timers_Range;
-							elseif(spell == "soulshards") then
+							elseif (spell == "soulshards") then
 								tiType = 2007;
 								cfinit = Gnosis.Timers_PowerGeneric;
-							elseif(spell == "eclipse") then
+							elseif (spell == "eclipse") then
 								tiType = 2008;
 								cfinit = Gnosis.Timers_PowerGeneric;
-							elseif(spell == "holypower") then
+							elseif (spell == "holypower") then
 								tiType = 2009;
 								cfinit = Gnosis.Timers_PowerGeneric;
-							elseif(spell == "chi") then
+							elseif (spell == "chi") then
 								tiType = 2012;
 								cfinit = Gnosis.Timers_PowerGeneric;
-							elseif(spell == "shadoworbs") then
+							elseif (spell == "shadoworbs") then
 								tiType = 2013;
 								cfinit = Gnosis.Timers_PowerGeneric;
-							elseif(spell == "burningembers") then
+							elseif (spell == "burningembers") then
 								tiType = 2014;
 								cfinit = Gnosis.Timers_PowerGeneric;
-							elseif(spell == "demonicfury") then
+							elseif (spell == "demonicfury") then
 								tiType = 2015;
 								cfinit = Gnosis.Timers_PowerGeneric;
+							elseif (spell == "xp" or spell == "experience") then
+								tiType = 2016;
+								cfinit = Gnosis.Timers_Experience;
+							elseif (spell == "rested" or spell == "restedxp") then
+								tiType = 2017;
+								cfinit = Gnosis.Timers_RestedXP;
 							end
-						elseif(w == "mine") then
+						elseif (w == "mine") then
 							bSelf = true;
-						elseif(w == "helpful" or w == "help") then
+						elseif (w == "helpful" or w == "help") then
 							bHelp = true;
-						elseif(w == "harmful" or w == "harm") then
+						elseif (w == "harmful" or w == "harm") then
 							bHarm = true;
-						elseif(w == "lag") then
+						elseif (w == "lag") then
 							bShowLag = true;
-						elseif(w == "casttime") then
+						elseif (w == "casttime") then
 							bShowCasttime = true;
-						elseif(w == "exists") then
+						elseif (w == "exists") then
 							bExists = true;
-						elseif(w == "not") then
+						elseif (w == "not") then
 							bNot = true;
-						elseif(w == "hidespark") then
+						elseif (w == "hidespark") then
 							bHideSpark = true;
-						elseif(w == "hideicon") then
+						elseif (w == "hideicon") then
 							bHideIcon = true;
-						elseif(w == "and") then
+						elseif (w == "and") then
 							boolop = 1;
-						elseif(w == "or") then
+						elseif (w == "or") then
 							boolop = 2;
-						elseif(w == "sort") then
-							if(spell == "minrem") then
+						elseif (w == "sort") then
+							if (spell == "minrem") then
 								iSort = 1;
-							elseif(spell == "maxrem") then
+							elseif (spell == "maxrem") then
 								iSort = 2;
-							elseif(spell == "mindur") then
+							elseif (spell == "mindur") then
 								iSort = 3;
-							elseif(spell == "maxdur") then
+							elseif (spell == "maxdur") then
 								iSort = 4;
-							elseif(spell == "first") then
+							elseif (spell == "first") then
 								iSort = 5;
 							end
-						elseif(w == "norefresh") then
+						elseif (w == "norefresh") then
 							norefresh = true;
 						end
 					end
