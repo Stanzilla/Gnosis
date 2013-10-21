@@ -2021,11 +2021,11 @@ function Gnosis:ExportAllBars()
 end
 
 function Gnosis:ExportBar(key)
-	if(key) then
+	if (key) then
 		local key_name = string_gsub(key, "\"", "\\\"");
 		local str = Gnosis:CreateBarValueScript("Gnosis.s.cbconf[\"" .. key_name .. "\"]", Gnosis.s.cbconf[key]);
 
-		if(str) then
+		if (str) then
 			local dispstr = "Gnosis:ImportBarInit(\"" .. key_name .. "\"); " .. str .. " Gnosis:ImportBarFinalize(\"" .. key_name .. "\");";
 			
 			Gnosis.dialog:Register("GNOSIS_EXPORT",
