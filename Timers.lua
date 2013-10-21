@@ -862,15 +862,15 @@ end
 
 function Gnosis:ExtractRegex(str, regex_a, regex_b, dotrim)
 	local res = string_match(str, regex_a);
-	if(res) then
-		if(dotrim) then
+	if (res) then
+		if (dotrim) then
 			res = string_trim(res);
 		end
 		return res, string_gsub(str, regex_a, "");
-	elseif(regex_b) then
+	elseif (regex_b) then
 		res = string_match(str, regex_b);
-		if(res) then
-			if(dotrim) then
+		if (res) then
+			if (dotrim) then
 				res = string_trim(res);
 			end
 			return res, string_gsub(str, regex_b, "");
@@ -992,7 +992,7 @@ function Gnosis:CreateSingleTimerTable()
 					str = "";
 				end
 
-				local unit, recast, staticdur, zoom, spec, iconoverride, portraitunit, shown, hidden;
+				local unit, recast, staticdur, zoom, spec, iconoverride, portraitunit, shown, hidden, plays, playm, playf;
 
 				-- extract commands from current line
 				unit, str = self:ExtractRegex(str, "unit=(%w+)", "unit=\"([^\"]+)\"", true);
@@ -1000,6 +1000,9 @@ function Gnosis:CreateSingleTimerTable()
 				shown, str = self:ExtractRegex(str, "shown=(%w+)", "shown=\"([^\"]+)\"", true);
 				hidden, str = self:ExtractRegex(str, "hidden=(%w+)", "hidden=\"([^\"]+)\"", true);
 				portraitunit, str = self:ExtractRegex(str, "portrait=(%w+)", "portrait=\"([^\"]+)\"", true);
+				plays, str = self:ExtractRegex(str, "plays=\"([^\"]+)\"", nil, true);
+				playm, str = self:ExtractRegex(str, "playm=\"([^\"]+)\"", nil, true);
+				playf, str = self:ExtractRegex(str, "playf=\"([^\"]+)\"", nil, true);
 				recast, str = self:ExtractRegex(str, "recast=([+-]?[0-9]*%.?[0-9]*)", "recast=\"([+-]?[0-9]*%.?[0-9]*)\"");	-- floating point regex
 				staticdur, str = self:ExtractRegex(str, "staticdur=([+-]?[0-9]*%.?[0-9]*)", "staticdur=\"([+-]?[0-9]*%.?[0-9]*)\"");
 				zoom, str = self:ExtractRegex(str, "zoom=([+-]?[0-9]*%.?[0-9]*)", "zoom=\"([+-]?[0-9]*%.?[0-9]*)\"");
@@ -1009,6 +1012,45 @@ function Gnosis:CreateSingleTimerTable()
 					staticdur and (tonumber(staticdur) * 1000),
 					zoom and (tonumber(zoom) * 1000),
 					spec and tonumber(spec);
+				
+				-- get play interval time
+				local playinterval;
+				if (plays) then
+					local s, f;
+					s, f, playinterval, plays = string_find(plays, "([+-]?[0-9]*%.?[0-9]*)%-(.+)");
+					if (playinterval) then playinterval = tonumber(playinterval); end
+					playm = nil; playf = nil;
+				elseif (playm) then
+					s, f, playinterval, playm = string_find(playm, "([+-]?[0-9]*%.?[0-9]*)%-(.+)");
+					if (playinterval) then playinterval = tonumber(playinterval); end
+					plays = nil; playf = nil;
+				elseif (playf) then
+					s, f, playinterval, playf = string_find(playf, "([+-]?[0-9]*%.?[0-9]*)%-(.+)");
+					if (playinterval) then playinterval = tonumber(playinterval); end
+					plays = nil; playm = nil;
+				end
+				
+				-- check if playinterval is too short or too long
+				if (playinterval and (playinterval < 0.5 or playinterval > 600)) then
+					playinterval = nil;
+				end
+
+				local fplay, tplay, toplay;
+				if (playinterval) then
+					if (plays) then
+						fplay = PlaySound;
+						tplay = self.played.s;
+						toplay = plays;
+					elseif (playm and self.lsm:Fetch("sound", playm)) then
+						fplay = PlaySoundFile;
+						tplay = self.played.m;
+						toplay = self.lsm:Fetch("sound", playm);
+					elseif (playf) then
+						fplay = PlaySoundFile;
+						tplay = self.played.f;
+						toplay = playf;
+					end
+				end
 				
 				-- icon override, portrait unit
 				local iconoverride = select(3, GetSpellInfo(iconoverride));
@@ -1254,6 +1296,10 @@ function Gnosis:CreateSingleTimerTable()
 							ptun = portraitunit,
 							shown = shown,
 							hidden = hidden,
+							playinterval = playinterval,
+							fplay = fplay,
+							tplay = tplay,
+							toplay = toplay,
 						};
 						-- targeted unit
 						tTimer.unit = unit and unit or conf.unit;
@@ -1353,12 +1399,12 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 	local bDelayedShow = false;
 
 	-- hide bar in/out of combat
-	if(bar.conf.incombatsel == 1 or bar.conf.incombatsel == self.curincombattype or bar.conf.bUnlocked) then
-		if(bar.bBarHidden) then
+	if (bar.conf.incombatsel == 1 or bar.conf.incombatsel == self.curincombattype or bar.conf.bUnlocked) then
+		if (bar.bBarHidden) then
 			bDelayedShow = true;
 		end
 	else
-		if(not bar.bBarHidden) then
+		if (not bar.bBarHidden) then
 			bar:Hide();
 			bar.bBarHidden = true;
 		end
@@ -1366,7 +1412,7 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 	end
 
 		-- valid group layout?
-	if(not self:CheckGroupLayout(bar.conf)) then
+	if (not self:CheckGroupLayout(bar.conf)) then
 		if(not bar.bBarHidden) then
 			bar:Hide();
 			bar.bBarHidden = true;
@@ -1377,7 +1423,7 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 	local boolop_complete;
 	SelectedTimerInfo.duration = nil;
 	for k, v in ipairs(bar.timers) do
-		if(boolop_complete) then
+		if (boolop_complete) then
 			-- search for first timer entry without boolop
 			if(v.boolop == 0) then
 				boolop_complete = nil;
@@ -1403,42 +1449,42 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 			end
 			
 			-- check entry
-			if(checkentry) then
+			if (checkentry) then
 				-- call related timer function (Timers.lua)
 				v:cfinit(bar, v, TimerInfo);
 
-				if(TimerInfo.ok and self:UnitRelationSelect(bar.conf.relationsel, TimerInfo.unit)) then
+				if (TimerInfo.ok and self:UnitRelationSelect(bar.conf.relationsel, TimerInfo.unit)) then
 					-- boolop?
-					if(v.boolop == 1) then
+					if (v.boolop == 1) then
 						-- timer is condition for next one(s), next please
 					else
-						if(v.boolop == 2) then
+						if (v.boolop == 2) then
 							boolop_complete = true;
 						end
 
 						-- check if cooldown is gcd
 						local bTakeover = false;
-						if(TimerInfo.bSpecial) then
+						if (TimerInfo.bSpecial) then
 							bTakeover = true;
 							SelectedTimerInfo.bSpecial = TimerInfo.bSpecial;
 							SelectedTimerInfo.valIsStatic = TimerInfo.valIsStatic;
 						else
 							-- sorting
 							SelectedTimerInfo.bSpecial = false;
-							if(not bar.iTimerSort or not SelectedTimerInfo.duration) then
+							if (not bar.iTimerSort or not SelectedTimerInfo.duration) then
 								bTakeover = true;
-							elseif(bar.iTimerSort == 1 and SelectedTimerInfo.endTime > TimerInfo.fin) then	-- min remaining
+							elseif (bar.iTimerSort == 1 and SelectedTimerInfo.endTime > TimerInfo.fin) then	-- min remaining
 								bTakeover = true;
-							elseif(bar.iTimerSort == 2 and SelectedTimerInfo.endTime < TimerInfo.fin) then	-- max remaining
+							elseif (bar.iTimerSort == 2 and SelectedTimerInfo.endTime < TimerInfo.fin) then	-- max remaining
 								bTakeover = true;
-							elseif(bar.iTimerSort == 3 and SelectedTimerInfo.duration > TimerInfo.dur) then	-- min duration
+							elseif (bar.iTimerSort == 3 and SelectedTimerInfo.duration > TimerInfo.dur) then	-- min duration
 								bTakeover = true;
-							elseif(bar.iTimerSort == 4 and SelectedTimerInfo.duration < TimerInfo.dur) then	-- max duration
+							elseif (bar.iTimerSort == 4 and SelectedTimerInfo.duration < TimerInfo.dur) then	-- max duration
 								bTakeover = true;
 							end
 						end
 
-						if(bTakeover) then
+						if (bTakeover) then
 							SelectedTimerInfo.castname = TimerInfo.cname;
 							SelectedTimerInfo.endTime = TimerInfo.fin;
 							SelectedTimerInfo.duration = TimerInfo.dur;
@@ -1450,37 +1496,51 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 							SelectedTimerInfo.curtimer = v;							
 						end
 
-						if(SelectedTimerInfo.bSpecial or not bar.iTimerSort) then
+						if (SelectedTimerInfo.bSpecial or not bar.iTimerSort) then
 							-- break if no sorting criterion given or if bar was durationless,
 							-- i.e. it couldn't be sorted anyway
 							break;
 						end
 					end
-				elseif(v.boolop == 1) then
+				elseif (v.boolop == 1) then
 					-- and but invalid entry, skip to next combined and/or block
 					boolop_complete = true;
 				end
-			elseif(v.boolop == 1) then
+			elseif (v.boolop == 1) then
 				-- and but invalid entry, skip to next combined and/or block
 				boolop_complete = true;
 			end
 		end
 	end
 
-	if(SelectedTimerInfo.duration) then
-		if(bDelayedShow) then
+	if (SelectedTimerInfo.duration) then
+		if (bDelayedShow) then
 			bar.bBarHidden = nil;
 			bar:Show();
 		end
 
+		-- play sound/music/file
+		local playinterval = SelectedTimerInfo.curtimer.playinterval;
+		if (playinterval) then
+			local fplay = SelectedTimerInfo.curtimer.fplay;
+			local tplay = SelectedTimerInfo.curtimer.tplay;
+			local toplay = SelectedTimerInfo.curtimer.toplay;
+			
+			if ((not tplay[toplay]) or tplay[toplay] <= GetTime()) then
+				fplay(toplay, self.s.ct.channel and self.tSoundChannels[self.s.ct.channel] or self.tSoundChannels[1]);
+				
+				tplay[toplay] = GetTime() + playinterval;
+			end
+		end
+		
 		-- only minor changes to bar necessary?
-		if(bar.bActive and bar.timer_id == SelectedTimerInfo.curtimer.id and bar.castname == SelectedTimerInfo.castname) then
+		if (bar.bActive and bar.timer_id == SelectedTimerInfo.curtimer.id and bar.castname == SelectedTimerInfo.castname) then
 			local dur = bar.dur and bar.dur or bar.duration;
 			local bRecalcTick = (dur ~= SelectedTimerInfo.duration);
 
 			-- redo name text
 				-- stacks; effect value and name of targeted unit (added in 4.01)
-			if(bar.stacks ~= SelectedTimerInfo.stacks or bar.effect ~= SelectedTimerInfo.effect or SelectedTimerInfo.tiunit ~= bar.tiUnit or bar.tiUnitName ~= UnitName(bar.tiUnit)) then
+			if (bar.stacks ~= SelectedTimerInfo.stacks or bar.effect ~= SelectedTimerInfo.effect or SelectedTimerInfo.tiunit ~= bar.tiUnit or bar.tiUnitName ~= UnitName(bar.tiUnit)) then
 				bar.stacks = SelectedTimerInfo.stacks;
 				bar.effect = SelectedTimerInfo.effect;
 				bar.tiUnit = SelectedTimerInfo.tiunit;
@@ -1488,8 +1548,8 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 				bar.ctext:SetText(self:CreateCastname(bar, bar.conf, SelectedTimerInfo.castname, ""));
 			end
 			
-			if(SelectedTimerInfo.bSpecial) then
-				if(not SelectedTimerInfo.valIsStatic) then
+			if (SelectedTimerInfo.bSpecial) then
+				if (not SelectedTimerInfo.valIsStatic) then
 					-- power
 					self:SetPowerbarValue(bar, SelectedTimerInfo.endTime, SelectedTimerInfo.duration, SelectedTimerInfo.curtimer.cbs);
 				end
@@ -1506,15 +1566,15 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 			bar.duration = bZoom and SelectedTimerInfo.curtimer.zoom or (bStatic and SelectedTimerInfo.curtimer.staticdur or SelectedTimerInfo.duration);
 			bar.endTime = SelectedTimerInfo.endTime;
 
-			if(bar.cbs_check) then
+			if (bar.cbs_check) then
 				local bShowCBS = bar.duration >= (bar.endTime - fCurTime);
-				if(bShowCBS) then
-					if(bar.cbs_hidden) then
+				if (bShowCBS) then
+					if (bar.cbs_hidden) then
 						bar.cbs:Show();
 						bar.cbs_hidden = false;
 					end
 				else
-					if(not bar.cbs_hidden) then
+					if (not bar.cbs_hidden) then
 						bar.cbs:Hide();
 						bar.cbs_hidden = true;
 					end
@@ -1532,7 +1592,7 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 			bar.nfs = SelectedTimerInfo.curtimer.nfs and SelectedTimerInfo.curtimer.nfs or bar.conf.strNameFormat;
 			bar.tfs = SelectedTimerInfo.curtimer.tfs and SelectedTimerInfo.curtimer.tfs or bar.conf.strTimeFormat;
 
-			if(SelectedTimerInfo.bSpecial) then
+			if (SelectedTimerInfo.bSpecial) then
 				bar.bSpecial = true;
 				self:SetupPowerbar(bar, SelectedTimerInfo);
 			else
@@ -1540,10 +1600,10 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 				self:SetupTimerbar(bar, fCurTime, SelectedTimerInfo);
 			end
 		end
-	elseif(self.activebars[bar.name] or bar.forcecleanup) then
+	elseif (self.activebars[bar.name] or bar.forcecleanup) then
 		local conf = bar.conf;
 		-- bar active, fadeout or cleanup
-		if(conf.bUnlocked or conf.bShowWNC or bDelayedShow) then
+		if (conf.bUnlocked or conf.bShowWNC or bDelayedShow) then
 			self:CleanupCastbar(bar);
 			bar.forcecleanup = false;
 		else

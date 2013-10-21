@@ -168,6 +168,13 @@ function Gnosis:StartupVariables()
 	self.ti_icd_active = {};-- active inner cooldowns
 	self.scan = {};			-- units to scan
 
+	-- play intervals (audio)
+	self.played = {
+		s = {},
+		m = {},
+		f = {},
+	};
+	
 	-- (LibSharedMedia)
 	self.bartexnames = {};
 	self.bartextures = {};
