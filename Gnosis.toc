@@ -42,6 +42,7 @@ Options.lua
 Variables.lua
 Bars.lua
 Timers.lua
+Encoding.lua
 
 # Gnosis' StatusBar implementation
 CreateStatusBar.lua
