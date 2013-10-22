@@ -2053,6 +2053,46 @@ function Gnosis:ExportBar(key)
 			Gnosis.dialog:Spawn("GNOSIS_EXPORT");
 		end
 	end
+	
+	--[[ tried encoding in 6bit, compression incl. encoding gains only about 20%; keep the old solution :(
+	if (key and self.s.cbconf[key]) then
+		-- serialize table
+		local comp = self.libs:Serialize(self.s.cbconf[key]);
+		-- compress and encode for communication via addon channel
+		local lc = Gnosis.libc;
+		comp = lc:Compress(comp);
+		comp = self:EncStr(comp);
+		-- generate 32bit hash
+		local comp_hash = lc:fcs32final(lc:fcs32update(lc:fcs32init(), comp));
+		-- complete message to send
+		local msg = "[" .. Gnosis:ExchangeEscapeSequenceChars(key, "\\:") .. ":" ..
+			comp_hash .. ":" .. string.len(comp) .. ":" .. comp .. "]";
+	
+		Gnosis.dialog:Register("GNOSIS_EXPORT",
+			{
+				text = string_format(Gnosis.L["CpyScriptFromEditBox"], key),
+				editboxes = {
+					{
+						width = 400,
+						height = 200,
+					},
+				},
+				on_show = function(self, data) 
+					self.editboxes[1]:SetText(msg);
+					self.editboxes[1]:HighlightText();
+					self.editboxes[1]:SetFocus();
+				end,
+				hide_on_escape = false,
+				show_while_dead = true,
+				exclusive = true,
+				width = 420,
+				strata = 5,
+			}
+		);
+		
+		Gnosis.dialog:Spawn("GNOSIS_EXPORT");
+	end
+	]]
 end
 
 function Gnosis:ExportBarChatlink(key)
@@ -2092,9 +2132,16 @@ function Gnosis:ImportBars()
 					text = Gnosis.L["Import"],
 					on_click = function(self)
 						local str = self.editboxes[1]:GetText();
-						if(str and string_len(str) > 0) then
-							RunScript(str);
-							InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+						if (str and string_len(str) > 0) then
+							local func, errorMessage = loadstring(str, "import");
+							
+							if (func) then
+								func();
+								InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+							else
+								Gnosis:Print("error importing bars from script:");
+								Gnosis:Print(errorMessage);								
+							end
 						end
 					end,
 				},
