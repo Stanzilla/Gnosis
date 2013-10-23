@@ -1516,7 +1516,7 @@ function Gnosis:CreateCastbarsOpt()
 							name = Gnosis.L["OptCBBWListedSpells"],
 							desc = Gnosis.L["OptCBNewListElem_D"],
 							type = "input",
-							multiline = 10,
+							multiline = 20,
 							get = function(info)
 								return Gnosis:MultilineFromTable(Gnosis.s.cbconf[key].bnwlist);
 							end,
