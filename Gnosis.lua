@@ -485,6 +485,7 @@ function Gnosis:HandleChatCommand(cmd)
 			self:InjectTimer(bar, text, cnt, spell, iscast);
 		else
 			InterfaceOptionsFrame_OpenToCategory(self.optFrame);
+			InterfaceOptionsFrame_OpenToCategory(self.optFrame);
 		end
 	end
 end
