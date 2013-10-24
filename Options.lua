@@ -2021,53 +2021,10 @@ function Gnosis:ExportAllBars()
 end
 
 function Gnosis:ExportBar(key)
-	if (key) then
-		local key_name = string_gsub(key, "\"", "\\\"");
-		local str = Gnosis:CreateBarValueScript("Gnosis.s.cbconf[\"" .. key_name .. "\"]", Gnosis.s.cbconf[key]);
-
-		if (str) then
-			local dispstr = "Gnosis:ImportBarInit(\"" .. key_name .. "\"); " .. str .. " Gnosis:ImportBarFinalize(\"" .. key_name .. "\");";
-			
-			Gnosis.dialog:Register("GNOSIS_EXPORT",
-				{
-					text = string_format(Gnosis.L["CpyScriptFromEditBox"], key),
-					editboxes = {
-						{
-							width = 400,
-							height = 200,
-						},
-					},
-					on_show = function(self, data) 
-						self.editboxes[1]:SetText(dispstr);
-						self.editboxes[1]:HighlightText();
-						self.editboxes[1]:SetFocus();
-					end,
-					hide_on_escape = false,
-					show_while_dead = true,
-					exclusive = true,
-					width = 420,
-					strata = 5,
-				}
-			);
-			
-			Gnosis.dialog:Spawn("GNOSIS_EXPORT");
-		end
-	end
+	local encstr = self:ExportBarEncStr(key);
 	
-	--[[ tried encoding in 6bit, compression incl. encoding gains only about 20%; keep the old solution :(
-	if (key and self.s.cbconf[key]) then
-		-- serialize table
-		local comp = self.libs:Serialize(self.s.cbconf[key]);
-		-- compress and encode for communication via addon channel
-		local lc = Gnosis.libc;
-		comp = lc:Compress(comp);
-		comp = self:EncStr(comp);
-		-- generate 32bit hash
-		local comp_hash = lc:fcs32final(lc:fcs32update(lc:fcs32init(), comp));
-		-- complete message to send
-		local msg = "[" .. Gnosis:ExchangeEscapeSequenceChars(key, "\\:") .. ":" ..
-			comp_hash .. ":" .. string.len(comp) .. ":" .. comp .. "]";
-	
+	-- send 6bit encoded bar table information
+	if (encstr) then
 		Gnosis.dialog:Register("GNOSIS_EXPORT",
 			{
 				text = string_format(Gnosis.L["CpyScriptFromEditBox"], key),
@@ -2078,7 +2035,7 @@ function Gnosis:ExportBar(key)
 					},
 				},
 				on_show = function(self, data) 
-					self.editboxes[1]:SetText(msg);
+					self.editboxes[1]:SetText(encstr);
 					self.editboxes[1]:HighlightText();
 					self.editboxes[1]:SetFocus();
 				end,
@@ -2092,12 +2049,11 @@ function Gnosis:ExportBar(key)
 		
 		Gnosis.dialog:Spawn("GNOSIS_EXPORT");
 	end
-	]]
 end
 
 function Gnosis:ExportBarChatlink(key)
 	local link = "[Gnosis:" .. UnitName("player") .. '-' .. GetRealmName() .. ":" ..
-		self:ExchangeEscapeSequenceChars(key, "\\%]") .. "]";
+		self:ExchangeEscapeSequenceChars(key, "\\:%[%]") .. "]";
 		
 	local eb = GetCurrentKeyBoardFocus();
 	if (eb) then
@@ -2133,15 +2089,7 @@ function Gnosis:ImportBars()
 					on_click = function(self)
 						local str = self.editboxes[1]:GetText();
 						if (str and string_len(str) > 0) then
-							local func, errorMessage = loadstring(str, "import");
-							
-							if (func) then
-								func();
-								InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
-							else
-								Gnosis:Print("error importing bars from script:");
-								Gnosis:Print(errorMessage);								
-							end
+							Gnosis:ImportBarsFromScriptOrEncStr(str);
 						end
 					end,
 				},
@@ -2158,7 +2106,7 @@ function Gnosis:ImportBars()
 			end,
 			hide_on_escape = false,
 			show_while_dead = true,
-			exclusive = true,
+			--exclusive = true,
 			width = 420,
 			strata = 5,
 		}
