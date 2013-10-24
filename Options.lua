@@ -1971,7 +1971,7 @@ function Gnosis:CreateBarValueScript(key, tab)
 end
 
 function Gnosis:ExportAllBars()
-	if(self.s and self.s.cbconf) then
+	if (self.s and self.s.cbconf) then
 		local output = "";
 		
 		-- created sorted table
@@ -1982,14 +1982,11 @@ function Gnosis:ExportAllBars()
 		table_sort(tSorted);
 	
 		for i, cbname in ipairs(tSorted) do
-			if(self.s.cbconf[cbname]) then
-				local key_name = string_gsub(cbname, "\"", "\\\"");
-				local str = Gnosis:CreateBarValueScript("Gnosis.s.cbconf[\"" .. key_name .. "\"]", Gnosis.s.cbconf[cbname]);
-
-				if(str) then
-					local dispstr = "Gnosis:ImportBarInit(\"" .. key_name .. "\"); " .. str .. " Gnosis:ImportBarFinalize(\"" .. key_name .. "\");"
-					
-					output = output .. "--[[ Exported bar: " .. cbname .. " ]]\n" .. dispstr .. "\n\n";				
+			if (self.s.cbconf[cbname]) then
+				local barexpstr = Gnosis:ExportBarEncStr(cbname);
+				
+				if (barexpstr) then
+					output = output .. barexpstr .. "\n\n";
 				end
 			end
 		end
@@ -2089,7 +2086,14 @@ function Gnosis:ImportBars()
 					on_click = function(self)
 						local str = self.editboxes[1]:GetText();
 						if (str and string_len(str) > 0) then
-							Gnosis:ImportBarsFromScriptOrEncStr(str);
+							-- import by executing lua script
+							local func, errorMessage = loadstring(str, "import");
+							if (func) then
+								func();
+								InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+							else
+								Gnosis:ImportBarsFromStr(str);
+							end								
 						end
 					end,
 				},
@@ -2106,7 +2110,7 @@ function Gnosis:ImportBars()
 			end,
 			hide_on_escape = false,
 			show_while_dead = true,
-			--exclusive = true,
+			exclusive = true,
 			width = 420,
 			strata = 5,
 		}

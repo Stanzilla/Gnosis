@@ -313,7 +313,6 @@ function Gnosis:OnInitialize()
 			GnosisCharConfig = self:deepcopy(self.db.profile);
 		end
 	elseif(self:tsize(GnosisCharConfig) == 0) then
-		print("Copy to GnosisCharConfig");
 		self.db = LibStub("AceDB-3.0"):New("GnosisChar", defaults);	
 		if(self.db and self.db.profile and self:tsize(self.db.profile) > 0) then
 			-- copy AceDB profile to GnosisCharConfig
@@ -1148,6 +1147,7 @@ function Gnosis:CheckForFirstStart(bForce)
 		btnGUI:SetText(Gnosis.L["IfOpenGUI"]);
 		btnGUI:SetCallback("OnClick", function()
 				InterfaceOptionsFrame_OpenToCategory(Gnosis.optFrame);
+				InterfaceOptionsFrame_OpenToCategory(Gnosis.optFrame);
 			end
 		);
 		f:AddChild(btnGUI);
@@ -1291,7 +1291,6 @@ function SetItemRef(link, text, ...)
 		s, f, barname = text:find("%[[^:]+: (.-)%]\124h$");
 	end
 		
-	--print(name, server, barname);
 	if (name and server and barname) then
 		if (not IsShiftKeyDown()) then
 			Gnosis.comm:SendCommMessage("GnosisComm", "req:" .. barname, "WHISPER", name .. "-" .. server);
@@ -1357,6 +1356,7 @@ function Gnosis:CommCb(message, distribution, sender)
 									Gnosis:ImportBarInit(importname);
 									Gnosis.s.cbconf[importname] = uncomp;
 									Gnosis:ImportBarFinalize(importname);
+									InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
 								end,
 							},
 							(Gnosis.s.cbconf[importname] and {
@@ -1378,7 +1378,7 @@ function Gnosis:CommCb(message, distribution, sender)
 						},
 						hide_on_escape = false,
 						show_while_dead = true,
-						--exclusive = false,
+						exclusive = true,
 						width = 420,
 						strata = 5,
 					}
@@ -1503,8 +1503,11 @@ function Gnosis:ExtractAndImportEncStr(str)
 				ok, uncomp = Gnosis.libs:Deserialize(uncomp);
 			
 				if (ok) then
+					Gnosis.dlgcnt = Gnosis.dlgcnt and (Gnosis.dlgcnt + 1) or 1;
+					local dlgname = "GNOSIS_IMPORT_ENCSTR" .. Gnosis.dlgcnt;
+					
 					-- create import dialog
-					Gnosis.dialog:Register("GNOSIS_IMPORT_ENCSTR",
+					Gnosis.dialog:Register(dlgname,
 						{
 							text = "|cffdddd22" .. importname .. "|r\n\n" .. Gnosis.L["ImportFromHyperlink"],
 							buttons = { 
@@ -1517,7 +1520,7 @@ function Gnosis:ExtractAndImportEncStr(str)
 										InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
 									end,
 								},
-								(Gnosis.s.cbconf[importname] and {
+								Gnosis.s.cbconf[importname] and {
 									text = Gnosis.L["ImportKeepPos"],
 									on_click = function(self)
 										Gnosis:ImportBarInit(importname);
@@ -1527,7 +1530,7 @@ function Gnosis:ExtractAndImportEncStr(str)
 										Gnosis:ImportBarFinalize(importname);
 										InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
 									end,
-								} or {}),
+								} or {},
 								{
 									text = Gnosis.L["NoImport"],
 									on_click = function(self)
@@ -1536,13 +1539,13 @@ function Gnosis:ExtractAndImportEncStr(str)
 							},
 							hide_on_escape = false,
 							show_while_dead = true,
-							--exclusive = false,
+							exclusive = true,
 							width = 420,
 							strata = 5,
 						}
 					);
 				
-					Gnosis.dialog:Spawn("GNOSIS_IMPORT_ENCSTR");
+					Gnosis.dialog:Spawn(dlgname);
 				end
 				return before .. after, true;
 			end
@@ -1552,17 +1555,11 @@ function Gnosis:ExtractAndImportEncStr(str)
 	return str;
 end
 
-function Gnosis:ImportBarsFromScriptOrEncStr(str)
-	local found = true;
+function Gnosis:ImportBarsFromStr(str)
+	local found;
 	
 	-- import encoded bars
 	repeat
 		str, found = Gnosis:ExtractAndImportEncStr(str);
 	until (found == nil);
-	
-	-- import by executing lua script
-	local func, errorMessage = loadstring(str, "import");
-	if (func) then
-		func();		
-	end
 end
