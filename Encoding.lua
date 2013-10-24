@@ -76,10 +76,8 @@ end
 function Gnosis:DecStr(str, len)
 	Gnosis:GenDecTab();
 	
-	print(len, str);
-	
 	local gtd = Gnosis.tDec;
-	local cnt = min(#str, len);
+	local cnt = #str;
 	local res = {};
 	local bits = 0;
 	local bitcnt = 0;
@@ -97,7 +95,7 @@ function Gnosis:DecStr(str, len)
 		bitcnt = bitcnt + 6;
 		
 		-- generate result from bitstream
-		while (bitcnt >= 8 or (i == cnt and bitcnt > 0)) do
+		while (bitcnt >= 8) do
 			res[#res+1] = string_char(bit_band(bits, 0xff));
 			bits = bit_rshift(bits, 8);
 			bitcnt = bitcnt - 8;
@@ -105,6 +103,10 @@ function Gnosis:DecStr(str, len)
 	end	
 	
 	if (res) then
+		if (#res > len) then
+			table_setn(res, len);
+		end
+		
 		res = table_concat(res);
 		return res, string.len(res); -- do not use utf8 version of len
 	end
