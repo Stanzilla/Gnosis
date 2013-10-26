@@ -1356,7 +1356,7 @@ function Gnosis:CommCb(message, distribution, sender)
 									Gnosis:ImportBarInit(importname);
 									Gnosis.s.cbconf[importname] = uncomp;
 									Gnosis:ImportBarFinalize(importname);
-									InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+									--InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
 								end,
 							},
 							(Gnosis.s.cbconf[importname] and {
@@ -1367,7 +1367,7 @@ function Gnosis:CommCb(message, distribution, sender)
 									Gnosis.s.cbconf[importname] = uncomp;
 									Gnosis.s.cbconf[importname].anchor = anchor;
 									Gnosis:ImportBarFinalize(importname);
-									InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+									--InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
 								end,
 							} or {}),
 							{
@@ -1378,7 +1378,6 @@ function Gnosis:CommCb(message, distribution, sender)
 						},
 						hide_on_escape = false,
 						show_while_dead = true,
-						exclusive = true,
 						width = 420,
 						strata = 5,
 					}
@@ -1503,11 +1502,8 @@ function Gnosis:ExtractAndImportEncStr(str)
 				ok, uncomp = Gnosis.libs:Deserialize(uncomp);
 			
 				if (ok) then
-					Gnosis.dlgcnt = Gnosis.dlgcnt and (Gnosis.dlgcnt + 1) or 1;
-					local dlgname = "GNOSIS_IMPORT_ENCSTR" .. Gnosis.dlgcnt;
-					
 					-- create import dialog
-					Gnosis.dialog:Register(dlgname,
+					Gnosis.dialog:Register("GNOSIS_IMPORT_ENCSTR",
 						{
 							text = "|cffdddd22" .. importname .. "|r\n\n" .. Gnosis.L["ImportFromHyperlink"],
 							buttons = { 
@@ -1517,7 +1513,7 @@ function Gnosis:ExtractAndImportEncStr(str)
 										Gnosis:ImportBarInit(importname);
 										Gnosis.s.cbconf[importname] = uncomp;
 										Gnosis:ImportBarFinalize(importname);
-										InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+										--InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
 									end,
 								},
 								Gnosis.s.cbconf[importname] and {
@@ -1528,7 +1524,7 @@ function Gnosis:ExtractAndImportEncStr(str)
 										Gnosis.s.cbconf[importname] = uncomp;
 										Gnosis.s.cbconf[importname].anchor = anchor;
 										Gnosis:ImportBarFinalize(importname);
-										InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+										--InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
 									end,
 								} or {},
 								{
@@ -1537,15 +1533,18 @@ function Gnosis:ExtractAndImportEncStr(str)
 									end,
 								},
 							},
+							on_hide = function(self)
+								-- LibDialog-1.0 bandaid
+								Gnosis.bDelayedEsc = 2;
+							end,
 							hide_on_escape = false,
 							show_while_dead = true,
-							exclusive = true,
 							width = 420,
 							strata = 5,
 						}
 					);
 				
-					Gnosis.dialog:Spawn(dlgname);
+					Gnosis.dialog:Spawn("GNOSIS_IMPORT_ENCSTR");
 				end
 				return before .. after, true;
 			end
