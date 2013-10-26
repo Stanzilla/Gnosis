@@ -111,6 +111,17 @@ function Gnosis:Update()
 
 	-- timers
 	self:StartTimerUpdate(fCurTime);
+	
+	-- LibDialog-1.0 bandaid
+	if (Gnosis.bDelayedEsc) then
+		if (Gnosis.bDelayedEsc == 1) then
+			StaticPopup_EscapePressed();
+			Gnosis.bDelayedEsc = nil;
+		else
+			Gnosis.bDelayedEsc = Gnosis.bDelayedEsc - 1;
+		end
+	end
+								
 end
 
 -- events
