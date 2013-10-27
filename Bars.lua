@@ -745,6 +745,34 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 	else
 		bar.bnIsCB = nil;
 	end
+	
+	-- stop any sounds of current bar
+	Gnosis:StopBarSounds(name);
+end
+
+function Gnosis:StopBarSounds(name)
+	-- stop sound if running
+	if (Gnosis.played.s[name]) then
+		for k, v in pairs(Gnosis.played.s[name]) do
+			StopSound(v.handle);
+		end
+		wipe(Gnosis.played.s[name]);
+		Gnosis.played.s[name] = nil;
+	end
+	if (Gnosis.played.m[name]) then
+		for k, v in pairs(Gnosis.played.m[name]) do
+			StopSound(v.handle);
+		end
+		wipe(Gnosis.played.m[name]);
+		Gnosis.played.m[name] = nil;
+	end
+	if (Gnosis.played.f[name]) then
+		for k, v in pairs(Gnosis.played.f[name]) do
+			StopSound(v.handle);
+		end
+		wipe(Gnosis.played.f[name]);
+		Gnosis.played.f[name] = nil;
+	end
 end
 
 function Gnosis:RAG(tex)
@@ -979,6 +1007,10 @@ function Gnosis:RemoveCastbarDialog(key)
 end
 
 function Gnosis:RemoveCastbar(key)
+	-- stop sounds
+	self:StopBarSounds(key);
+	
+	-- cleanup
 	self:CleanupCastbar(self.castbars[key]);
 	self.castbars[key]:Hide();
 	table_insert(self.unusedcastbars, self.castbars[key]);

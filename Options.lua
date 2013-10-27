@@ -493,6 +493,14 @@ function Gnosis:OptCreateNewCastbar(passedname, passedunit)
 		self:Print(self.L["OptCreatenewbarExists"]);
 	else
 		self.s.cbconf[name] = self:CreateDefaultBarTable(passedunit and passedunit or "player");
+		
+		if (IsShiftKeyDown()) then
+			-- convert to icon-like bar
+			for k, v in pairs(self.tIconLikeOverrides) do
+				self.s.cbconf[name][k] = v;
+			end
+		end
+		
 		self.castbars[name] = self:CreateBarFrame(name, nil, 0, 1.0);
 		self:SetBarParams(name);
 
