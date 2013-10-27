@@ -1052,6 +1052,7 @@ end
 function Gnosis:OnMouseUp(button)
 	if(button == "RightButton") then
 		InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+		InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
 	end
 end
 
