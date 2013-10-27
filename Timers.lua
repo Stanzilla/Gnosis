@@ -1526,10 +1526,34 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 			local tplay = SelectedTimerInfo.curtimer.tplay;
 			local toplay = SelectedTimerInfo.curtimer.toplay;
 			
-			if ((not tplay[toplay]) or tplay[toplay] <= GetTime()) then
-				fplay(toplay, self.s.ct.channel and self.tSoundChannels[self.s.ct.channel] or self.tSoundChannels[1]);
+			if (not tplay[bar.name]) then
+				tplay[bar.name] = {};
+			end
+			
+			local tp = tplay[bar.name];
+			if ((not tp[toplay]) or tp[toplay].timer <= GetTime()) then
+				if (tp[toplay] and tp[toplay].handle) then
+					StopSound(tp[toplay].handle);
+				end
 				
-				tplay[toplay] = GetTime() + playinterval;
+				local willPlay, handle = fplay(toplay, self.s.ct.channel and self.tSoundChannels[self.s.ct.channel] or self.tSoundChannels[1]);
+									
+				if (willPlay) then
+					if (tp[toplay]) then
+						tp[toplay].handle = handle;
+						tp[toplay].timer = GetTime() + playinterval;
+					else
+						tp[toplay] = {
+							["handle"] = handle,
+							["timer"] = GetTime() + playinterval,
+						};
+					end
+				else
+					if (tp[toplay]) then
+						wipe(tp[toplay]);
+					end
+					tp[toplay] = nil;
+				end
 			end
 		end
 		

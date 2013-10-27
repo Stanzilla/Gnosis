@@ -207,7 +207,6 @@ function Gnosis:StartupVariables()
 		bResizeOptions = true,
 		-- option settings
 		bAutoCreateOptions = false,
-		iTimerScanEvery = 150,
 
 		-- castbar configs
 		cbconf = {},
@@ -240,7 +239,7 @@ function Gnosis:StartupVariables()
 		ctt = 300,		-- clip test time (in ms)
 
 		-- timer scan
-		tiscan = 200,	-- scan for spell/item cooldowns and auras every 200ms (default)
+		iTimerScanEvery = 200,	-- scan for spell/item cooldowns and auras every 200ms (default)
 	};
 
 	-- set default combat text addon, if multiple addons found than MSBT > Parrot > SCT
@@ -370,6 +369,52 @@ function Gnosis:StartupVariables()
 		rotatertext = 0,		--
 		rotatelattext = 0,		--
 	};
+	
+	self.tIconLikeOverrides = {
+		-- bar geometry
+		width = 40,
+		height = 40,
+		border = 0,
+		
+		coord = {
+			castname = { x = 0, y = 0 },
+			casttime = { x = 3, y = 0 },
+			casticon = { x = 42, y = 0 },
+			latency = { x = -1, y = 1 },
+			shadow = { x = 3, y = -3 },
+		},
+		
+		-- alignments
+		alignment = "FREE",	-- new alignment options for name and time (v1.30)
+		alignname = "CENTER",		--
+		aligntime = "CENTER", 	--
+		
+		-- default bar colors
+		colBar = { 0.15, 0.35, 0.35, 0.0 },
+		colBarNI = { 0.15, 0.35, 0.35, 0.0 },
+		colBarBg = { 0.15, 0.42, 0.42, 0.0 },
+		colLagBar  = { 0.90, 0.85, 0.70, 0.0 },
+		colBorder = { 0.00, 0.00, 0.00, 0.85 },
+		colBorderNI = { 1.00, 0.80, 0.00, 0.0 },
+		colText = { 1.00, 1.00, 1.00, 1.00 },
+		colTextTime = { 1.00, 1.00, 1.00, 1.00 },
+		colTextLag = { 1.00, 0.00, 0.00, 1.00 },
+		colInterrupted = { 1.00, 0.80, 0.00, 0 },
+		colFailed = { 0.70, 0.30, 0.20, 0 },
+		colSpark = { 1.00, 1.00, 1.00, 0 },
+		colSuccess = { 0.15, 0.25, 0.10, 0 },
+		colShadow = { 0.00, 0.00, 0.00, 0.70 },
+
+		-- bar settings
+		bShowLat = false,		-- show latency box
+		bShowCBS = false,		-- show castbar spark
+		bShowTicks = false,		-- show channeled ticks
+		strNameFormat = "",		-- default nfs
+		strTimeFormat = "r<0m>",-- default tfs
+		bShowPlayerLatency = false,	-- do not show text latency information
+		bMergeTrade = false,		-- merge tradeskill information
+		bIconUnlocked = true,	-- option to unlock icon (v1.31)
+	};
 
 	self.strAutoShot, _, self.iconAutoShot = GetSpellInfo(75);
 	self.strAutoAttack, _, self.iconAutoAttack = GetSpellInfo(6603);
@@ -377,7 +422,7 @@ function Gnosis:StartupVariables()
 
 	self.toyIcon = "Interface\\Icons\\Inv_Misc_Toy_07";
 
-	if(not GnosisConfigs) then
+	if (not GnosisConfigs) then
 		GnosisConfigs = {};
 	end
 end
