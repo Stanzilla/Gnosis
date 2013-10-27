@@ -1535,7 +1535,7 @@ function Gnosis:ExtractAndImportEncStr(str)
 							},
 							on_hide = function(self)
 								-- LibDialog-1.0 bandaid
-								Gnosis.bDelayedEsc = 2;
+								Gnosis.bDelayedEsc = true;
 							end,
 							hide_on_escape = false,
 							show_while_dead = true,

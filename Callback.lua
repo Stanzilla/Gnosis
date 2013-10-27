@@ -114,12 +114,8 @@ function Gnosis:Update()
 	
 	-- LibDialog-1.0 bandaid
 	if (Gnosis.bDelayedEsc) then
-		if (Gnosis.bDelayedEsc == 1) then
-			StaticPopup_EscapePressed();
-			Gnosis.bDelayedEsc = nil;
-		else
-			Gnosis.bDelayedEsc = Gnosis.bDelayedEsc - 1;
-		end
+		StaticPopup_EscapePressed();
+		Gnosis.bDelayedEsc = nil;
 	end
 								
 end
