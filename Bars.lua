@@ -1228,7 +1228,7 @@ function Gnosis:SetupMirrorbar(cb, label, channel, curval, maxval, fCurTime, tim
 	local barname, cfg = cb.name, cb.conf;
 
 	-- valid group layout?
-	if(not self:CheckGroupLayout(cfg)) then
+	if (not self:CheckGroupLayout(cfg)) then
 		return;
 	end
 
