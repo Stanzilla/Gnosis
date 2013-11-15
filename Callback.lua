@@ -497,24 +497,26 @@ end
 
 function Gnosis:MIRROR_TIMER_STOP(event, timer)
 	local cb = self:FindCB("mirror");
-	if(cb) then
+	if (cb) then
 		local fCurTime = GetTime() * 1000;
 		repeat
-			if(cb.bActive) then
-				local conf = cb.conf;
-				if(cb.castname == timer) then
-					for i = 1,3 do
-						local timer, init, maxval, scale, paused, label = GetMirrorTimerInfo(i);
-						if(timer and timer ~= cb.castname and init ~= 0 and maxval ~= 0) then
-							local curval = GetMirrorTimerProgress(timer);
+			local bDoCleanup = true;
+			local conf = cb.conf;
+			if (cb.castname == timer) then
+				for i = 1, MIRRORTIMER_NUMTIMERS do
+					local timer, init, maxval, scale, paused, label = GetMirrorTimerInfo(i);
+					if (timer and timer ~= cb.castname and init ~= 0 and maxval ~= 0) then
+						local curval = GetMirrorTimerProgress(timer);
 
-							if(self:SetupMirrorbar(cb, label, scale < 0 and true or false, curval / (abs(scale)) , maxval / (abs(scale)), fCurTime, timer)) then
-								return;
-							end
+						if (self:SetupMirrorbar(cb, label, scale < 0 and true or false, curval / (abs(scale)) , maxval / (abs(scale)), fCurTime, timer)) then
+							bDoCleanup = false;
+							break;
 						end
 					end
+				end
 
-					if(conf.bUnlocked or conf.bShowWNC) then
+				if (bDoCleanup and cb.bActive) then
+					if (conf.bUnlocked or conf.bShowWNC) then
 						self:CleanupCastbar(cb);
 					else
 						self:PrepareCastbarForFadeout(cb, fCurTime);
