@@ -1016,7 +1016,7 @@ function Gnosis:CreateSingleTimerTable()
 					spec and tonumber(spec);
 				
 				-- marker count/size (tick markers for power bars)
-				if (mcnt) then
+				if (mcnt and tonumber(mcnt)) then
 					mcnt = tonumber(mcnt);
 					
 					if (mcnt > 10) then
@@ -1024,9 +1024,8 @@ function Gnosis:CreateSingleTimerTable()
 					elseif (mcnt < 1) then
 						mcnt = 1;
 					end
-					mcnt = floor(mcnt);
 					
-					if (not msize) then
+					if (not msize or not tonumber(msize)) then
 						msize = "1.0";
 					end
 				else
@@ -1034,6 +1033,7 @@ function Gnosis:CreateSingleTimerTable()
 				end
 				if (msize) then
 					msize = tonumber(msize);
+					
 					if (msize > 1.0 or msize < 0.0) then
 						msize = 1.0;
 					end
@@ -1608,7 +1608,7 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 					if (SelectedTimerInfo.curtimer.mcnt) then
 						self:SetPowerbarValueMarkers(bar, SelectedTimerInfo.endTime,
 							SelectedTimerInfo.duration, SelectedTimerInfo.curtimer.mcnt,
-							SelectedTimerInfo.curtimer.msiz);
+							SelectedTimerInfo.curtimer.msize);
 					end
 				end
 
