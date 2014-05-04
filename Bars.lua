@@ -1594,12 +1594,72 @@ local function selectIcon(cb, curtimer)
 	end
 end
 
+function Gnosis:SetPowerbarValueMarkers(cb, curpower, maxpower, mcnt, msize)
+	local cfg = cb.conf;
+	
+	-- calculated values
+	local marker_power = maxpower / mcnt;
+	local usize = 1 - msize;
+	
+	local summed_bar_parts = mcnt - usize;
+	local marker_visible_size = msize / summed_bar_parts;
+	local marker_pos = 1.0 / summed_bar_parts;
+		
+	-- draw markers
+	for i = 1, mcnt do
+		if (i * marker_power > curpower) then
+			cb.lb[i]:Hide();
+		else
+			local p = (i-1) * marker_pos;				
+			if (cfg.bChanAsNorm) then
+				-- show channel as normal cast
+				cb.lb[i]:ClearAllPoints();
+				if (cfg.orient == 2) then
+					if(cfg.bInvDir) then
+						cb.lb[i]:SetPoint("BOTTOM", 0, cb.barheight * p);
+					else
+						cb.lb[i]:SetPoint("TOP", 0, -cb.barheight * p);
+					end
+					cb.lb[i]:SetHeight(marker_visible_size * cb.barheight);
+				else
+					if (cfg.bInvDir) then
+						cb.lb[i]:SetPoint("LEFT", cb.barwidth * p, 0);
+					else
+						cb.lb[i]:SetPoint("RIGHT", -cb.barwidth * p, 0);
+					end
+					cb.lb[i]:SetWidth(marker_visible_size * cb.barwidth);
+				end
+				cb.lb[i]:Show();
+			else -- show as channel
+				cb.lb[i]:ClearAllPoints();
+				if (cfg.orient == 2) then
+					if (cfg.bInvDir) then
+						cb.lb[i]:SetPoint("TOP", 0, -cb.barheight * p);
+					else
+						cb.lb[i]:SetPoint("BOTTOM", 0, cb.barheight * p);
+					end
+					cb.lb[i]:SetHeight(marker_visible_size * cb.barheight);
+				else
+					if (cfg.bInvDir) then
+						cb.lb[i]:SetPoint("RIGHT", -cb.barwidth * p, 0);
+					else
+						cb.lb[i]:SetPoint("LEFT", cb.barwidth * p, 0);
+					end
+					cb.lb[i]:SetWidth(marker_visible_size * cb.barwidth);
+				end
+				cb.lb[i]:Show();
+			end
+		end
+	end
+end
+
 function Gnosis:SetPowerbarValue(cb, curpower, maxpower, bShowSpark)
 	local cfg = cb.conf;
 
 	-- set statusbar value
 	local val = min(curpower/maxpower, 1);
 	cb.bar:SetValue(val);
+	
 	cb:SetAlpha(cfg.alpha);
 	cb:Show();
 

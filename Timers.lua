@@ -992,7 +992,7 @@ function Gnosis:CreateSingleTimerTable()
 					str = "";
 				end
 
-				local unit, recast, staticdur, zoom, spec, iconoverride, portraitunit, shown, hidden, plays, playm, playf;
+				local unit, recast, staticdur, zoom, spec, iconoverride, portraitunit, shown, hidden, plays, playm, playf, mcnt, msize;
 
 				-- extract commands from current line
 				unit, str = self:ExtractRegex(str, "unit=(%w+)", "unit=\"([^\"]+)\"", true);
@@ -1003,7 +1003,9 @@ function Gnosis:CreateSingleTimerTable()
 				plays, str = self:ExtractRegex(str, "plays=\"([^\"]+)\"", nil, true);
 				playm, str = self:ExtractRegex(str, "playm=\"([^\"]+)\"", nil, true);
 				playf, str = self:ExtractRegex(str, "playf=\"([^\"]+)\"", nil, true);
-				recast, str = self:ExtractRegex(str, "recast=([+-]?[0-9]*%.?[0-9]*)", "recast=\"([+-]?[0-9]*%.?[0-9]*)\"");	-- floating point regex
+				mcnt, str = self:ExtractRegex(str, "mcnt=(%w+)", "mcnt=\"([^\"]+)\"", true);
+				msize, str = self:ExtractRegex(str, "msize=([+-]?[0-9]*%.?[0-9]*)", "msize=\"([+-]?[0-9]*%.?[0-9]*)\""); -- floating point regex
+				recast, str = self:ExtractRegex(str, "recast=([+-]?[0-9]*%.?[0-9]*)", "recast=\"([+-]?[0-9]*%.?[0-9]*)\"");
 				staticdur, str = self:ExtractRegex(str, "staticdur=([+-]?[0-9]*%.?[0-9]*)", "staticdur=\"([+-]?[0-9]*%.?[0-9]*)\"");
 				zoom, str = self:ExtractRegex(str, "zoom=([+-]?[0-9]*%.?[0-9]*)", "zoom=\"([+-]?[0-9]*%.?[0-9]*)\"");
 				spec, str = self:ExtractRegex(str, "spec=(%d+)", "spec=\"(%d+)\"");
@@ -1012,6 +1014,30 @@ function Gnosis:CreateSingleTimerTable()
 					staticdur and (tonumber(staticdur) * 1000),
 					zoom and (tonumber(zoom) * 1000),
 					spec and tonumber(spec);
+				
+				-- marker count/size (tick markers for power bars)
+				if (mcnt) then
+					mcnt = tonumber(mcnt);
+					
+					if (mcnt > 10) then
+						mcnt = 10;
+					elseif (mcnt < 1) then
+						mcnt = 1;
+					end
+					mcnt = floor(mcnt);
+					
+					if (not msize) then
+						msize = "1.0";
+					end
+				else
+					msize = nil;
+				end
+				if (msize) then
+					msize = tonumber(msize);
+					if (msize > 1.0 or msize < 0.0) then
+						msize = 1.0;
+					end
+				end
 				
 				-- get play interval time
 				local playinterval;
@@ -1300,6 +1326,8 @@ function Gnosis:CreateSingleTimerTable()
 							fplay = fplay,
 							tplay = tplay,
 							toplay = toplay,
+							mcnt = mcnt,
+							msize = msize,
 						};
 						-- targeted unit
 						tTimer.unit = unit and unit or conf.unit;
@@ -1576,6 +1604,12 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 				if (not SelectedTimerInfo.valIsStatic) then
 					-- power
 					self:SetPowerbarValue(bar, SelectedTimerInfo.endTime, SelectedTimerInfo.duration, SelectedTimerInfo.curtimer.cbs);
+					
+					if (SelectedTimerInfo.curtimer.mcnt) then
+						self:SetPowerbarValueMarkers(bar, SelectedTimerInfo.endTime,
+							SelectedTimerInfo.duration, SelectedTimerInfo.curtimer.mcnt,
+							SelectedTimerInfo.curtimer.msiz);
+					end
 				end
 
 				return;
@@ -1619,6 +1653,12 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 			if (SelectedTimerInfo.bSpecial) then
 				bar.bSpecial = true;
 				self:SetupPowerbar(bar, SelectedTimerInfo);
+				
+				if (SelectedTimerInfo.curtimer.mcnt) then
+					self:SetPowerbarValueMarkers(bar, SelectedTimerInfo.endTime,
+						SelectedTimerInfo.duration, SelectedTimerInfo.curtimer.mcnt,
+						SelectedTimerInfo.curtimer.msize);
+				end
 			else
 				bar.bSpecial = false;
 				self:SetupTimerbar(bar, fCurTime, SelectedTimerInfo);
