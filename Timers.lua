@@ -182,33 +182,47 @@ function Gnosis:Timers_Aura(bar, timer, ti)
 		ti.effect = effect;	
 		ti.icon = ic;
 		
-		local rem = 0;		
-		if (s > 0) then
-			rem = s - GetTime();
-		end
-		
-		if (rem > 0) then
-			-- dynamic aura
-			if (timer.brange) then
-				if (in_value_range(rem, rem*100/d, timer.range_tab) and
-						in_stacks_range(sta, timer.range_tab)) then
-					ti.ok = true;
-				end
+		if (timer.auravalue and ti.stacks) then
+			s = ti.stacks;
+			d = timer.auravalue;
+			
+			ti.unit = timer.unit;
+			ti.bSpecial = true;
+			if(timer.brange) then
+				ti.ok = in_value_range(s, s*100/d, timer.range_tab);
 			else
 				ti.ok = true;
 			end
-			set_times(timer, ti, d * 1000, s * 1000, true);
-		elseif (s == 0 and d == 0 and not timer.bNot) then
-			-- static aura
-			if (timer.brange) then
-				if (in_stacks_range(sta, timer.range_tab)) then
+			set_times(timer, ti, d, s, true);
+		else
+			local rem = 0;		
+			if (s > 0) then
+				rem = s - GetTime();
+			end
+			
+			if (rem > 0) then
+				-- dynamic aura
+				if (timer.brange) then
+					if (in_value_range(rem, rem*100/d, timer.range_tab) and
+							in_stacks_range(sta, timer.range_tab)) then
+						ti.ok = true;
+					end
+				else
 					ti.ok = true;
 				end
-			else
-				ti.ok = true;
+				set_times(timer, ti, d * 1000, s * 1000, true);
+			elseif (s == 0 and d == 0 and not timer.bNot) then
+				-- static aura
+				if (timer.brange) then
+					if (in_stacks_range(sta, timer.range_tab)) then
+						ti.ok = true;
+					end
+				else
+					ti.ok = true;
+				end
+				ti.valIsStatic = true;
+				set_times(timer, ti);
 			end
-			ti.valIsStatic = true;
-			set_times(timer, ti);
 		end
 	elseif (timer.bNot) then
 		ti.cname = timer.spell;
@@ -992,7 +1006,7 @@ function Gnosis:CreateSingleTimerTable()
 					str = "";
 				end
 
-				local unit, recast, staticdur, zoom, spec, iconoverride, portraitunit, shown, hidden, plays, playm, playf, mcnt, msize;
+				local unit, recast, staticdur, zoom, spec, iconoverride, portraitunit, shown, hidden, plays, playm, playf, mcnt, msize, tooltipvalue;
 
 				-- extract commands from current line
 				unit, str = self:ExtractRegex(str, "unit=(%w+)", "unit=\"([^\"]+)\"", true);
@@ -1008,12 +1022,20 @@ function Gnosis:CreateSingleTimerTable()
 				recast, str = self:ExtractRegex(str, "recast=([+-]?[0-9]*%.?[0-9]*)", "recast=\"([+-]?[0-9]*%.?[0-9]*)\"");
 				staticdur, str = self:ExtractRegex(str, "staticdur=([+-]?[0-9]*%.?[0-9]*)", "staticdur=\"([+-]?[0-9]*%.?[0-9]*)\"");
 				zoom, str = self:ExtractRegex(str, "zoom=([+-]?[0-9]*%.?[0-9]*)", "zoom=\"([+-]?[0-9]*%.?[0-9]*)\"");
+				auravalue, str = self:ExtractRegex(str, "auravalue=([+-]?[0-9]*%.?[0-9]*)", "auravalue=\"([+-]?[0-9]*%.?[0-9]*)\"");
 				spec, str = self:ExtractRegex(str, "spec=(%d+)", "spec=\"(%d+)\"");
 				recast, staticdur, zoom, spec =
 					recast and (tonumber(recast) * 1000),
 					staticdur and (tonumber(staticdur) * 1000),
 					zoom and (tonumber(zoom) * 1000),
 					spec and tonumber(spec);
+				
+				-- stack value display variable
+				if (auravalue and tonumber(auravalue)) then
+					auravalue = tonumber(auravalue);
+				else
+					auravalue = nil;
+				end
 				
 				-- marker count/size (tick markers for power bars)
 				if (mcnt and tonumber(mcnt)) then
@@ -1328,6 +1350,7 @@ function Gnosis:CreateSingleTimerTable()
 							toplay = toplay,
 							mcnt = mcnt,
 							msize = msize,
+							auravalue = auravalue,
 						};
 						-- targeted unit
 						tTimer.unit = unit and unit or conf.unit;
