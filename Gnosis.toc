@@ -5,7 +5,7 @@
 ## Version: @project-version@
 ## SavedVariables: GnosisDB, GnosisConfigs
 ## SavedVariablesPerCharacter: GnosisChar, GnosisCharConfig
-## OptionalDeps: Ace3, LibRangeCheck-2.0, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets
+## OptionalDeps: Ace3, LibRangeCheck-2.0, LibCompress, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets
 ## X-Embeds: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets
 ## LoadOnDemand: 0
 ## DefaultState: enabled
