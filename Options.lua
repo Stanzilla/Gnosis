@@ -1,3 +1,6 @@
+-- Gnosis @project-version@ last changed @project-date-iso@
+-- Options.lua last changed @file-date-iso@
+
 -- local functions
 local tonumber = tonumber;
 local type = type;
