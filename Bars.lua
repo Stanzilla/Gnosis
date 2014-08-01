@@ -2183,10 +2183,11 @@ function Gnosis:DrawTicks(cb, cfg)
 		local valLBperc = ((cfg.unit == "player") and max(min(self.lag / cb.duration, cfg.latbarsize), cfg.latbarfixed) or cfg.latbarfixed);
 		-- never create latency box larger than half of distance between ticks
 		-- vital for long channels with high number of ticks (e.g. hellfire with 15 ticks)
-		if cb.totalticks > 0 then
+		if (cb.totalticks > 0) then		-- check should not be necessary since totalticks
+										-- should always be in the range 1..15
 			valLBperc = min(valLBperc, 1 / cb.totalticks * 0.5);
-		else
-		end				
+		end
+		
 		for i = 1, cb.totalticks do
 			if (i <= cb.shownticks) then
 				if (cb.ticks[i] > cb.endTime) then
