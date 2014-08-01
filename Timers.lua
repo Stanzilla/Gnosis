@@ -1,3 +1,6 @@
+-- Gnosis @project-version@ last changed @project-date-iso@
+-- Timers.lua last changed @file-date-iso@
+
 local UnitCastingInfo = UnitCastingInfo;
 local UnitChannelInfo = UnitChannelInfo;
 local GetItemInfo = GetItemInfo;

@@ -1,3 +1,6 @@
+-- Gnosis @project-version@ last changed @project-date-iso@
+-- Callback.lua last changed @file-date-iso@
+
 -- local functions
 local GetTime = GetTime;
 local UnitChannelInfo = UnitChannelInfo;

@@ -1,3 +1,6 @@
+-- Gnosis @project-version@ last changed @project-date-iso@
+-- Encoding.lua last changed @file-date-iso@
+
 local string_char = string.char;
 local string_byte = string.byte;
 local string_char = string.char;
