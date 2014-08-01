@@ -1,4 +1,7 @@
-﻿Gnosis.LSet = {
+﻿-- Gnosis @project-version@ last changed @project-date-iso@
+-- Locale.lua last changed @file-date-iso@
+
+Gnosis.LSet = {
 	["default"] = "default (English)",
 	["deDE"] = "deDE (Deutsch)",
 	["frFR"] = "frFR (Français)",

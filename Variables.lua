@@ -1,3 +1,6 @@
+-- Gnosis @project-version@ last changed @project-date-iso@
+-- Variables.lua last changed @file-date-iso@
+
 -- local functions
 local GetSpellInfo = GetSpellInfo;
 local string_format = string.format;

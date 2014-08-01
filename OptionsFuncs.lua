@@ -1,3 +1,6 @@
+-- Gnosis @project-version@ last changed @project-date-iso@
+-- OptionsFuncs.lua last changed @file-date-iso@
+
 -- local functions
 local pairs = pairs;
 local ipairs = ipairs;
