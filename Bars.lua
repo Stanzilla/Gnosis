@@ -1,5 +1,5 @@
--- Gnosis @project-version@ last changed @project-date-iso@
--- Bars.lua last changed @file-date-iso@
+-- Gnosis r97 last changed 2014-09-17T22:27:45Z
+-- Bars.lua last changed 2014-09-17T22:27:45Z
 
 -- local functions
 local UnitCastingInfo = UnitCastingInfo;
@@ -1155,7 +1155,7 @@ function Gnosis:SetupGCDbar(cb, spell, rank, fCurTime, right2left, start, cd)
 
 	-- non casttime spell GCD Indicator?
 	if (cfg.unit == "gcd2") then
-		local spellcasttime = select(7, GetSpellInfo(spell));
+		local spellcasttime = select(4, GetSpellInfo(spell));
 		local playerischanneling = UnitChannelInfo("player");
 		
 		if (playerischanneling or not (spellcasttime and spellcasttime == 0)) then
@@ -1831,7 +1831,7 @@ function Gnosis:SetupTimerLagBox(cb, showlag, showcasttime, castname, recast, bR
 	-- latency
 	local lagct = (((showlag or recast) and self.lag < 3500) and self.lag or 0);
 	if(showcasttime or recast) then
-		local _, _, _, _, _, _, castTime = GetSpellInfo(castname);
+		local _, _, _, castTime = GetSpellInfo(castname);
 		if(castTime) then
 			lagct = lagct + castTime;
 		end
