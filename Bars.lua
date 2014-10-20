@@ -1,5 +1,5 @@
--- Gnosis r97 last changed 2014-09-17T22:27:45Z
--- Bars.lua last changed 2014-09-17T22:27:45Z
+-- Gnosis @project-version@ last changed @project-date-iso@
+-- Bars.lua last changed @file-date-iso@
 
 -- local functions
 local UnitCastingInfo = UnitCastingInfo;
@@ -1830,66 +1830,52 @@ function Gnosis:SetupTimerLagBox(cb, showlag, showcasttime, castname, recast, bR
 
 	-- latency
 	local lagct = (((showlag or recast) and self.lag < 3500) and self.lag or 0);
-	if(showcasttime or recast) then
+	if (showcasttime or recast) then
 		local _, _, _, castTime = GetSpellInfo(castname);
-		if(castTime) then
+		if (castTime) then
 			lagct = lagct + castTime;
 		end
 	end
 
-	if(recast) then
-		local dur = cb.dur and cb.dur or cb.duration;
-		if(bRecalcTick or not cb.ticktime) then
-			local haste = UnitSpellHaste("player") / 100.0 + 1.0;
-			--[[ implementation taken over from MFClip:
-			guess original ticks, often guesses one tick too much
-			which is not really bad for safer recasting,
-			would need a database (including set bonus, ...) with
-			initial tick counts for 100% correct value which I really
-			do not want to implement into MFClip ]]
-			local initTicks = floor(dur / recast + max(15000/dur,1.0) * 0.375);	-- seems to work well
-			local hastedTicks = floor(initTicks * haste + 0.5);
-			cb.ticktime = dur / hastedTicks;
-		end
-
-		if(cb.ticktime) then
-			-- latency box
-			cb.lb[1]:ClearAllPoints();
-			local ctlagSize = min(lagct / cb.duration, 1.0);
-			local esttickSize = min(cb.ticktime / cb.duration, 1.0 - ctlagSize);
-
-			if(cfg.orient == 2) then
-				cb.lb[1]:SetHeight(cb.barheight * esttickSize);
-				if(cfg.bInvDir) then
-					cb.lb[1]:SetPoint(cb.channel and "TOP" or "BOTTOM", 0, cb.barheight * (cb.channel and -1 or 1) * ctlagSize);
-				else
-					cb.lb[1]:SetPoint(cb.channel and "BOTTOM" or "TOP", 0, cb.barheight * (cb.channel and 1 or -1) * ctlagSize);
-				end
-			else
-				cb.lb[1]:SetWidth(cb.barwidth * esttickSize);
-				if(cfg.bInvDir) then
-					cb.lb[1]:SetPoint(cb.channel and "RIGHT" or "LEFT", cb.barwidth * (cb.channel and -1 or 1) * ctlagSize, 0);
-				else
-					cb.lb[1]:SetPoint(cb.channel and "LEFT" or "RIGHT", cb.barwidth * (cb.channel and 1 or -1) * ctlagSize, 0);
-				end
-			end
-			cb.lb[1]:Show();
-		else
-			cb.lb[1]:Hide();
-		end
-	elseif(lagct > 0) then
+	if (recast) then
+		-- removed tick duration estimation with 6.0.2+
+		-- recast=# will mark the given duration
 		-- latency box
 		cb.lb[1]:ClearAllPoints();
-		if(cfg.orient == 2) then
-			cb.lb[1]:SetHeight(cb.barheight * min(lagct / cb.duration, 1.0));
-			if(cfg.bInvDir) then
+		local ctlagSize = min(lagct / cb.duration, 1.0);
+		local recastSize = min(recast / cb.duration, 1.0) - ctlagSize;
+		
+		if (cfg.orient == 2) then
+			cb.lb[1]:SetHeight(cb.barheight * recastSize);
+			if (cfg.bInvDir) then
+				cb.lb[1]:SetPoint(cb.channel and "TOP" or "BOTTOM", 0, cb.barheight * (cb.channel and -1 or 1) * ctlagSize);
+			else
+				cb.lb[1]:SetPoint(cb.channel and "BOTTOM" or "TOP", 0, cb.barheight * (cb.channel and 1 or -1) * ctlagSize);
+			end
+		else
+			cb.lb[1]:SetWidth(cb.barwidth * recastSize);
+			if (cfg.bInvDir) then
+				cb.lb[1]:SetPoint(cb.channel and "RIGHT" or "LEFT", cb.barwidth * (cb.channel and -1 or 1) * ctlagSize, 0);
+			else
+				cb.lb[1]:SetPoint(cb.channel and "LEFT" or "RIGHT", cb.barwidth * (cb.channel and 1 or -1) * ctlagSize, 0);
+			end
+		end
+		cb.lb[1]:Show();
+	elseif (lagct > 0) then
+		-- latency box
+		cb.lb[1]:ClearAllPoints();
+		local ctlagSize = min(lagct / cb.duration, 1.0);
+		
+		if (cfg.orient == 2) then
+			cb.lb[1]:SetHeight(cb.barheight * ctlagSize);
+			if (cfg.bInvDir) then
 				cb.lb[1]:SetPoint(cb.channel and "TOP" or "BOTTOM");
 			else
 				cb.lb[1]:SetPoint(cb.channel and "BOTTOM" or "TOP");
 			end
 		else
-			cb.lb[1]:SetWidth(cb.barwidth * min(lagct / cb.duration, 1.0));
-			if(cfg.bInvDir) then
+			cb.lb[1]:SetWidth(cb.barwidth * ctlagSize);
+			if (cfg.bInvDir) then
 				cb.lb[1]:SetPoint(cb.channel and "RIGHT" or "LEFT");
 			else
 				cb.lb[1]:SetPoint(cb.channel and "LEFT" or "RIGHT");
