@@ -1829,7 +1829,7 @@ function Gnosis:SetupTimerLagBox(cb, showlag, showcasttime, castname, recast, bR
 	local cfg = cb.conf;
 
 	-- latency
-	local lagct = (((showlag or recast) and self.lag < 3500) and self.lag or 0);
+	local lagct = ((showlag or recast) and self.lag < 3500) and self.lag or 0;
 	if (showcasttime or recast) then
 		local _, _, _, castTime = GetSpellInfo(castname);
 		if (castTime) then
@@ -1843,21 +1843,25 @@ function Gnosis:SetupTimerLagBox(cb, showlag, showcasttime, castname, recast, bR
 		-- latency box
 		cb.lb[1]:ClearAllPoints();
 		local ctlagSize = min(lagct / cb.duration, 1.0);
-		local recastSize = min(recast / cb.duration, 1.0) - ctlagSize;
+		local recastSize = min(recast / cb.duration, 1.0 - ctlagSize);
 		
 		if (cfg.orient == 2) then
 			cb.lb[1]:SetHeight(cb.barheight * recastSize);
 			if (cfg.bInvDir) then
-				cb.lb[1]:SetPoint(cb.channel and "TOP" or "BOTTOM", 0, cb.barheight * (cb.channel and -1 or 1) * ctlagSize);
+				cb.lb[1]:SetPoint(cb.channel and "TOP" or "BOTTOM", 0,
+					cb.barheight * (cb.channel and -1 or 1) * ctlagSize);
 			else
-				cb.lb[1]:SetPoint(cb.channel and "BOTTOM" or "TOP", 0, cb.barheight * (cb.channel and 1 or -1) * ctlagSize);
+				cb.lb[1]:SetPoint(cb.channel and "BOTTOM" or "TOP", 0,
+					cb.barheight * (cb.channel and 1 or -1) * ctlagSize);
 			end
 		else
 			cb.lb[1]:SetWidth(cb.barwidth * recastSize);
 			if (cfg.bInvDir) then
-				cb.lb[1]:SetPoint(cb.channel and "RIGHT" or "LEFT", cb.barwidth * (cb.channel and -1 or 1) * ctlagSize, 0);
+				cb.lb[1]:SetPoint(cb.channel and "RIGHT" or "LEFT",
+					cb.barwidth * (cb.channel and -1 or 1) * ctlagSize, 0);
 			else
-				cb.lb[1]:SetPoint(cb.channel and "LEFT" or "RIGHT", cb.barwidth * (cb.channel and 1 or -1) * ctlagSize, 0);
+				cb.lb[1]:SetPoint(cb.channel and "LEFT" or "RIGHT",
+					cb.barwidth * (cb.channel and 1 or -1) * ctlagSize, 0);
 			end
 		end
 		cb.lb[1]:Show();
