@@ -619,14 +619,14 @@ function Gnosis:Timers_Range(bar, timer, ti)
 	-- range between player and selected unit
 	local minRange, maxRange;
 	
-	if(UnitExists(timer.unit)) then
+	if (UnitExists(timer.unit)) then
 		minRange, maxRange = Gnosis.range:GetRange(timer.unit);
 	end
 	
-	if(minRange) then
+	if (minRange and maxRange) then
 		ti.unit = timer.unit;
 		ti.bSpecial = true;
-		if(timer.brange) then
+		if (timer.brange) then
 			--[[ range_tab structure
 				[1] == value lower bound (>=)
 				[2] == value upper bound (<=)
@@ -635,11 +635,11 @@ function Gnosis:Timers_Range(bar, timer, ti)
 				[5] == value lower bound is in percent (true, nil)
 				[6] == value upper bound is in percent (true, nil) ]]
 			
-			if(timer.range_tab[5] or timer.range_tab[6]) then
+			if (timer.range_tab[5] or timer.range_tab[6]) then
 				-- percentages of what??? (not allowed)
 				ti.ok = false;
 			else
-				if(minRange <= (timer.range_tab[2] or 10000) and
+				if (minRange <= (timer.range_tab[2] or 10000) and
 					maxRange >= (timer.range_tab[1] or 0)) then
 					ti.ok = true;
 				end
@@ -648,7 +648,7 @@ function Gnosis:Timers_Range(bar, timer, ti)
 			ti.ok = true;
 		end
 		set_times(timer, ti, maxRange, minRange, true);
-	elseif(timer.bNot) then
+	elseif (timer.bNot) then
 		ti.cname = "";
 		ti.icon = nil;
 		ti.unit = timer.unit;
