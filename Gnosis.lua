@@ -32,11 +32,22 @@ local _;
 
 -- LibSharedMedia
 if(Gnosis.lsm) then
+	-- statusbar textures
 	Gnosis.lsm:Register("statusbar", "Waterline", "Interface\\Addons\\Gnosis\\Textures\\Waterline");
 	Gnosis.lsm:Register("statusbar", "Gnosis_Plain", "Interface\\Addons\\Gnosis\\Textures\\Gnosis_Plain");
 	Gnosis.lsm:Register("statusbar", "Gnosis_Gradient", "Interface\\Addons\\Gnosis\\Textures\\Gnosis_Gradient");
+	
+	-- fonts
 	Gnosis.lsm:Register("font", "Desyrel", "Interface\\Addons\\Gnosis\\Fonts\\DESYREL_.ttf");
 	Gnosis.lsm:Register("font", "Accidental Presidency", "Interface\\Addons\\Gnosis\\Fonts\\Accidental Presidency\\accid___.ttf");
+	
+	-- sound files
+	Gnosis.lsm:Register("sound", "Gnosis_Coin", "Interface\\Addons\\Gnosis\\Sounds\\coin_dropped_on_wooden_floor.ogg");
+	Gnosis.lsm:Register("sound", "Gnosis_CompStart", "Interface\\Addons\\Gnosis\\Sounds\\Computer_Start-Up-Your_Mom-1280862923.ogg");
+	Gnosis.lsm:Register("sound", "Gnosis_Cuckoo", "Interface\\Addons\\Gnosis\\Sounds\\Cuckoo Clock-SoundBible.com-1776874523.ogg");
+	Gnosis.lsm:Register("sound", "Gnosis_Electric", "Interface\\Addons\\Gnosis\\Sounds\\Electrical_Sweep-Sweeper-1760111493.ogg");
+	Gnosis.lsm:Register("sound", "Gnosis_MusicBox", "Interface\\Addons\\Gnosis\\Sounds\\Music_Box-Big_Daddy-1389738694.ogg");
+	Gnosis.lsm:Register("sound", "Gnosis_Wharf", "Interface\\Addons\\Gnosis\\Sounds\\announcementonawharf.ogg");	
 end
 
 function Gnosis:InitialConfig()
