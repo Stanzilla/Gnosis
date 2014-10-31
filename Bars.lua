@@ -2140,19 +2140,19 @@ function Gnosis:UpdateCastbar(cb, startTime, endTime, spell)
 	local fSPB = endTime - cb.endTime;		-- spell pushback
 
 	-- "positive" channel pushback (4.1)
-	if(fSPB > 0 and cb.channel) then
-		if(cfg.bExtChannels) then
+	if (fSPB > 0 and cb.channel) then
+		if (cfg.bExtChannels) then
 			cb.duration = cb.duration + fSPB;
 		end
 		cb.endTime = endTime;
 
-		if(cb.totalticks and cb.totalticks > 0) then
+		if (cb.totalticks and cb.totalticks > 0) then
 			for i = 1, cb.totalticks do
 				cb.ticks[i] = cb.ticks[i] + fSPB;
 			end
 
-			if(cfg.bExtChannels) then
-				if(cb.endTime - cb.ticks[cb.totalticks] > cb.channelticktime) then
+			if (cfg.bExtChannels) then
+				if (cb.endTime - cb.ticks[cb.totalticks] > cb.channelticktime) then
 					cb.totalticks = cb.totalticks + 1;
 					cb.ticks[cb.totalticks] = cb.ticks[cb.totalticks-1] - cb.channelticktime;
 				end
@@ -2161,7 +2161,7 @@ function Gnosis:UpdateCastbar(cb, startTime, endTime, spell)
 			end
 		end
 	-- "negative" pushback
-	elseif(fSPB ~= 0) then
+	elseif (fSPB ~= 0) then
 		cb.pushback = cb.pushback + fSPB;
 		cb.endTime = endTime;
 
@@ -2172,7 +2172,10 @@ end
 function Gnosis:DrawTicks(cb, cfg)
 	if (cfg.bShowTicks) then
 		-- calculate new tick marker size
-		local valLBperc = ((cfg.unit == "player") and max(min(self.lag / cb.duration, cfg.latbarsize), cfg.latbarfixed) or cfg.latbarfixed);
+		local valLBperc = ((cfg.unit == "player")
+			and max(min(self.lag / cb.duration, cfg.latbarsize), cfg.latbarfixed)
+			or cfg.latbarfixed);
+
 		-- never create latency box larger than half of distance between ticks
 		-- vital for long channels with high number of ticks (e.g. hellfire with 15 ticks)
 		if (cb.totalticks > 0) then		-- check should not be necessary since totalticks
@@ -2185,8 +2188,13 @@ function Gnosis:DrawTicks(cb, cfg)
 				if (cb.ticks[i] > cb.endTime) then
 					cb.lb[i]:Hide();
 				else
-					local p = (cb.endTime-cb.ticks[i]) / cb.duration;				
-					if (cfg.bChanAsNorm) then
+					-- position of marker
+					local p = (cb.endTime-cb.ticks[i]) / cb.duration;
+					
+					if (p == 1.0) then
+						-- out of bounds (need special handling since :SetWidth(0) does not work)
+						cb.lb[i]:Hide();
+					elseif (cfg.bChanAsNorm) then
 						-- show channel as normal cast
 						cb.lb[i]:ClearAllPoints();
 						if (cfg.orient == 2) then
