@@ -632,12 +632,13 @@ function Gnosis:AddChanneledSpellById(id, tickcount, bdoaddticks, bars, binit, b
 end
 
 function Gnosis:SetupChanneledSpellsTable()
-	-- (spellid, #ticks, addticks, #shown ticks, first tick instant, multi mob (therefore no clipping detection), spellschool, isheal, upgrade_num)
+	-- spellid, #ticks, addticks, #shown ticks, first tick instant,
+	-- multi mob (no clipping detection), spellschool, isheal, upgrade_num
 
 	-- priest
 	self:AddChanneledSpellById(15407, 3, false, 4, false, false, "shadow", false, 2);	-- mind flay
 	self:AddChanneledSpellById(129197, 3, false, 4, false, false, "shadow", false, 1);	-- mind flay (insanity)
-	self:AddChanneledSpellById(32000, 5, false, 6, false, true, "shadow", false, 2); 	-- mind sear
+	self:AddChanneledSpellById(32000, 6, false, 7, true, true, "shadow", false, 3); 	-- mind sear
 	self:AddChanneledSpellById(47540, 3, false, 2, true, false, "holy", true, 1);		-- penance, first tick instant
 	self:AddChanneledSpellById(64843, 4, true, 15, false, true, "holy", true, 3);		-- divine hymn
 	self:AddChanneledSpellById(64901, 4, true, 15, false, true, "holy", false, 2); 		-- hymn of hope
