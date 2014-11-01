@@ -790,7 +790,7 @@ function Gnosis:GenerateCombattext(cc, cs, bClip)
 	str = string_gsub(str, "ticktext<(.-)>", "");
 
 	-- hits, crits, ticks, dmg, dps, clipped
-	local dpstime = 1000 / (cc.freqtest and min(cc.freqtest-cc.starttime,cc.duration) or cc.duration);
+	local dpstime = (cc.freqtest and min(cc.freqtest-cc.starttime,cc.duration) or cc.duration) / 1000;
 	local tickscrits = string_format("%d%s", cc.ticks + cc.mastery, tick);
 	if(cc.crits > 0) then tickscrits = string_format("%s, %d%s", tickscrits, cc.crits, crit); end
 
@@ -800,7 +800,7 @@ function Gnosis:GenerateCombattext(cc, cs, bClip)
 	str = string_gsub(str, "crits", string_format("%d", cc.crits) .. crit);
 	str = string_gsub(str, "ticks", string_format("%d", cc.ticks + cc.mastery) .. tick);
 	str = string_gsub(str, "dmg", string_format("%d", cc.dmg));
-	str = string_gsub(str, "dps", string_format("%d", cc.dmg * dpstime));
+	str = string_gsub(str, "dps", (dpstime > 0.02) and string_format("%d", cc.dmg / dpstime) or "1.#INF");
 	str = string_gsub(str, "eh", string_format("%d", cc.eh));
 	str = string_gsub(str, "oh", string_format("%d", cc.oh));
 	str = string_gsub(str, "target", cc.target or "");
