@@ -649,7 +649,7 @@ function Gnosis:SetupChanneledSpellsTable()
 	self:AddChanneledSpellById(12051, 4, false, 3, true, false, "arcane", false, 2);	-- evocation
 
 	-- warlock
-	self:AddChanneledSpellById(1120, 6, false, 15, false, false, "shadow", false, 3);	-- drain soul
+	self:AddChanneledSpellById(1120, 4, false, 5, false, false, "shadow", false, 4);	-- drain soul
 	self:AddChanneledSpellById(689, 6, false, 15, false, false, "shadow", false, 3);	-- drain life
 	self:AddChanneledSpellById(108371, 6, false, 15, false, true, "shadow", false, 1);	-- harvest life
 	self:AddChanneledSpellById(4629, 6, false, 15, false, true, "fire", false, 3);		-- rain of fire
