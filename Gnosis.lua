@@ -637,12 +637,11 @@ function Gnosis:SetupChanneledSpellsTable()
 
 	-- priest
 	self:AddChanneledSpellById(15407, 3, false, 4, false, false, "shadow", false, 2);	-- mind flay
-	self:AddChanneledSpellById(129197, 3, false, 4, false, false, "shadow", false, 1);	-- mind flay (insanity)
+	self:AddChanneledSpellById(129197, 3, false, 4, false, false, "shadow", false, 1);	-- insanity
 	self:AddChanneledSpellById(32000, 6, false, 7, true, true, "shadow", false, 3); 	-- mind sear
 	self:AddChanneledSpellById(47540, 3, false, 2, true, false, "holy", true, 1);		-- penance, first tick instant
-	self:AddChanneledSpellById(64843, 4, true, 15, false, true, "holy", true, 3);		-- divine hymn
-	self:AddChanneledSpellById(64901, 4, true, 15, false, true, "holy", false, 2); 		-- hymn of hope
-
+	self:AddChanneledSpellById(64843, 4, false, 15, false, true, "holy", true, 4);		-- divine hymn
+	
 	-- mage
 	self:AddChanneledSpellById(10, 8, false, 15, false, true, "frost", false, 2);		-- blizzard
 	self:AddChanneledSpellById(5143, 5, false, 6, false, false, "arcane", false, 2);	-- arcane missiles
