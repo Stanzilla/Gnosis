@@ -1895,23 +1895,23 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 	local barname, cfg = cb.name, cb.conf;
 
 	local name, rank, displayName, texture, startTime, endTime, isTradeSkill, notInterruptible, id;
-	if(bIsChannel) then
+	if (bIsChannel) then
 		name, rank, displayName, texture, startTime, endTime, isTradeSkill, notInterruptible = UnitChannelInfo(cfg.unit);
 	else
 		name, rank, displayName, texture, startTime, endTime, isTradeSkill, id, notInterruptible = UnitCastingInfo(cfg.unit);
 	end
 
-	if(not name) then
+	if (not name) then
 		return;
 	end
 
 	-- unit relation
-	if(not self:UnitRelationSelect(cfg.relationsel, cfg.unit)) then
+	if (not self:UnitRelationSelect(cfg.relationsel, cfg.unit)) then
 		return;
 	end
 
 		-- valid group layout?
-	if(not self:CheckGroupLayout(cfg)) then
+	if (not self:CheckGroupLayout(cfg)) then
 		return;
 	end
 
@@ -1923,7 +1923,7 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 			end
 		end
 	-- not whitelisted?
-	elseif(cfg.bnwtypesel == 3 and cfg.bnwlist) then
+	elseif (cfg.bnwtypesel == 3 and cfg.bnwlist) then
 		local bReturn = true;
 		for key, value in pairs(cfg.bnwlist) do
 			if(value == name) then
@@ -1932,7 +1932,7 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 			end
 		end
 
-		if(bReturn) then
+		if (bReturn) then
 			return;
 		end
 	end
@@ -1940,17 +1940,17 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 	-- tradeskill stuff
 	local bDoResize = true;
 	local bnTS = true;
-	if(cfg.unit == "player" and cfg.bMergeTrade) then
-		if(isTradeSkill) then
+	if (cfg.unit == "player" and cfg.bMergeTrade) then
+		if (isTradeSkill) then
 			bnTS = false;
 			cb.tscnt = self.iLastTradeSkillCnt and self.iLastTradeSkillCnt or 1;
-			if(cb.bIsTrade and (not self.bNewTradeSkill)) then
+			if (cb.bIsTrade and (not self.bNewTradeSkill)) then
 				-- tradeskill in progress
 				cb.duration = (fCurTime - cb.starttime) * cb.tstot / (cb.tstot - cb.tscnt);
 				cb.endTime = cb.duration + cb.starttime;
 
 				bDoResize = false;
-			elseif(cb.tscnt > 1 and self.bNewTradeSkill) then
+			elseif (cb.tscnt > 1 and self.bNewTradeSkill) then
 				-- new tradeskill merge, don't start if repeat count less than 2
 				if((self.activebars[barname] or self.fadeoutbars[barname])) then
 					self:CleanupCastbar(cb);
@@ -1964,7 +1964,7 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 			else
 				cb.bIsTrade = nil;
 
-				if((self.activebars[barname] or self.fadeoutbars[barname])) then
+				if ((self.activebars[barname] or self.fadeoutbars[barname])) then
 					self:CleanupCastbar(cb);
 				end
 
@@ -1977,7 +1977,7 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 		end
 	end
 
-	if(bnTS) then
+	if (bnTS) then
 		cb.bIsTrade = nil;
 
 		if((self.activebars[barname] or self.fadeoutbars[barname])) then
@@ -2008,7 +2008,7 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 	self:SetupBarString(cb, cfg, fCurTime, bDoResize);
 
 	-- non interruptible colors
-	if(notInterruptible) then
+	if (notInterruptible) then
 		cb.bar:SetStatusBarColor(unpack(cfg.colBarNI));
 		self:SetBorderColor(cb, cfg.colBorderNI, cfg.colBarBg);
 		if(cfg.bShowShield) then
@@ -2023,19 +2023,19 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 	end
 
 	-- castbar spark
-	if(cfg.bShowCBS) then
+	if (cfg.bShowCBS) then
 		cb.cbs:SetPoint("CENTER", cb.bar, "LEFT", val * cb.barwidth, 0);
 		cb.cbs:Show();
 	end
 
 	-- latency & ticks
 	local cs = self.s.channeledspells[cb.castname];
-	if(cs and cs.ben and not(cs.bhidenonplayer and cfg.unit ~= "player")) then
+	if (cs and cs.ben and not(cs.bhidenonplayer and cfg.unit ~= "player")) then
 		local totalticks = cs.ticks;
 		local noninitticks = cs.binit and (totalticks-1) or totalticks;
 		local shownticks = cs.bars > 15 and 15 or cs.bars;
 
-		if(cfg.unit == "player" and cs.baddticks) then
+		if (cfg.unit == "player" and cs.baddticks) then
 			-- estimate amount of ticks due to haste
 			local haste = UnitSpellHaste("player") / 100.0 + 1.0;
 			noninitticks = floor(noninitticks * haste + 0.5);
@@ -2059,12 +2059,12 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 		cb.channelticktime = 0;
 	end
 
-	if(cfg.unit == "player" and self.lag < 10000) then
+	if (cfg.unit == "player" and self.lag < 10000) then
 		-- latency box, player only
 		-- < 10000ms should filter latency for most summoning stone timers, also hide latency when just too extreme		
 		if (not(cs and cs.ben and cfg.bShowTicks) and cfg.bShowLat) then
 			cb.lb[1]:ClearAllPoints();
-			if(cfg.orient == 2) then
+			if (cfg.orient == 2) then
 				cb.lb[1]:SetHeight(cb.barheight * min(self.lag / cb.duration, cfg.latbarsize));
 				local direction = (cb.channel and (not cfg.bChanAsNorm)) and "BOTTOM" or "TOP";
 				if (cfg.bInvDir) then
@@ -2085,9 +2085,9 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 		-- latency text
 		if (cfg.bShowPlayerLatency) then
 			-- < 10000ms should filter latency for most summoning stone timers, also hide latency when just too extreme
-			if(cfg.alignlat == "LEFT") then
+			if (cfg.alignlat == "LEFT") then
 				cb.bltext:SetText(string_format("%d", self.lag));
-			elseif(cfg.alignlat == "RIGHT") then
+			elseif (cfg.alignlat == "RIGHT") then
 				cb.brtext:SetText(string_format("%d", self.lag));
 			else
 				if (cfg.bInvDir) then
@@ -2113,6 +2113,11 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 	-- set bar active
 	cb.bActive = true;
 	self.activebars[barname] = cb;
+	
+	if (not (cfg.incombatsel == 1 or cfg.incombatsel == self.curincombattype or cfg.bUnlocked)) then
+		cb:Hide();
+		cb.bBarHidden = true;
+	end
 end
 
 function Gnosis:CloseAllTradeskillBars()
