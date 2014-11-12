@@ -339,6 +339,7 @@ function Gnosis:StartupVariables()
 		relationsel = 1,		-- show casts of friendly and/or enemy units
 		incombatsel = 1,		-- show castbar in and out of combat (1==always)
 		ingroupsel = 1,			-- show castbar while solo, in party or raid (1==always)
+		instancetype = 1,		-- show castbar while inside or outside of instance (1==always)
 		bnwtypesel = 1,			-- neither black-/whitelist
 		bnwlist = {},			-- empty list to begin with
 		bnwlistnew = "",		-- new entry box

@@ -1511,9 +1511,9 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 		return;
 	end
 
-		-- valid group layout?
-	if (not self:CheckGroupLayout(bar.conf)) then
-		if(not bar.bBarHidden) then
+	-- valid group layout? valid instance type?
+	if (not self:CheckGroupLayout(bar.conf) or not self:CheckInstanceType(bar.conf)) then
+		if (not bar.bBarHidden) then
 			bar:Hide();
 			bar.bBarHidden = true;
 		end
