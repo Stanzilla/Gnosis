@@ -141,6 +141,36 @@ function Gnosis:En(status)
 	end
 end
 
+function Gnosis:OpenOptions()
+	if (not self.iofcalled) then
+		-- call twice the first time
+		InterfaceOptionsFrame_OpenToCategory(Gnosis.optFrame);
+	end
+		
+	InterfaceOptionsFrame_OpenToCategory(Gnosis.optFrame);
+	self.iofcalled = true;
+end
+
+function Gnosis:OpenCfgOptions()
+	if (not self.iofcfgcalled) then
+		-- call twice the first time
+		InterfaceOptionsFrame_OpenToCategory(Gnosis.optCfgs);
+	end
+		
+	InterfaceOptionsFrame_OpenToCategory(Gnosis.optCfgs);
+	self.iofcfgcalled = true;
+end
+
+function Gnosis:OpenCastbarOptions()
+	if (not self.iofcbcalled) then
+		-- call twice the first time
+		InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+	end
+		
+	InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+	self.iofcbcalled = true;
+end
+
 function Gnosis:HideBlizzardCastbarIfStatusChange(status)
 	if(self.s.bHideBlizz ~= status) then
 		self.s.bHideBlizz = status;
@@ -497,8 +527,7 @@ function Gnosis:HandleChatCommand(cmd)
 		if (bar and text and cnt) then
 			self:InjectTimer(bar, text, cnt, spell, iscast);
 		else
-			InterfaceOptionsFrame_OpenToCategory(self.optFrame);
-			InterfaceOptionsFrame_OpenToCategory(self.optFrame);
+			Gnosis:OpenOptions();
 		end
 	end
 end
@@ -1160,8 +1189,7 @@ function Gnosis:CheckForFirstStart(bForce)
 		btnGUI:SetWidth(230);
 		btnGUI:SetText(Gnosis.L["IfOpenGUI"]);
 		btnGUI:SetCallback("OnClick", function()
-				InterfaceOptionsFrame_OpenToCategory(Gnosis.optFrame);
-				InterfaceOptionsFrame_OpenToCategory(Gnosis.optFrame);
+				Gnosis:OpenOptions();
 			end
 		);
 		f:AddChild(btnGUI);
