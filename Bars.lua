@@ -11,6 +11,7 @@ local UnitClass = UnitClass;
 local UnitIsEnemy = UnitIsEnemy;
 local UnitIsPlayer = UnitIsPlayer;
 local GetSpellInfo = GetSpellInfo;
+local IsInInstance = IsInInstance;
 local IsInRaid = IsInRaid;
 local GetNumSubgroupMembers = GetNumSubgroupMembers;
 local tonumber = tonumber;
@@ -1072,16 +1073,47 @@ function Gnosis:MakeBarMovable(name, status)
 end
 
 function Gnosis:CheckGroupLayout(cfg)
-	if(cfg.ingroupsel == 1) then
+	if (cfg.ingroupsel == 1) then
 		return true;
-	elseif(cfg.ingroupsel == 2) then
+	elseif (cfg.ingroupsel == 2) then
 		return(not IsInRaid() and GetNumSubgroupMembers() == 0);
-	elseif(cfg.ingroupsel == 3) then
+	elseif (cfg.ingroupsel == 3) then
 		return(not IsInRaid() and GetNumSubgroupMembers() > 0);
-	elseif(cfg.ingroupsel == 4) then
+	elseif (cfg.ingroupsel == 4) then
 		return(IsInRaid());
 	end
 
+	return true;
+end
+
+function Gnosis:CheckInstanceType(cfg)
+	if (not cfg.instancetype or cfg.instancetype <= 1) then
+		-- in or out of instance
+		return true;
+	else
+		local isinside, instance = IsInInstance();
+		
+		if (cfg.instancetype == 2) then
+			-- only when inside any instance
+			return isinside == true;
+		elseif (cfg.instancetype == 3) then
+			-- only when outside of instance			
+			return isinside ~= true;
+		elseif (cfg.instancetype == 4) then
+			-- only when inside battleground
+			return isinside == true and instance == "pvp";
+		elseif (cfg.instancetype == 5) then
+			-- only inside arena
+			return isinside == true and instance == "arena";
+		elseif (cfg.instancetype == 6) then
+			-- only inside 5-man instance
+			return isinside == true and instance == "party";
+		elseif (cfg.instancetype == 7) then
+			-- only inside raid instance
+			return isinside == true and instance == "raid";
+		end
+	end
+	
 	return true;
 end
 
@@ -1109,8 +1141,8 @@ end
 function Gnosis:SetupSwingBar(cb, spell, icon, fCurTime, bMeleeSwing)
 	local barname, cfg = cb.name, cb.conf;
 
-		-- valid group layout?
-	if(not self:CheckGroupLayout(cfg)) then
+	-- valid group layout? valid instance type?
+	if (not self:CheckGroupLayout(cfg) or not self:CheckInstanceType(cfg)) then
 		return;
 	end
 
@@ -1163,8 +1195,8 @@ function Gnosis:SetupGCDbar(cb, spell, rank, fCurTime, right2left, start, cd)
 		end
 	end
 	
-		-- valid group layout?
-	if (not self:CheckGroupLayout(cfg)) then
+	-- valid group layout? valid instance type?
+	if (not self:CheckGroupLayout(cfg) or not self:CheckInstanceType(cfg)) then
 		return;
 	end
 
@@ -1229,8 +1261,8 @@ end
 function Gnosis:SetupMirrorbar(cb, label, channel, curval, maxval, fCurTime, timer)
 	local barname, cfg = cb.name, cb.conf;
 
-	-- valid group layout?
-	if (not self:CheckGroupLayout(cfg)) then
+	-- valid group layout? valid instance type?
+	if (not self:CheckGroupLayout(cfg) or not self:CheckInstanceType(cfg)) then
 		return;
 	end
 
@@ -1910,11 +1942,11 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 		return;
 	end
 
-		-- valid group layout?
-	if (not self:CheckGroupLayout(cfg)) then
+	-- valid group layout? valid instance type?
+	if (not self:CheckGroupLayout(cfg) or not self:CheckInstanceType(cfg)) then
 		return;
 	end
-
+	
 	-- blacklisted?
 	if(cfg.bnwtypesel == 2 and cfg.bnwlist) then
 		for key, value in pairs(cfg.bnwlist) do
