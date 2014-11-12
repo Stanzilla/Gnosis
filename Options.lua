@@ -1850,7 +1850,7 @@ function Gnosis:OptCreateConfigurations()
 									GnosisConfigs[key] = nil;
 									Gnosis:OptSaveNewConfig(key, _def, _cb, _cs, _ct);
 									Gnosis:OptCreateConfigurations();
-									InterfaceOptionsFrame_OpenToCategory(Gnosis.optCfgs);
+									Gnosis:OpenCfgOptions();
 								end,
 							},
 							{
@@ -1885,7 +1885,7 @@ function Gnosis:OptCreateConfigurations()
 								on_click = function(self)
 									GnosisConfigs[key] = nil;
 									Gnosis:OptCreateConfigurations();
-									InterfaceOptionsFrame_OpenToCategory(Gnosis.optCfgs);
+									Gnosis:OpenCfgOptions();
 								end,
 							},
 							{
@@ -2094,6 +2094,10 @@ function Gnosis:ImportBarInit(key)
 end
 
 function Gnosis:ImportBarFinalize(key)
+	-- make sure imported bar is up to date
+	self:CheckStoredCastbarOptions();
+	
+	-- config bar and create options
 	self:SetBarParams(key);
 	self:CreateCastbarsOpt();
 	self:CreateCBTables();
@@ -2119,7 +2123,7 @@ function Gnosis:ImportBars()
 							local func, errorMessage = loadstring(str, "import");
 							if (func) then
 								func();
-								InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+								Gnosis:OpenCastbarOptions();
 							else
 								Gnosis:ImportBarsFromStr(str);
 							end								

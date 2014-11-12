@@ -990,7 +990,7 @@ function Gnosis:RemoveCastbarDialog(key)
 					text = Gnosis.L["Yes"],
 					on_click = function(self)
 						Gnosis:RemoveCastbar(key);
-						InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+						Gnosis:OpenCastbarOptions();
 					end,
 				},
 				{
@@ -1054,8 +1054,8 @@ function Gnosis:OnDragStop()
 end
 
 function Gnosis:OnMouseUp(button)
-	if(button == "RightButton") then
-		InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+	if (button == "RightButton") then
+		Gnosis:OpenCastbarOptions();
 	end
 end
 
