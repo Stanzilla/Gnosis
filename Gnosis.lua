@@ -665,8 +665,8 @@ function Gnosis:SetupChanneledSpellsTable()
 	-- multi mob (no clipping detection), spellschool, isheal, upgrade_num
 
 	-- priest
-	self:AddChanneledSpellById(15407, 3, false, 4, false, false, "shadow", false, 2);	-- mind flay
-	self:AddChanneledSpellById(129197, 3, false, 4, false, false, "shadow", false, 1);	-- insanity
+	self:AddChanneledSpellById(15407, 4, false, 5, false, false, "shadow", false, 3);	-- mind flay
+	self:AddChanneledSpellById(129197, 4, false, 5, false, false, "shadow", false, 2);	-- insanity
 	self:AddChanneledSpellById(32000, 6, false, 7, true, true, "shadow", false, 3); 	-- mind sear
 	self:AddChanneledSpellById(47540, 3, false, 2, true, false, "holy", true, 1);		-- penance, first tick instant
 	self:AddChanneledSpellById(64843, 4, false, 15, false, true, "holy", true, 4);		-- divine hymn
