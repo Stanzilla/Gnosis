@@ -1,6 +1,7 @@
 -- Gnosis @project-version@ last changed @project-date-iso@
 -- Timers.lua last changed @file-date-iso@
 
+
 local UnitCastingInfo = UnitCastingInfo;
 local UnitChannelInfo = UnitChannelInfo;
 local GetItemInfo = GetItemInfo;
@@ -343,6 +344,38 @@ function Gnosis:Timers_SpellCD(bar, timer, ti)
 	elseif(timer.bNot) then
 		ti.cname = timer.spell;
 		ti.icon = timer.icon or select(3, GetSpellInfo(timer.spell));
+		set_not(ti);
+	end
+end
+
+function Gnosis:Timers_Counter(bar, timer, ti)
+	ti.unit = "player";
+	
+	local cnter;
+	if (Gnosis.counters and Gnosis.counters[timer.spell]) then
+		cnter = Gnosis.counters[timer.spell];
+		
+		if (cnter.endtime < GetTime()) then
+			cnter = nil;
+		end
+	end
+	
+	if (cnter) then
+		ti.cname = timer.spell;
+		if(timer.brange) then
+			local curcnt = GetTime() - cnter.starttime;
+			local totcnt = cnter.endtime - cnter.starttime;
+			ti.ok = in_value_range(curcnt, curcnt*100/totcnt, timer.range_tab);
+		else
+			ti.ok = true;
+		end
+		set_times(timer, ti,
+			(cnter.endtime-cnter.starttime)*1000,
+			cnter.endtime*1000,
+			true
+		);
+	elseif (timer.bNot) then
+		ti.cname = timer.spell;
 		set_not(ti);
 	end
 end
@@ -1045,7 +1078,7 @@ function Gnosis:Timers_UnitName(bar, timer, ti)
 		ti.unit = timer.unit;
 		ti.ok = true;
 		ti.valIsStatic = true;
-		set_times(timer, ti);	
+		set_times(timer, ti);
 	elseif (timer.bNot) then
 		ti.cname = timer.spell;
 		ti.unit = timer.unit;
@@ -1208,12 +1241,12 @@ local SelectedTimerInfo = {
 function Gnosis:CreateSingleTimerTable()
 	wipe(self.ti_fl);
 	wipe(self.ti_icd);
-
+	
 	for key, value in pairs(self.castbars) do
 		local conf = Gnosis.s.cbconf[key];
 		local timer_id = 0;
 
-		if(conf.bEn and conf.bartype == "ti" and (conf.spec == 0 or conf.spec == self.iCurSpec)) then
+		if (conf.bEn and conf.bartype == "ti" and (conf.spec == 0 or conf.spec == self.iCurSpec)) then
 			value.timers = {};
 			value.iTimerSort = nil;
 
@@ -1231,7 +1264,7 @@ function Gnosis:CreateSingleTimerTable()
 
 				local unit, recast, staticdur, zoom, spec, iconoverride, portraitunit,
 					shown, hidden, plays, playm, playf, mcnt, msize, tooltipvalue,
-					aurastacks, auraeffect;
+					aurastacks, auraeffect, startcnt, stopcnt;
 
 				-- extract commands from current line
 				unit, str = self:ExtractRegex(str, "unit=(%w+)", "unit=\"([^\"]+)\"", true);
@@ -1242,6 +1275,8 @@ function Gnosis:CreateSingleTimerTable()
 				plays, str = self:ExtractRegex(str, "plays=\"([^\"]+)\"", nil, true);
 				playm, str = self:ExtractRegex(str, "playm=\"([^\"]+)\"", nil, true);
 				playf, str = self:ExtractRegex(str, "playf=\"([^\"]+)\"", nil, true);
+				startcnt, str = self:ExtractRegex(str, "startcnt=(%w+)", "startcnt=\"([^\"]+)\"", true);
+				stopcnt, str = self:ExtractRegex(str, "stopcnt=(%w+)", "stopcnt=\"([^\"]+)\"", true);
 				mcnt, str = self:ExtractRegex(str, "mcnt=(%w+)", "mcnt=\"([^\"]+)\"", true);
 				msize, str = self:ExtractRegex(str, "msize=([+-]?[0-9]*%.?[0-9]*)", "msize=\"([+-]?[0-9]*%.?[0-9]*)\""); -- floating point regex
 				recast, str = self:ExtractRegex(str, "recast=([+-]?[0-9]*%.?[0-9]*)", "recast=\"([+-]?[0-9]*%.?[0-9]*)\"");
@@ -1251,6 +1286,7 @@ function Gnosis:CreateSingleTimerTable()
 				aurastacks, str = self:ExtractRegex(str, "aurastacks=([+-]?[0-9]*%.?[0-9]*)", "aurastacks=\"([+-]?[0-9]*%.?[0-9]*)\"");
 				auraeffect, str = self:ExtractRegex(str, "auraeffect=([+-]?[0-9]*%.?[0-9]*)", "auraeffect=\"([+-]?[0-9]*%.?[0-9]*)\"");
 				spec, str = self:ExtractRegex(str, "spec=(%d+)", "spec=\"(%d+)\"");
+				
 				recast, staticdur, zoom, spec =
 					recast and (tonumber(recast) * 1000),
 					staticdur and (tonumber(staticdur) * 1000),
@@ -1333,6 +1369,22 @@ function Gnosis:CreateSingleTimerTable()
 					end
 				end
 				
+				-- start/stop count
+				local countstart, countinterval, countstop;
+				if (startcnt) then
+					countinterval, countstart =
+						string_match(startcnt, "([+-]?[0-9]*%.?[0-9]*)%-(.+)");
+						
+					if (countstart) then
+						countinterval = tonumber(countinterval);
+					else
+						countinterval = nil;
+					end
+				end
+				if (stopcnt) then
+					countstop = stopcnt;
+				end
+								
 				-- icon override, portrait unit
 				local iconoverride = select(3, GetSpellInfo(iconoverride));
 				local ptun = portraitunit;
@@ -1344,7 +1396,7 @@ function Gnosis:CreateSingleTimerTable()
 				tfs, str = self:ExtractRegex(str, "tfs=\"([^\"]*)\"", "tfs=(%w+)");
 				-- status bar color
 				colstr, str = self:ExtractRegex(str, "sbcol=\"([^\"]+)\"");
-				if(colstr) then
+				if (colstr) then
 					local r,g,b,a = self:GetColorsFromString(colstr);
 					if(r) then
 						tsbcol = { r, g, b, a };
@@ -1359,11 +1411,13 @@ function Gnosis:CreateSingleTimerTable()
 					spell, brange, range_tab = get_valid_range_table(spell);
 				end
 				cmd = cmd and string_trim(cmd);
-				if(cmd and string_len(cmd) > 0 and spell and string_len(spell) > 0) then
+				if (cmd and string_len(cmd) > 0 and spell and string_len(spell) > 0) then
 					for w in string_gmatch(cmd, "%w+") do
 						w = string_lower(w);
 
-						if (w == "cast") then
+						if (w == "exit") then
+							tiType = -1;
+						elseif (w == "cast") then
 							tiType = 0;
 							cfinit = Gnosis.Timers_Spell;
 						elseif (w == "cd") then
@@ -1457,6 +1511,9 @@ function Gnosis:CreateSingleTimerTable()
 						elseif (w == "groupaura") then
 							tiType = 21;
 							cfinit = Gnosis.Timers_GroupAura;
+						elseif (w == "counter") then
+							tiType = 22;
+							cfinit = Gnosis.Timers_Counter;
 						elseif (w == "resource") then
 							if (spell == "power") then
 								tiType = 1000;
@@ -1551,92 +1608,99 @@ function Gnosis:CreateSingleTimerTable()
 				strFilter = strFilter .. (bSelf and "PLAYER" or "");
 				strFilter = strFilter .. (bHarm and (string_len(strFilter) > 0 and "|HARMFUL" or "HARMFUL") or "");
 				strFilter = strFilter .. (bHelp and (string_len(strFilter) > 0 and "|HELPFUL" or "HELPFUL") or "");
+				
+				if (tiType) then
+					local tTimer = {
+						type = tiType,
+						spec = spec,
+						filter = strFilter,
+						spell = spell,
+						showlag = bShowLag,
+						showcasttime = bShowCasttime,
+						nfs = nfs,
+						tfs = tfs,
+						recast = recast,
+						staticdur = staticdur,
+						zoom = zoom,
+						bExists = bExists,
+						bNot = bNot,
+						cfinit = cfinit,
+						sbcolor = tsbcol,
+						cbs = not bHideSpark and conf.bShowCBS or false,
+						hideicon = bHideIcon,
+						id = timer_id,
+						brange = brange,
+						range_tab = range_tab,
+						boolop = boolop,
+						icon = icon__,
+						icov = iconoverride,
+						ptun = portraitunit,
+						shown = shown,
+						hidden = hidden,
+						playinterval = playinterval,
+						fplay = fplay,
+						tplay = tplay,
+						toplay = toplay,
+						mcnt = mcnt,
+						msize = msize,
+						aurastacks = aurastacks,
+						auraeffect = auraeffect,
+						countstart = countstart,
+						countinterval = countinterval,
+						countstop = countstop,
+					};
+					
+					-- targeted unit
+					tTimer.unit = unit and unit or conf.unit;
 
-				--if(not spec or spec == self.iCurSpec) then
-					if(tiType) then
-						local tTimer = {
-							type = tiType,
-							spec = spec,
-							filter = strFilter,
-							spell = spell,
-							showlag = bShowLag,
-							showcasttime = bShowCasttime,
-							nfs = nfs,
-							tfs = tfs,
-							recast = recast,
-							staticdur = staticdur,
-							zoom = zoom,
-							bExists = bExists,
-							bNot = bNot,
-							cfinit = cfinit,
-							sbcolor = tsbcol,
-							cbs = not bHideSpark and conf.bShowCBS or false,
-							hideicon = bHideIcon,
-							id = timer_id,
-							brange = brange,
-							range_tab = range_tab,
-							boolop = boolop,
-							icon = icon__,
-							icov = iconoverride,
-							ptun = portraitunit,
-							shown = shown,
-							hidden = hidden,
-							playinterval = playinterval,
-							fplay = fplay,
-							tplay = tplay,
-							toplay = toplay,
-							mcnt = mcnt,
-							msize = msize,
-							aurastacks = aurastacks,
-							auraeffect = auraeffect,
-						};
-						-- targeted unit
-						tTimer.unit = unit and unit or conf.unit;
-
-						-- get name and icon if cast/aura and passed as spellid
-						if((tiType <= 2 or tiType == 10 or tiType == 11 or tiType == 21) and tonumber(spell)) then
-							local name_, _, icon_ = GetSpellInfo(tonumber(spell));
-							if(name_ and icon_) then
-								tTimer.spell = name_;
-								tTimer.icon = icon_;
-							end
+					-- get name and icon if cast/aura and passed as spellid
+					if ((tiType <= 2 or tiType == 10 or tiType == 11 or tiType == 21) and tonumber(spell)) then
+						local name_, _, icon_ = GetSpellInfo(tonumber(spell));
+						if(name_ and icon_) then
+							tTimer.spell = name_;
+							tTimer.icon = icon_;
 						end
-
-						-- if itemcd try to get item id and texture
-						if(tiType == 3 or tiType == 14) then
-							local itemname, link, _, _, _, _, _, _, _, itex = GetItemInfo(spell);
-							if(link) then
-								tTimer.iid = string.match(link, "|Hitem:(%d+):");
-								tTimer.itex = itex;
-								tTimer.iname = itemname;
-							end
-						end
-						
-						-- inner cooldown/proc (norefresh command)
-						if(tiType == 8) then
-							self.ti_icd[spell].norefresh = norefresh;
-						end
-						
-						-- special handling for auras with
-						-- aurastacks/auraeffect commands
-						if (tiType == 2) then
-							if (aurastacks) then
-								tTimer.type = tiType + 5000;
-							elseif (auraeffect) then
-								tTimer.type = tiType + 5001;
-							end
-						end
-						
-						-- insert entry
-						table_insert(value.timers, tTimer);
-					elseif(iSort) then
-						-- sorting criterion
-						value.iTimerSort = iSort;
 					end
-				--end -- spec
+					
+					-- if itemcd try to get item id and texture
+					if (tiType == 3 or tiType == 14) then
+						local itemname, link, _, _, _, _, _, _, _, itex = GetItemInfo(spell);
+						if(link) then
+							tTimer.iid = string.match(link, "|Hitem:(%d+):");
+							tTimer.itex = itex;
+							tTimer.iname = itemname;
+						end
+					end
+					
+					-- inner cooldown/proc (norefresh command)
+					if (tiType == 8) then
+						self.ti_icd[spell].norefresh = norefresh;
+					end
+					
+					-- special handling for auras with
+					-- aurastacks/auraeffect commands
+					if (tiType == 2) then
+						if (aurastacks) then
+							tTimer.type = tiType + 5000;
+						elseif (auraeffect) then
+							tTimer.type = tiType + 5001;
+						end
+					end
+					
+					-- do not check if unit exists for unitname/npc command
+					if (not(tiType == 12 or tiType == 15)) then
+						tTimer.unitexistscheck = true;
+					end
+					
+					-- insert entry
+					table_insert(value.timers, tTimer);
+				elseif (iSort) then
+					-- sorting criterion
+					value.iTimerSort = iSort;
+				end
 			end
 
-			if(#value.timers > 0) then
+			if (#value.timers > 0) then
 				table_insert(self.ti_fl, value);
 			end
 		end
@@ -1727,7 +1791,12 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 			if (v.boolop == 0) then
 				boolop_complete = false;
 			end
-		else			
+		else
+			-- exit?
+			if (v.type == -1) then
+				break;
+			end
+			
 			-- compute command?
 			local checkentry = true;
 			
@@ -1736,7 +1805,7 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 				checkentry = false;
 			else
 				-- selected unit exists?
-				if (not UnitExists(v.unit)) then
+				if (v.unitexistscheck and (not UnitExists(v.unit))) then
 					checkentry = false;
 				else
 					-- "shown" command? is given bar actually shown?
@@ -1758,7 +1827,28 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 				-- call related timer function (Timers.lua)
 				v:cfinit(bar, v, TimerInfo);
 
+				-- related timer info valid
 				if (TimerInfo.ok and self:UnitRelationSelect(bar.conf.relationsel, TimerInfo.unit)) then
+					-- counter?					
+					if (v.countinterval) then
+						if (self.counters == nil) then
+							self.counters = {};
+						end
+						
+						if (self.counters[v.countstart] == nil) then
+							self.counters[v.countstart] = { starttime = GetTime(), endtime = GetTime() + v.countinterval };
+						elseif (self.counters[v.countstart].endtime < GetTime()) then
+							self.counters[v.countstart].starttime = GetTime();
+							self.counters[v.countstart].endtime = self.counters[v.countstart].starttime + v.countinterval;
+						end
+					end
+					
+					if (v.countstop) then
+						if (self.counters) then
+							self.counters[v.countstop] = nil;
+						end
+					end
+					
 					-- boolop?
 					if (v.boolop == 1) then
 						-- timer is condition for next one(s), next please
