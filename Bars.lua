@@ -692,18 +692,29 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 	elseif (tParams.alignment == "TIMENAME") then
 		bar.rtext:SetPoint("LEFT", bar, "LEFT", tParams.coord["casttime"].x, tParams.coord["casttime"].y);
 		bar.ctext:SetPoint("RIGHT", bar, "RIGHT", tParams.coord["castname"].x, tParams.coord["castname"].y);
+		
 		if (tParams.alignname == "LEFT" or tParams.alignname == "CENTER") then
-			bar.ctext:SetPoint("LEFT", bar.rtext, "RIGHT", 0, 0);
+			-- no resizing of long names possible
+			bar.ctext:SetPoint("LEFT", bar.rtext, "LEFT", 0, 0);
 		else
-			bar.rtext:SetPoint("RIGHT", bar.ctext, "LEFT", 0, 0);
+			if (tParams.bResizeLongName) then
+				bar.rtext:SetPoint("RIGHT", bar.ctext, "LEFT", 0, 0);
+			else
+				bar.ctext:SetPoint("LEFT", bar.rtext, "RIGHT", 0, 0);
+			end
 		end
 	else
 		bar.rtext:SetPoint("RIGHT", bar, "RIGHT", tParams.coord["casttime"].x, tParams.coord["casttime"].y);
 		bar.ctext:SetPoint("LEFT", bar, "LEFT", tParams.coord["castname"].x, tParams.coord["castname"].y);
 		if (tParams.alignname == "RIGHT" or tParams.alignname == "CENTER") then
-			bar.ctext:SetPoint("RIGHT", bar.rtext, "LEFT", 0, 0);
+			-- no resizing of long names possible
+			bar.ctext:SetPoint("RIGHT", bar.rtext, "RIGHT", 0, 0);
 		else
-			bar.rtext:SetPoint("LEFT", bar.ctext, "RIGHT", 0, 0);
+			if (tParams.bResizeLongName) then
+				bar.rtext:SetPoint("LEFT", bar.ctext, "RIGHT", 0, 0);
+			else
+				bar.ctext:SetPoint("RIGHT", bar.rtext, "LEFT", 0, 0);
+			end
 		end
 	end
 
@@ -2378,7 +2389,7 @@ function Gnosis:SetupBarString(cb, cfg, fCurTime, bDoResize)
 
 		local ctextmax = cb.barwidth - (cb.rtext:GetStringWidth() + cfg.strGap);
 		local factor = 1.0;
-
+		
 		while ctextmax < cb.ctext:GetStringWidth() do
 			local refactor = ctextmax / cb.ctext:GetStringWidth();
 			if(refactor > 0.9) then

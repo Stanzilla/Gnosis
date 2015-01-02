@@ -1,7 +1,6 @@
 -- Gnosis @project-version@ last changed @project-date-iso@
 -- Timers.lua last changed @file-date-iso@
 
-
 local UnitCastingInfo = UnitCastingInfo;
 local UnitChannelInfo = UnitChannelInfo;
 local GetItemInfo = GetItemInfo;
@@ -15,6 +14,10 @@ local GetRuneType = GetRuneType;
 local GetTotemInfo = GetTotemInfo;
 local GetWeaponEnchantInfo = GetWeaponEnchantInfo;
 local GetInventoryItemTexture = GetInventoryItemTexture;
+local GetGlyphSocketInfo = GetGlyphSocketInfo;
+local GetSpecialization = GetSpecialization;
+local GetSpecializationInfo = GetSpecializationInfo;
+local GetTalentInfo = GetTalentInfo;
 local UnitExists = UnitExists;
 local UnitPower = UnitPower;
 local UnitPowerMax = UnitPowerMax;
@@ -56,12 +59,12 @@ local function ParseTimer_IsComment(line)
 	end
 end
 
-function Gnosis:ParseTimer_GetCommand(bnwlist, linetostart, token)
-	local curcmd;
+function Gnosis:ParseTimer_GetCommand(bnwlist, linetostart)
+	local curcmd, boolop;
 	
 	-- is valid table?
 	if (type(bnwlist) ~= "table") then
-		return nil, nil, nil;
+		return;
 	end
 	
 	-- remove comments
@@ -70,49 +73,41 @@ function Gnosis:ParseTimer_GetCommand(bnwlist, linetostart, token)
 	end
 	
 	if (linetostart > #bnwlist) then
-		return nil, nil, nil;
+		return;
 	end
 	
 	-- grab first non comment (and remove tokens)
-	local removed_token, cmdstart = string_match(bnwlist[linetostart], "^[%s%.,]*([\\&#%+])[%s,]+(.*)")
-	if (removed_token and not token) then
-		return nil, nil, nil;
-	elseif (removed_token) then
-		-- remove tokens '\\'. '&', '?'. '|'
-		curcmd = cmdstart;
-	else
-		curcmd = bnwlist[linetostart];
-	end
-	
+	-- remove tokens '\\'. '&', '+'. '*'
+	-- '\\': append line; '&': previous and current line have to be valid, same as 'and'
+	-- '?': either previous or current line has to be valid (or both)
+	-- '*': simply compute line, same as 'or', belongs to previous '&' or '+'
+	curcmd = string_match(bnwlist[linetostart], "^[%s%.,\\&%?%*]*(.*)")
 	linetostart = linetostart + 1;
-	removed_token = nil;
+	if (not curcmd) then
+		return;
+	end	
 	
 	-- append lines beginning with '\\'
 	while (linetostart <= #bnwlist) do
-		removed_token = nil;
-		
 		if (ParseTimer_IsComment(bnwlist[linetostart])) then
 			-- comment, next line
 			linetostart = linetostart + 1;
 		else	
-			local token, append = string_match(bnwlist[linetostart], "^[%s%.,]*([\\&#%+])[%s,]+(.*)");
+			local token, append = string_match(bnwlist[linetostart], "^[%s%.,]*([\\&%?%*])[%s%.,\\&%?%*]*(.*)");
 			
 			if (token) then
 				if (token == "\\") then
 					-- append line
 					curcmd = curcmd .. " " .. append;
-					linetostart = linetostart + 1;				
+					linetostart = linetostart + 1;			
 				elseif (token == "&") then
-					curcmd = "and " .. curcmd;
-					removed_token = token;
+					boolop = 1;
 					break;
-				elseif (token == "#") then
-					curcmd = "xand " .. curcmd;
-					removed_token = token;
+				elseif (token == "?") then
+					boolop = 3;
 					break;
-				elseif (token == "+") then
-					curcmd = "or " .. curcmd;
-					removed_token = token;
+				elseif (token == "*") then
+					boolop = 2;
 					break;	
 				else
 					break;
@@ -123,95 +118,7 @@ function Gnosis:ParseTimer_GetCommand(bnwlist, linetostart, token)
 		end
 	end
 	
-	return curcmd, linetostart, removed_token;
-end
-
-local tTimerEntries = {
-	["cast"] = {
-		["command_id"] = 0,
-		["callback"] = Gnosis.Timers_Spell,
-		["cfg_callback"] = nil,
-		["parameter"] = nil,
-		["forced_unit"] = nil,
-	},
-};
-
-function Gnosis:ParseTimer_AddEntryCmd(keyword, parameter, timer)
-
-end
-
-function Gnosis:ParseTimer_AddEntryOption(keyword, parameter, timer)
-
-end
-
-function Gnosis:ParseTimer_AddEntry(keyword, parameter, timer)
-	if (tTimerEntries[keyword]) then
-		if (tTimerEntries[keyword].command_id) then
-			self:ParseTimer_AddEntryCmd(keyword, parameter, timer);
-		else
-			self:ParseTimer_AddEntryOption(keyword, parameter, timer);
-		end
-	end
-end
-
-function Gnosis:ParseTimer_Command(line, timer)
-	repeat
-		local keyword, parameter, restofline;
-		
-		-- comment
-		if (ParseTimer_IsComment(line)) then
-			if (next(timer) ~= nil) then
-				self:Print("timer needs to be in the format command [options] : id [<conditions>]");
-				return false;
-			end
-			
-			return true;
-		else
-			-- delimiter ':'
-			restofline  = string_match(line, "^%:(.*)");
-
-			if (restofline) then
-				-- boundary between commands/options and name/id found
-				return self:ParseTimer_Id(restofline, timer);
-			else
-				keyword, parameter, restofline = string_match(line, "^(%w+)=\"([^\"]-)\"(.*)");
-				if (keyword) then
-					self:ParseTimer_CheckAndAddEntry(keyword, parameter, timer);
-					print(1, keyword, parameter, restofline);
-				else
-					keyword, parameter, restofline = string_match(line, "^(%w+)=([^%s:,]+)(.*)");
-					if (keyword) then
-						self:ParseTimer_CheckAndAddEntry(keyword, parameter, timer);
-					else
-						keyword, restofline = string_match(line, "^(%w+)(.*)");
-						if (keyword) then
-							self:ParseTimer_CheckAndAddEntry(keyword, nil, timer);
-						end
-					end   
-				end
-
-				line = restofline;
-			end
-		end
-	until (line == nil);
-	
-	return false;
-end
-
-function Gnosis:ParseTimer_Id(line, timer)
-	local id, restofline, conditions;
-	
-	line = string_trim(line);
-	
-	local full_comment = string_match(line, "%-%-[%s]*(.*)");
-	if (full_comment) then
-		self:Print("id missing from timer line");
-		return false;
-	end
-	
-	id, restofline = string_match(line, "\"([^\"]+)\"(.*)");
-	if (id) then
-	end
+	return curcmd, linetostart, boolop;
 end
 
 local function in_value_range(cur_val, cur_val_perc, range_tab)
@@ -1079,7 +986,10 @@ function Gnosis:Timers_UnitName(bar, timer, ti)
 		ti.ok = true;
 		ti.valIsStatic = true;
 		set_times(timer, ti);
-	elseif (timer.bNot) then
+		return;
+	end
+	
+	if (timer.bNot) then
 		ti.cname = timer.spell;
 		ti.unit = timer.unit;
 		set_not(ti);
@@ -1090,8 +1000,6 @@ function Gnosis:Timers_Npc(bar, timer, ti)
 	local guid = UnitGUID(timer.unit);
 	
 	if (guid) then
-		--print(timer.unit, guid);
-	
 		local _, _, _, _, _, npc_id, _ = string_split("-", guid);
 		
 		if (npc_id and (timer.spell == "any" or npc_id == timer.spell)) then
@@ -1100,11 +1008,126 @@ function Gnosis:Timers_Npc(bar, timer, ti)
 			ti.ok = true;
 			ti.valIsStatic = true;
 			set_times(timer, ti);
-		elseif (timer.bNot) then
-			ti.cname = timer.spell;
-			ti.unit = timer.unit;
-			set_not(ti);
+			return;
 		end
+	end
+	
+	if (timer.bNot) then
+		ti.cname = timer.spell;
+		ti.unit = timer.unit;
+		set_not(ti);
+	end
+end
+
+function Gnosis:Timers_Charspec(bar, timer, ti)
+	local current_spec = GetSpecialization();
+	
+	if (current_spec) then
+		-- spec active
+		local spec_id, spec_name = GetSpecializationInfo(current_spec);
+		local spell_number = tonumber(timer.spell);
+		
+		local matched = false;
+		-- try to compare to specialization id first
+		-- http://www.wowwiki.com/Specialization_IDs
+		if (spell_number and spell_number == spec_id) then
+			matched = true;			
+		-- otherwise compare to string
+		elseif (timer.spell == spec_name) then
+			matched = true;
+		end
+		
+		if (matched) then
+			ti.cname = spec_name;
+			ti.unit = "player";
+			ti.ok = true;
+			ti.valIsStatic = true;
+			set_times(timer, ti);
+		elseif (timer.bNot) then
+			ti.cname = spec_name;
+			ti.unit = "player";
+			set_not(ti);			
+		end
+	end
+end
+
+function Gnosis:Timers_Talent(bar, timer, ti)
+	if (Gnosis.iCurSpec) then
+		local tier, column = string_split("-", timer.spell);
+		
+		if (tier and column) then
+			local tier_num = tonumber(tier);
+			local column_num = tonumber(column);
+			
+			if (tier_num and column_num) then
+				local _, tname, ttex, tsel = GetTalentInfo(tier_num, column_num, Gnosis.iCurSpec);
+				
+				-- talent selected?
+				if (tsel) then
+					ti.cname = tname;
+					ti.unit = "player";
+					ti.icon = ttex;
+					ti.ok = true;
+					ti.valIsStatic = true;
+					set_times(timer, ti);
+				elseif (timer.bNot and tname) then
+					ti.cname = tname;
+					ti.unit = "player";
+					ti.icon = ttex;
+					set_not(ti);
+				end
+			end
+		end
+	end
+end
+
+function Gnosis:Timers_Glyph(bar, timer, ti)
+	-- check for glyph match
+	local matched, glyph_name, glyph_icon;
+	local spellnum = tonumber(timer.spell);
+	
+	for i=1, NUM_GLYPH_SLOTS do
+		local valid, _, _, id = GetGlyphSocketInfo(i);
+		
+		if (valid) then
+			glyph_name, _, glyph_icon = GetSpellInfo(id);
+			
+			if (spellnum) then
+				if (spellnum == id) then
+					matched = true;
+					break;
+				end
+			elseif (glyph_name == timer.spell) then
+				matched = true;
+				break;
+			end
+		end
+	end
+	
+	-- glyph found
+	if (matched) then
+		ti.cname = glyph_name;
+		ti.unit = "player";
+		ti.icon = glyph_icon;
+		ti.ok = true;
+		ti.valIsStatic = true;
+		set_times(timer, ti);
+	-- glyph not found
+	elseif (timer.bNot) then
+		ti.unit = "player";
+		
+		if (spellnum) then
+			local sname, _, stex = GetSpellInfo(spellnum);
+			
+			if (sname) then
+				ti.cname = sname;
+				ti.icon = stex;
+				set_not(ti);
+			end
+		else
+			ti.cname = timer.spell;
+			set_not(ti);
+		end		
 	end
 end
 
@@ -1250,16 +1273,17 @@ function Gnosis:CreateSingleTimerTable()
 			value.timers = {};
 			value.iTimerSort = nil;
 
-			for k, v in ipairs(conf.bnwlist) do
+			local curline = 1;
+			while (curline) do
 				-- timer id
 				timer_id = timer_id + 1;
 
 				-- copy of timer command string
-				local str = v;
+				local str, cmd_boolop;
+				str, curline, cmd_boolop = self:ParseTimer_GetCommand(conf.bnwlist, curline);
 				
-				-- comment
-				if(string_find(str, "^%s*[-][-]")) then
-					str = "";
+				if (not str) then
+					break;
 				end
 
 				local unit, recast, staticdur, zoom, spec, iconoverride, portraitunit,
@@ -1405,7 +1429,7 @@ function Gnosis:CreateSingleTimerTable()
 				-- command and spellname
 				local tiType, bSelf, bHarm, bHelp, bShowLag, bShowCasttime, iSort, bExists, bNot, bHideSpark, bHideIcon, cfinit, brange, range_tab, icon__;
 				local norefresh = false;
-				local boolop = 0;
+				local boolop = cmd_boolop or 0;
 				local cmd, spell = string_match(str, "(.-):(.+)");
 				if(spell) then
 					spell, brange, range_tab = get_valid_range_table(spell);
@@ -1500,6 +1524,15 @@ function Gnosis:CreateSingleTimerTable()
 						elseif (w == "npc") then
 							tiType = 15;
 							cfinit = Gnosis.Timers_Npc;
+						elseif (w == "charspec") then
+							tiType = 16;
+							cfinit = Gnosis.Timers_Charspec;
+						elseif (w == "talent") then
+							tiType = 17;
+							cfinit = Gnosis.Timers_Talent;
+						elseif (w == "glyph") then
+							tiType = 18;
+							cfinit = Gnosis.Timers_Glyph;
 						elseif (w == "groupdot" or w == "groupdebuff") then
 							bHarm = true;
 							tiType = 21;
@@ -1583,9 +1616,13 @@ function Gnosis:CreateSingleTimerTable()
 						elseif (w == "hideicon") then
 							bHideIcon = true;
 						elseif (w == "and") then
-							boolop = 1;
+							if (boolop == 0) then
+								boolop = 1;
+							end
 						elseif (w == "or") then
-							boolop = 2;
+							if (boolop == 0) then
+								boolop = 2;
+							end
 						elseif (w == "sort") then
 							if (spell == "minrem") then
 								iSort = 1;
@@ -1688,7 +1725,7 @@ function Gnosis:CreateSingleTimerTable()
 					end
 					
 					-- do not check if unit exists for unitname/npc command
-					if (not(tiType == 12 or tiType == 15)) then
+					if (not(tiType == 12 or tiType == 15 or tiType == -1)) then
 						tTimer.unitexistscheck = true;
 					end
 					
@@ -1757,6 +1794,27 @@ function Gnosis:InjectTimer(barname, text, cnt, spell, isCast)
 	end
 end
 
+function Gnosis:CheckCounter(v)
+	if (v.countinterval) then
+		if (self.counters == nil) then
+			self.counters = {};
+		end
+		
+		if (self.counters[v.countstart] == nil) then
+			self.counters[v.countstart] = { starttime = GetTime(), endtime = GetTime() + v.countinterval };
+		elseif (self.counters[v.countstart].endtime < GetTime()) then
+			self.counters[v.countstart].starttime = GetTime();
+			self.counters[v.countstart].endtime = self.counters[v.countstart].starttime + v.countinterval;
+		end
+	end
+	
+	if (v.countstop) then
+		if (self.counters) then
+			self.counters[v.countstop] = nil;
+		end
+	end
+end
+
 function Gnosis:ScanTimerbar(bar, fCurTime)
 	local bUpdateText = false;
 	local bDelayedShow = false;
@@ -1783,20 +1841,19 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 		return;
 	end
 
+	local relaxed_and = nil;
 	local boolop_complete = false;
 	SelectedTimerInfo.duration = nil;
 	for k, v in ipairs(bar.timers) do
 		if (boolop_complete) then
+			-- unmark relaxed and request
+			relaxed_and = nil;
+			
 			-- search for first timer entry without boolop
 			if (v.boolop == 0) then
 				boolop_complete = false;
 			end
 		else
-			-- exit?
-			if (v.type == -1) then
-				break;
-			end
-			
 			-- compute command?
 			local checkentry = true;
 			
@@ -1822,6 +1879,14 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 						
 			-- check entry
 			if (checkentry) then
+				-- exit?
+				if (v.type == -1) then
+					-- start or stop counter?
+					self:CheckCounter(v);
+					-- exit, do not compute further
+					break;
+				end
+			
 				wipe(TimerInfo);
 				
 				-- call related timer function (Timers.lua)
@@ -1829,29 +1894,21 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 
 				-- related timer info valid
 				if (TimerInfo.ok and self:UnitRelationSelect(bar.conf.relationsel, TimerInfo.unit)) then
-					-- counter?					
-					if (v.countinterval) then
-						if (self.counters == nil) then
-							self.counters = {};
-						end
-						
-						if (self.counters[v.countstart] == nil) then
-							self.counters[v.countstart] = { starttime = GetTime(), endtime = GetTime() + v.countinterval };
-						elseif (self.counters[v.countstart].endtime < GetTime()) then
-							self.counters[v.countstart].starttime = GetTime();
-							self.counters[v.countstart].endtime = self.counters[v.countstart].starttime + v.countinterval;
-						end
-					end
-					
-					if (v.countstop) then
-						if (self.counters) then
-							self.counters[v.countstop] = nil;
-						end
-					end
+					-- start or stop counter?				
+					self:CheckCounter(v);
 					
 					-- boolop?
-					if (v.boolop == 1) then
+					if (v.boolop == 3) then
+						-- '?' (relaxed and, only one match necessary)
+						relaxed_and = 2;		-- store as valid
+					elseif (v.boolop == 1) then
 						-- timer is condition for next one(s), next please
+					elseif (relaxed_and == 1) then
+						-- relaxed and requested but no match found
+						relaxed_and = nil;
+						if (v.boolop == 2) then
+							boolop_complete = true;
+						end
 					else
 						if (v.boolop == 2) then
 							boolop_complete = true;
@@ -1897,13 +1954,21 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 							break;
 						end
 					end
+				elseif (v.boolop == 3) then
+					-- '?' (relaxed and, only one match necessary)
+					relaxed_and = relaxed_and or 1;	-- relaxed ok requested
 				elseif (v.boolop == 1) then
-					-- "and" but invalid entry, skip to next combined "and"/"or" block
+					-- "and"/'&' but invalid entry, skip to next combined "and"/"or" block
 					boolop_complete = true;
 				end
+			elseif (v.boolop == 3) then
+				-- '?' (relaxed and, only one match necessary)
+				relaxed_and = 1;	-- relaxed ok requested
 			elseif (v.boolop == 1) then
-				-- "and" but invalid entry, skip to next combined "and"/"or" block
+				-- "and"/'&' but invalid entry, skip to next combined "and"/"or" block
 				boolop_complete = true;
+			else
+				relaxed_and = nil;
 			end
 		end
 	end
