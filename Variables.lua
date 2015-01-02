@@ -343,7 +343,7 @@ function Gnosis:StartupVariables()
 		bnwtypesel = 1,			-- neither black-/whitelist
 		bnwlist = {},			-- empty list to begin with
 		bnwlistnew = "",		-- new entry box
-		bResizeLongName = true,	-- automatic resize of long spell names
+		bResizeLongName = false,-- automatic resize of long spell names
 		strata = "MEDIUM",		-- medium frame strata
 		strNameFormat = Gnosis.tPremadeNfs[1],	-- default nfs
 		strTimeFormat = Gnosis.tPremadeTfs[1],	-- default tfs
