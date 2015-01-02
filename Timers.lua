@@ -704,30 +704,6 @@ function Gnosis:Timers_WeaponEnchantOff(bar, timer, ti)
 	end
 end
 
-function Gnosis:Timers_ComboPoints(bar, timer, ti)
-	-- rogue or feral cat combo points
-	local s, d = nil, nil;
-	if(UnitExists(timer.unit)) then
-		s, d = GetComboPoints("player", timer.unit), 5;
-	end
-	
-	if(s) then
-		ti.unit = timer.unit;
-		ti.bSpecial = true;
-		if(timer.brange) then
-			ti.ok = in_value_range(s, s*100/d, timer.range_tab);
-		else
-			ti.ok = true;
-		end
-		set_times(timer, ti, d, s, true);
-	elseif(timer.bNot) then
-		ti.cname = "";
-		ti.icon = nil;
-		ti.unit = timer.unit;
-		set_not(ti);
-	end
-end
-
 function Gnosis:Timers_Range(bar, timer, ti)
 	-- range between player and selected unit
 	local minRange, maxRange;
@@ -794,11 +770,13 @@ end
 function Gnosis:Timers_PowerGeneric(bar, timer, ti)
 	-- soul shards, eclipse, holy power, dark force, light force (chi)
 	-- shadow orbs, burning embers and demonic fury
+	-- combo points (6.0)
 	local idx = timer.type - 2000;
 	local s, d = UnitPower(timer.unit, idx), UnitPowerMax(timer.unit, idx);
-	if(d and d > 0) then
-		if(not ti.cname or ti.cname == "") then
+	if (d and d > 0) then
+		if (not ti.cname or ti.cname == "") then
 			ti.cname =
+					(idx == 4 and _G["COMBO_POINTS"]) or
 					(idx == 7 and _G["SOUL_SHARDS"]) or
 					(idx == 8 and _G["ECLIPSE"]) or
 					(idx == 9 and _G["HOLY_POWER"]) or
@@ -808,10 +786,11 @@ function Gnosis:Timers_PowerGeneric(bar, timer, ti)
 					(idx == 15 and _G["DEMONIC_FURY"]) or
 				"";
 			ti.icon = select(3, GetSpellInfo(
+					(idx == 4 and 108209) or	-- combo points, no exact icon match
 					(idx == 7 and 117198) or	-- soul shards
 					(idx == 8 and 79577) or		-- eclipse
 					(idx == 9 and 85247) or		-- holy power
-					(idx == 12 and 97272) or	-- chi???
+					(idx == 12 and 157411) or	-- chi, no exact icon match
 					(idx == 13 and 95740) or	-- shadow orbs
 					(idx == 14 and 108647) or	-- burning embers
 					(idx == 15 and 104315) or	-- demonic fury
@@ -820,13 +799,13 @@ function Gnosis:Timers_PowerGeneric(bar, timer, ti)
 		end
 		ti.unit = timer.unit;
 		ti.bSpecial = true;
-		if(timer.brange) then
+		if (timer.brange) then
 			ti.ok = in_value_range(s, s*100/d, timer.range_tab);
 		else
 			ti.ok = true;
 		end
 		set_times(timer, ti, d, s, true);
-	elseif(timer.bNot) then
+	elseif (timer.bNot) then
 		ti.cname = "";
 		ti.icon = nil;
 		ti.unit = timer.unit;
@@ -1563,12 +1542,12 @@ function Gnosis:CreateSingleTimerTable()
 							elseif (spell == "threat") then
 								tiType = 1004;
 								cfinit = Gnosis.Timers_TargetThreat;
-							elseif (spell == "combopoints") then
-								tiType = 1005;
-								cfinit = Gnosis.Timers_ComboPoints;
 							elseif (spell == "range") then
 								tiType = 1006;
 								cfinit = Gnosis.Timers_Range;
+							elseif (spell == "combopoints") then
+								tiType = 2004;
+								cfinit = Gnosis.Timers_PowerGeneric;
 							elseif (spell == "soulshards") then
 								tiType = 2007;
 								cfinit = Gnosis.Timers_PowerGeneric;
