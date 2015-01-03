@@ -1505,12 +1505,15 @@ function Gnosis:CreateSingleTimerTable()
 							cfinit = Gnosis.Timers_Npc;
 						elseif (w == "charspec") then
 							tiType = 16;
+							unit = "player";
 							cfinit = Gnosis.Timers_Charspec;
 						elseif (w == "talent") then
 							tiType = 17;
+							unit = "player";
 							cfinit = Gnosis.Timers_Talent;
 						elseif (w == "glyph") then
 							tiType = 18;
+							unit = "player";
 							cfinit = Gnosis.Timers_Glyph;
 						elseif (w == "groupdot" or w == "groupdebuff") then
 							bHarm = true;
@@ -1774,6 +1777,14 @@ function Gnosis:InjectTimer(barname, text, cnt, spell, isCast)
 end
 
 function Gnosis:CheckCounter(v)
+	-- stop counter
+	if (v.countstop) then
+		if (self.counters) then
+			self.counters[v.countstop] = nil;
+		end
+	end
+	
+	-- start counter if it's not already running
 	if (v.countinterval) then
 		if (self.counters == nil) then
 			self.counters = {};
@@ -1784,12 +1795,6 @@ function Gnosis:CheckCounter(v)
 		elseif (self.counters[v.countstart].endtime < GetTime()) then
 			self.counters[v.countstart].starttime = GetTime();
 			self.counters[v.countstart].endtime = self.counters[v.countstart].starttime + v.countinterval;
-		end
-	end
-	
-	if (v.countstop) then
-		if (self.counters) then
-			self.counters[v.countstop] = nil;
 		end
 	end
 end
