@@ -198,12 +198,13 @@ end
 
 function Gnosis:Timers_Spell(bar, timer, ti)
 	-- cast
-	local spell, _, _, icon, s, d = UnitCastingInfo(timer.unit);
+	local spell, _, _, icon, s, d, _, _, notInterruptible = UnitCastingInfo(timer.unit);
 	if(d and d > 0) then
 		if(timer.spell == "all" or timer.spell == "any" or timer.spell == spell) then
 			ti.cname = spell;
 			ti.icon = icon;
 			ti.unit = timer.unit;
+			ti.notInterruptible = notInterruptible or nil;
 			local dur, fin = d-s, d;
 			if(timer.brange) then
 				local rem = fin/1000-GetTime();
@@ -214,12 +215,13 @@ function Gnosis:Timers_Spell(bar, timer, ti)
 			set_times(timer, ti, dur, fin, false);
 		end
 	else
-		spell, _, _, icon, s, d = UnitChannelInfo(timer.unit);
+		spell, _, _, icon, s, d, _, _, notInterruptible = UnitChannelInfo(timer.unit);
 		if(d and d > 0) then
 			if(timer.spell == "all" or timer.spell == "any" or timer.spell == spell) then
 				ti.cname = spell;
 				ti.icon = icon;
 				ti.unit = timer.unit;
+				ti.notInterruptible = notInterruptible or nil;
 				local dur, fin = d-s, d;
 				if(timer.brange) then
 					local rem = fin/1000-GetTime();
@@ -1929,6 +1931,7 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 							SelectedTimerInfo.effect = TimerInfo.effect;
 							SelectedTimerInfo.tiunit = TimerInfo.unit;
 							SelectedTimerInfo.bChannel = TimerInfo.bChannel;
+							SelectedTimerInfo.notInterruptible = TimerInfo.notInterruptible;
 							SelectedTimerInfo.curtimer = v;							
 						end
 
@@ -2002,7 +2005,9 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 		end
 		
 		-- only minor changes to bar necessary?
-		if (bar.bActive and bar.timer_id == SelectedTimerInfo.curtimer.id and bar.castname == SelectedTimerInfo.castname) then
+		if (bar.bActive and bar.timer_id == SelectedTimerInfo.curtimer.id and
+			bar.castname == SelectedTimerInfo.castname and bar.notInterruptible == SelectedTimerInfo.notInterruptible) then
+			
 			local dur = bar.dur and bar.dur or bar.duration;
 			local bRecalcTick = (dur ~= SelectedTimerInfo.duration);
 
@@ -2066,6 +2071,9 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 			bar.nfs = SelectedTimerInfo.curtimer.nfs and SelectedTimerInfo.curtimer.nfs or bar.conf.strNameFormat;
 			bar.tfs = SelectedTimerInfo.curtimer.tfs and SelectedTimerInfo.curtimer.tfs or bar.conf.strTimeFormat;
 
+			-- not interruptible status for 'cast' command
+			bar.notInterruptible = SelectedTimerInfo.notInterruptible; 
+			
 			if (SelectedTimerInfo.bSpecial) then
 				bar.bSpecial = true;
 				self:SetupPowerbar(bar, SelectedTimerInfo);
