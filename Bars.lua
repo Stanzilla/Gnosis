@@ -1839,14 +1839,26 @@ function Gnosis:SetupTimerbar(cb, fCurTime, tiinfo)
 	-- setup strings, including automatic resize of long strings
 	self:SetupBarString(cb, cfg, fCurTime, true);
 
+	-- non interruptible colors
+	if (cb.notInterruptible) then
+		cb.bar:SetStatusBarColor(unpack(cfg.colBarNI));
+		self:SetBorderColor(cb, cfg.colBorderNI, cfg.colBarBg, curtimer.hideicon);
+		if(cfg.bShowShield) then
+			cb.sicon:Show();
+		else
+			cb.sicon:Hide();
+		end
+	else
+		cb.bar:SetStatusBarColor(unpack(cfg.colBar));
+		self:SetBorderColor(cb, cfg.colBorder, cfg.colBarBg, curtimer.hideicon);
+		cb.sicon:Hide();
+	end
+	
 	-- castbar color
 	if(curtimer.sbcolor) then
 		cb.bar:SetStatusBarColor(unpack(curtimer.sbcolor));
 	end
-
-	-- border color
-	self:SetBorderColor(cb, cfg.colBorder, cfg.colBarBg, curtimer.hideicon);
-
+	
 	-- castbar spark
 	cb.cbs_hidden = false;
 	cb.cbs_check = bStatic;
