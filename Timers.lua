@@ -558,10 +558,17 @@ end
 function Gnosis:Timers_RuneCD(bar, timer, ti)
 	-- rune cooldown, player only
 	ti.unit = "player";
+	
+	-- check for runetype
+	local rune = GetRuneType(timer.spell);
+	if (rune and timer.runetype and timer.runetype ~= rune) then
+		return;
+	end
+	
+	-- check cooldown
 	local s, d, rdy = GetRuneCooldown(timer.spell);
-	if(s and s > 0) then
-		local rune = GetRuneType(timer.spell);
-		if(rune) then
+	if (s and (not rdy) and (s+d) >= GetTime()) then	
+		if (rune) then
 			ti.cname = Gnosis.tRuneName[rune];
 			ti.icon = Gnosis.tRuneTexture[rune];
 		else
@@ -569,16 +576,15 @@ function Gnosis:Timers_RuneCD(bar, timer, ti)
 			ti.icon = nil;
 		end
 		local dur, fin = d, s+d;
-		if(timer.brange) then
+		if (timer.brange) then
 			local rem = fin - GetTime();
 			ti.ok = in_value_range(rem, rem*100/dur, timer.range_tab);
 		else
 			ti.ok = true;
 		end
 		set_times(timer, ti, dur*1000, fin*1000, true);
-	elseif(timer.bNot and rdy) then
-		local rune = GetRuneType(timer.spell);
-		if(rune) then
+	elseif (timer.bNot) then
+		if (rune) then
 			ti.cname = Gnosis.tRuneName[rune];
 			ti.icon = Gnosis.tRuneTexture[rune];
 		else
@@ -1269,7 +1275,7 @@ function Gnosis:CreateSingleTimerTable()
 
 				local unit, recast, staticdur, zoom, spec, iconoverride, portraitunit,
 					shown, hidden, plays, playm, playf, mcnt, msize, tooltipvalue,
-					aurastacks, auraeffect, startcnt, stopcnt;
+					aurastacks, auraeffect, startcnt, stopcnt, runetype;
 
 				-- extract commands from current line
 				unit, str = self:ExtractRegex(str, "unit=(%w+)", "unit=\"([^\"]+)\"", true);
@@ -1291,6 +1297,7 @@ function Gnosis:CreateSingleTimerTable()
 				aurastacks, str = self:ExtractRegex(str, "aurastacks=([+-]?[0-9]*%.?[0-9]*)", "aurastacks=\"([+-]?[0-9]*%.?[0-9]*)\"");
 				auraeffect, str = self:ExtractRegex(str, "auraeffect=([+-]?[0-9]*%.?[0-9]*)", "auraeffect=\"([+-]?[0-9]*%.?[0-9]*)\"");
 				spec, str = self:ExtractRegex(str, "spec=(%d+)", "spec=\"(%d+)\"");
+				runetype, str = self:ExtractRegex(str, "runetype=(%d+)", "runetype=\"(%d+)\"");
 				
 				recast, staticdur, zoom, spec =
 					recast and (tonumber(recast) * 1000),
@@ -1309,6 +1316,13 @@ function Gnosis:CreateSingleTimerTable()
 					auraeffect = tonumber(auraeffect);
 				else
 					auraeffect = nil;
+				end
+				
+				-- runetype
+				if (runetype and tonumber(runetype) and tonumber(runetype) > 0) then
+					runetype = tonumber(runetype);
+				else
+					runetype = nil;
 				end
 				
 				-- marker count/size (tick markers for power bars)
@@ -1669,6 +1683,7 @@ function Gnosis:CreateSingleTimerTable()
 						countstart = countstart,
 						countinterval = countinterval,
 						countstop = countstop,
+						runetype = runetype,
 					};
 					
 					-- targeted unit
