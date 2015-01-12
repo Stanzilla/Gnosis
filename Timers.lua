@@ -179,11 +179,11 @@ local function set_not(ti)
 end
 
 local function set_times(timer, ti, dur, fin, ischannel)
-	if(ti.ok) then
-		if(timer.bNot) then
+	if (ti.ok) then
+		if (timer.bNot) then
 			ti.ok = nil;
 		else
-			if(ti.valIsStatic or timer.bExists) then
+			if (ti.valIsStatic or timer.bExists) then
 				set_not(ti);
 			else
 				ti.bChannel = ischannel;
@@ -191,7 +191,7 @@ local function set_times(timer, ti, dur, fin, ischannel)
 				ti.fin = fin;
 			end
 		end
-	elseif(timer.bNot) then
+	elseif (timer.bNot) then
 		set_not(ti);
 	end
 end
