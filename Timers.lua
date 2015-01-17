@@ -1125,7 +1125,7 @@ function Gnosis:Timers_GlobalCD(bar, timer, ti)
 	if (rem > 0 and (timer.spell == "any" or gcd.spell == timer.spell)) then
 		ti.cname = gcd.spell;
 		ti.unit = "player";
-		ti.icon = timer.icon or select(3, GetSpellInfo(gcd.spell));
+		ti.icon = timer.icon or select(3, GetSpellInfo(gcd.spellid));
 		if (timer.brange) then
 			ti.ok = in_value_range(rem, rem*100/gcd.cd, timer.range_tab);			
 		else
