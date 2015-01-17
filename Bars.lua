@@ -374,7 +374,7 @@ function Gnosis:FindCBNext(unit)
 	return tFindCB[iFindCB];
 end
 
-function Gnosis:FindGCDBars(spell, rank, fCurTime)
+function Gnosis:FindGCDBars(spell, rank, fCurTime, spellid)
 	-- using "Global Cooldown" spell
 	local start, cd = GetSpellCooldown(61304);
 	if (not start or not(cd > 0 and cd <= 1.5)) then
@@ -383,23 +383,25 @@ function Gnosis:FindGCDBars(spell, rank, fCurTime)
 	
 	local cb = self:FindCB("gcd");
 	while (cb) do
-		self:SetupGCDbar(cb, spell, rank, fCurTime, false, start, cd);
+		self:SetupGCDbar(cb, spell, rank, fCurTime, false, start, cd, spellid);
 		cb = self:FindCBNext("gcd");
 	end
 	
 	local cb = self:FindCB("gcd2");
 	while (cb) do
-		self:SetupGCDbar(cb, spell, rank, fCurTime, false, start, cd);
+		self:SetupGCDbar(cb, spell, rank, fCurTime, false, start, cd, spellid);
 		cb = self:FindCBNext("gcd2");
 	end
 	
 	if (self.current_gcd) then
 		self.current_gcd.spell = spell;
+		self.current_gcd.spellid = spellid;
 		self.current_gcd.cd = cd;
 		self.current_gcd.finish = start + cd;
 	else
 		self.current_gcd = {
 			spell = spell,
+			spellid = spellid,
 			cd = cd,
 			finish = start + cd
 		};
@@ -408,7 +410,7 @@ end
 
 function Gnosis:FindSwingTimers(unit, spell, icon, fCurTime, bType)
 	local cb = self:FindCB(unit);
-	while(cb) do
+	while (cb) do
 		self:SetupSwingBar(cb, spell, icon, fCurTime, bType);
 		cb = self:FindCBNext(unit);
 	end
@@ -416,7 +418,7 @@ end
 
 function Gnosis:FindSwingTimersParry(unit, fCurTime)
 	local cb = self:FindCB(unit);
-	while(cb) do
+	while (cb) do
 		self:SetupSwingBarForParry(cb, fCurTime)
 		cb = self:FindCBNext(unit);
 	end
@@ -1194,12 +1196,12 @@ function Gnosis:SetupSwingBar(cb, spell, icon, fCurTime, bMeleeSwing)
 	self.activebars[barname] = cb;
 end
 
-function Gnosis:SetupGCDbar(cb, spell, rank, fCurTime, right2left, start, cd)
+function Gnosis:SetupGCDbar(cb, spell, rank, fCurTime, right2left, start, cd, spellid)
 	local barname, cfg = cb.name, cb.conf;
 
 	-- non casttime spell GCD Indicator?
 	if (cfg.unit == "gcd2") then
-		local spellcasttime = select(4, GetSpellInfo(spell));
+		local spellcasttime = select(4, GetSpellInfo(spellid));
 		local playerischanneling = UnitChannelInfo("player");
 		
 		if (playerischanneling or not (spellcasttime and spellcasttime == 0)) then
@@ -1238,7 +1240,7 @@ function Gnosis:SetupGCDbar(cb, spell, rank, fCurTime, right2left, start, cd)
 		self:CleanupCastbar(cb);
 	end
 
-	local _, _, icon = GetSpellInfo(spell);
+	local _, _, icon = GetSpellInfo(spellid);
 	cb.channel = right2left;
 	cb.duration = cd * 1000;
 	cb.endTime = start * 1000 + cd * 1000;
