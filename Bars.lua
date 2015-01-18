@@ -375,8 +375,10 @@ function Gnosis:FindCBNext(unit)
 end
 
 function Gnosis:FindGCDBars(spell, rank, fCurTime, spellid)
+	-- using spell id
+	local start, cd = GetSpellCooldown(spellid);
 	-- using "Global Cooldown" spell
-	local start, cd = GetSpellCooldown(61304);
+	--local start, cd = GetSpellCooldown(61304);
 	if (not start or not(cd > 0 and cd <= 1.5)) then
 		return;
 	end
