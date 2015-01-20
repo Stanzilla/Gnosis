@@ -1275,7 +1275,7 @@ function Gnosis:CreateSingleTimerTable()
 
 				local unit, recast, staticdur, zoom, spec, iconoverride, portraitunit,
 					shown, hidden, plays, playm, playf, mcnt, msize, tooltipvalue,
-					aurastacks, auraeffect, startcnt, stopcnt, runetype;
+					aurastacks, auraeffect, startcnt, startcntcpy, stopcnt, runetype;
 
 				-- extract commands from current line
 				unit, str = self:ExtractRegex(str, "unit=(%w+)", "unit=\"([^\"]+)\"", true);
@@ -1287,6 +1287,7 @@ function Gnosis:CreateSingleTimerTable()
 				playm, str = self:ExtractRegex(str, "playm=\"([^\"]+)\"", nil, true);
 				playf, str = self:ExtractRegex(str, "playf=\"([^\"]+)\"", nil, true);
 				startcnt, str = self:ExtractRegex(str, "startcnt=(%w+)", "startcnt=\"([^\"]+)\"", true);
+				startcntcpy, str = self:ExtractRegex(str, "startcntcpy=(%w+)", "startcntcpy=\"([^\"]+)\"", true);
 				stopcnt, str = self:ExtractRegex(str, "stopcnt=(%w+)", "stopcnt=\"([^\"]+)\"", true);
 				mcnt, str = self:ExtractRegex(str, "mcnt=(%w+)", "mcnt=\"([^\"]+)\"", true);
 				msize, str = self:ExtractRegex(str, "msize=([+-]?[0-9]*%.?[0-9]*)", "msize=\"([+-]?[0-9]*%.?[0-9]*)\""); -- floating point regex
@@ -1389,7 +1390,7 @@ function Gnosis:CreateSingleTimerTable()
 				end
 				
 				-- start/stop count
-				local countstart, countinterval, countstop;
+				local countstart, countinterval, countstop, countcpy;
 				if (startcnt) then
 					countinterval, countstart =
 						string_match(startcnt, "([+-]?[0-9]*%.?[0-9]*)%-(.+)");
@@ -1399,6 +1400,9 @@ function Gnosis:CreateSingleTimerTable()
 					else
 						countinterval = nil;
 					end
+				end
+				if (startcntcpy) then
+					countcpy = startcntcpy;
 				end
 				if (stopcnt) then
 					countstop = stopcnt;
@@ -1682,6 +1686,7 @@ function Gnosis:CreateSingleTimerTable()
 						auraeffect = auraeffect,
 						countstart = countstart,
 						countinterval = countinterval,
+						countcpy = countcpy,
 						countstop = countstop,
 						runetype = runetype,
 					};
@@ -1793,7 +1798,11 @@ function Gnosis:InjectTimer(barname, text, cnt, spell, isCast)
 	end
 end
 
-function Gnosis:CheckCounter(v)
+function Gnosis:CheckCounter(v, ti)
+	if (self.counters == nil) then
+		self.counters = {};
+	end
+		
 	-- stop counter
 	if (v.countstop) then
 		if (self.counters) then
@@ -1802,17 +1811,23 @@ function Gnosis:CheckCounter(v)
 	end
 	
 	-- start counter if it's not already running
-	if (v.countinterval) then
-		if (self.counters == nil) then
-			self.counters = {};
-		end
-		
+	if (v.countinterval) then		
 		if (self.counters[v.countstart] == nil) then
 			self.counters[v.countstart] = { starttime = GetTime(), endtime = GetTime() + v.countinterval };
 		elseif (self.counters[v.countstart].endtime < GetTime()) then
 			self.counters[v.countstart].starttime = GetTime();
 			self.counters[v.countstart].endtime = self.counters[v.countstart].starttime + v.countinterval;
 		end
+	end
+	
+	-- start counter (copying timer duration)
+	if (v.countcpy and ti) then
+		if (self.counters[v.countcpy] == nil) then
+			self.counters[v.countcpy] = { starttime = (ti.fin - ti.dur) / 1000, endtime = ti.fin / 1000 };
+		elseif (self.counters[v.countcpy].endtime < GetTime()) then
+			self.counters[v.countcpy].starttime = (ti.fin - ti.dur) / 1000;
+			self.counters[v.countcpy].endtime = ti.fin / 1000;
+		end		
 	end
 end
 
@@ -1896,7 +1911,7 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 				-- related timer info valid
 				if (TimerInfo.ok and self:UnitRelationSelect(bar.conf.relationsel, TimerInfo.unit)) then
 					-- start or stop counter?				
-					self:CheckCounter(v);
+					self:CheckCounter(v, TimerInfo);
 					
 					-- boolop?
 					if (v.boolop == 3) then
