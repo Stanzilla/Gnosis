@@ -239,12 +239,31 @@ function Gnosis:Timers_SpellCD(bar, timer, ti)
 	-- cooldown, player only
 	ti.unit = "player";
 	local s, d = GetSpellCooldown(timer.spell);
-	if(d and d > 1.5) then	-- duration greater than global cd
+	
+	local dur, fin;
+	local cd_info = Gnosis.timer_cds[timer.spell];
+	local curtime = GetTime();
+	if (d and d <= 1.5 and cd_info and curtime < cd_info.fin and (s+d) >= cd_info.fin) then
+		-- duration of the global cooldown
+		dur, fin = cd_info.dur, cd_info.fin;
+	elseif (d and d > 1.5) then
+		-- duration greater than global cd
+		dur, fin = d, s + d;
+		
+		if (cd_info) then
+			cd_info.dur = dur;
+			cd_info.fin = fin;
+		else
+			Gnosis.timer_cds[timer.spell] = { dur = dur, fin = fin };
+		end
+	end
+		
+	if (dur) then
 		ti.cname = timer.spell;
 		ti.icon = timer.icon or select(3, GetSpellInfo(timer.spell));
-		local dur, fin = d, s+d;
+		
 		if(timer.brange) then
-			local rem = fin - GetTime();
+			local rem = fin - curtime;
 			ti.ok = in_value_range(rem, rem*100/dur, timer.range_tab);
 		else
 			ti.ok = true;
@@ -260,18 +279,14 @@ end
 function Gnosis:Timers_Counter(bar, timer, ti)
 	ti.unit = "player";
 	
-	local cnter;
-	if (Gnosis.counters and Gnosis.counters[timer.spell]) then
-		cnter = Gnosis.counters[timer.spell];
-		
-		if (cnter.endtime < GetTime()) then
-			cnter = nil;
-		end
+	local cnter = Gnosis.counters[timer.spell];
+	if (cnter and cnter.endtime < GetTime()) then
+		cnter = nil;
 	end
 	
 	if (cnter) then
 		ti.cname = timer.spell;
-		if(timer.brange) then
+		if (timer.brange) then
 			local curcnt = GetTime() - cnter.starttime;
 			local totcnt = cnter.endtime - cnter.starttime;
 			ti.ok = in_value_range(curcnt, curcnt*100/totcnt, timer.range_tab);
@@ -1249,8 +1264,10 @@ local SelectedTimerInfo = {
 };
 
 function Gnosis:CreateSingleTimerTable()
+	-- wipe tables
 	wipe(self.ti_fl);
 	wipe(self.ti_icd);
+	wipe(self.counters);
 	
 	for key, value in pairs(self.castbars) do
 		local conf = Gnosis.s.cbconf[key];
@@ -1799,10 +1816,6 @@ function Gnosis:InjectTimer(barname, text, cnt, spell, isCast)
 end
 
 function Gnosis:CheckCounter(v, ti)
-	if (self.counters == nil) then
-		self.counters = {};
-	end
-		
 	-- stop counter
 	if (v.countstop) then
 		if (self.counters) then
