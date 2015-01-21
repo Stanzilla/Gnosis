@@ -160,7 +160,7 @@ function Gnosis:StartupVariables()
 	self.lastSpellSent = fCurTime;
 	self.lastTimerScan = fCurTime;
 
-	-- castbars
+	-- tables
 	self.castbars = {};		-- castbars
 	self.activebars = {};	-- currently active bars (performance reasons)
 	self.fadeoutbars = {};	-- bars to fade out
@@ -170,7 +170,9 @@ function Gnosis:StartupVariables()
 	self.ti_icd = {};		-- inner cooldown scan table
 	self.ti_icd_active = {};-- active inner cooldowns
 	self.scan = {};			-- units to scan
-
+	self.counters = {};		-- counters
+	self.timer_cds = {};	-- track player cds
+	
 	-- play intervals (audio)
 	self.played = {
 		s = {},
