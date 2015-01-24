@@ -795,8 +795,15 @@ function Gnosis:Timers_PowerGeneric(bar, timer, ti)
 	-- shadow orbs, burning embers and demonic fury
 	-- combo points (6.0)
 	local idx = timer.type - 2000;
-	local s, d = UnitPower(timer.unit, idx), UnitPowerMax(timer.unit, idx);
+	local s, d = UnitPower(timer.unit, idx, timer.resource_decimals), UnitPowerMax(timer.unit, idx, timer.resource_decimals);
 	if (d and d > 0) then
+		-- values including decimals?
+		if (timer.resource_decimals) then
+			s = s / 10;
+			d = d / 10;
+		end
+		
+		-- get name and icon of the effect
 		if (not ti.cname or ti.cname == "") then
 			ti.cname =
 					(idx == 4 and _G["COMBO_POINTS"]) or
@@ -820,6 +827,7 @@ function Gnosis:Timers_PowerGeneric(bar, timer, ti)
 					nil
 				)); 
 		end
+		
 		ti.unit = timer.unit;
 		ti.bSpecial = true;
 		if (timer.brange) then
@@ -1292,7 +1300,8 @@ function Gnosis:CreateSingleTimerTable()
 
 				local unit, recast, staticdur, zoom, spec, iconoverride, portraitunit,
 					shown, hidden, plays, playm, playf, mcnt, msize, tooltipvalue,
-					aurastacks, auraeffect, startcnt, startcntcpy, stopcnt, runetype;
+					aurastacks, auraeffect, startcnt, startcntcpy, stopcnt, runetype,
+					resource_decimals;
 
 				-- extract commands from current line
 				unit, str = self:ExtractRegex(str, "unit=(%w+)", "unit=\"([^\"]+)\"", true);
@@ -1606,6 +1615,10 @@ function Gnosis:CreateSingleTimerTable()
 							elseif (spell == "burningembers") then
 								tiType = 2014;
 								cfinit = Gnosis.Timers_PowerGeneric;
+							elseif (spell == "burningembers_decimals") then
+								tiType = 2014;
+								cfinit = Gnosis.Timers_PowerGeneric;
+								resource_decimals = true;
 							elseif (spell == "demonicfury") then
 								tiType = 2015;
 								cfinit = Gnosis.Timers_PowerGeneric;
@@ -1706,6 +1719,7 @@ function Gnosis:CreateSingleTimerTable()
 						countcpy = countcpy,
 						countstop = countstop,
 						runetype = runetype,
+						resource_decimals = resource_decimals,
 					};
 					
 					-- targeted unit
