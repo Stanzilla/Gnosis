@@ -383,20 +383,29 @@ function Gnosis:SetupHooks()
 	hooksecurefunc("DoTradeSkill", function(index, num)
 			Gnosis.bNewTradeSkill = tonumber(num) and true or nil;
 			Gnosis.iLastTradeSkillCnt = tonumber(num);
-		end);
+		end
+	);
 
 	hooksecurefunc("CloseTradeSkill", function()
 			Gnosis.bNewTradeSkill = nil;
 			Gnosis.iLastTradeSkillCnt = nil;
 			Gnosis:CloseAllTradeskillBars();
-		end);
+		end
+	);
 
 	-- SetCVar hook
 	hooksecurefunc("SetCVar", function(cv, val)
 			if(cv == "uiscale") then
 				Gnosis:UIScaleUpdate();		-- called when changing ui scale in the blizzard menu
 			end
-		end);
+		end
+	);
+		
+	-- SetItemRef hook
+	hooksecurefunc("SetItemRef", function(link, text, ...)
+			Gnosis:SetItemRef(link, text);
+		end
+	);
 end
 
 function Gnosis:OnEnable()
@@ -1318,10 +1327,8 @@ function Gnosis:ExchangeEscapeSequenceChars(str, charsToEscape)
    return string_gsub(str, pattern, "\\%1");   
 end
 
--- save SetItemRef function
-local oldSetItemRef = SetItemRef;
 -- hook SetItemRef (import Gnosis bar via chatlink)
-function SetItemRef(link, text, ...)
+function Gnosis:SetItemRef(link, text)
 	-- remove text coloring
 	link = string_gsub(link, "\124c[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]", "");
 	link = string_gsub(link, "\124r", "");
@@ -1338,8 +1345,6 @@ function SetItemRef(link, text, ...)
 		if (not IsShiftKeyDown()) then
 			Gnosis.comm:SendCommMessage("GnosisComm", "req:" .. barname, "WHISPER", name .. "-" .. server);
 		end
-	else
-		oldSetItemRef(link, text, ...);
 	end	
 end
 
