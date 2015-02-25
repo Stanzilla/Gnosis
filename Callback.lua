@@ -1,5 +1,5 @@
--- Gnosis @project-version@ last changed @project-date-iso@
--- Callback.lua last changed @file-date-iso@
+-- Gnosis r141 last changed 2015-01-24T15:46:11Z
+-- Callback.lua last changed 2015-01-24T15:46:11Z
 
 -- local functions
 local GetTime = GetTime;
@@ -380,7 +380,7 @@ function Gnosis:PLAYER_REGEN_ENABLED()
 	self.curincombattype = 3;	-- out of combat "flag"
 end
 
-function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dguid, dname, _, _, sid, spellname, _, dmg, oh, _, bcritheal, _, _, bcrit)
+function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dguid, dname, _, _, sid, spellname, _, dmg, oh, absorbed, bcritheal, bmultiheal, _, bcrit, _, _, _, bmulti)
 	if (sguid == self.guid) then	-- player
 		local fCurTime = GetTime() * 1000;
 
@@ -389,15 +389,17 @@ function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dgu
 			local cc, nc = self.curchannel, self.nextchannel;
 			local selcc = (cc and cc.spell == spellname) and cc or ((nc and nc.spell == spellname) and nc or nil);
 			local selccnext = (cc and cc.spell == spellname) and false or ((nc and nc.spell == spellname) and true or false);
+			local isheal = (event == "SPELL_HEAL");
 			
 			if (selcc) then
 				-- tick
 				local dmgdone = (event == "SPELL_DAMAGE" or event == "SPELL_PERIODIC_DAMAGE" or event == "SPELL_HEAL") and dmg or 0;
-				selcc.type = (event == "SPELL_HEAL");
+				selcc.type = isheal;
 				selcc.dmg = selcc.dmg + dmgdone;
-				selcc.eh = selcc.eh + (event == "SPELL_HEAL" and (dmg - oh) or 0);
-				selcc.oh = selcc.oh + (event == "SPELL_HEAL" and oh or 0);
+				selcc.eh = selcc.eh + (isheal and (dmg - oh) or 0);
+				selcc.oh = selcc.oh + (isheal and oh or 0);
 
+				--[[
 				local isNormalTick = true;
 				if (not selcc.baeo and selcc.lastticktime and (fCurTime - selcc.lastticktime) < 250) then
 					-- mastery tick
@@ -411,7 +413,22 @@ function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dgu
 						self:PlaySounds();
 					end
 				end
-
+				]]
+				
+				local isNormalTick = true;
+				if ((isheal and bmultiheal) or ((not isheal) and bmulti)) then
+					-- multistrike
+					selcc.mastery = selcc.mastery + 1;
+					isNormalTick = false;
+				else
+					-- non multistrike tick
+					selcc.ticks = selcc.ticks + 1;
+					
+					if(selcc.bticksound) then
+						self:PlaySounds();
+					end
+				end
+				
 				selcc.lastticktime = fCurTime;
 				selcc.hits = (bcrit or (event == "SPELL_MISSED" or event == "SPELL_PERIODIC_MISSED")) and selcc.hits or (selcc.hits + 1);
 				selcc.crits = (bcrit and (event == "SPELL_DAMAGE" or event == "SPELL_PERIODIC_DAMAGE")) and (selcc.crits + 1) or selcc.crits;
