@@ -1,5 +1,5 @@
--- Gnosis r141 last changed 2015-01-24T15:46:11Z
--- Callback.lua last changed 2015-01-24T15:46:11Z
+--- Gnosis @project-version@ last changed @project-date-iso@
+--- Callback.lua last changed @file-date-iso@
 
 -- local functions
 local GetTime = GetTime;
