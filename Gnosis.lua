@@ -402,7 +402,12 @@ function Gnosis:SetupHooks()
 	);
 		
 	-- SetItemRef hook
-	hooksecurefunc("SetItemRef", function(link, text, ...)
+	--[[hooksecurefunc("SetItemRef", function(link, text, ...)
+			Gnosis:SetItemRef(link, text);
+		end
+	);]]
+	
+	hooksecurefunc("ChatFrame_OnHyperlinkShow", function(frame, link, text, ...)
 			Gnosis:SetItemRef(link, text);
 		end
 	);
