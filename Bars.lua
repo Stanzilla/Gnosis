@@ -528,10 +528,10 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 			(tParams.iconside == "BOTTOM" and "TOP");
 
 		local bileft, biright, bitop, bibottom =
-				tParams.iconside == "RIGHT" and 0.0 or 1.0,
-				tParams.iconside == "LEFT" and 0.0 or 1.0,
-				tParams.iconside == "BOTTOM" and 0.0 or 1.0,
-				tParams.iconside == "TOP" and 0.0 or 1.0;
+			tParams.iconside == "RIGHT" and 0.0 or 1.0,
+			tParams.iconside == "LEFT" and 0.0 or 1.0,
+			tParams.iconside == "BOTTOM" and 0.0 or 1.0,
+			tParams.iconside == "TOP" and 0.0 or 1.0;
 
 		if (not tParams.bIconUnlocked) then
 			-- locked to barframe
@@ -1520,29 +1520,34 @@ function Gnosis:CreateCastnameFromString(name, rank, cb)
 end
 
 local function GenerateTimeTable_GetFormat(str)
-   local a, b = string.match(str, "([rtcp])<([^>]*)>");
-   local iNum, bMin, bSign, bPerc = 0;
-   local t = a == 'r' and 2 or (
-      a == 't' and 3 or (
-         a == 'c' and 4 or (
-            a == 'p' and 5 or nil
-  )));
+	local a, b = string.match(str, "([rtcp])<([^>]*)>");
+	local decimals, bMin, bSign, bPerc, bIncPrecision = 0;
+	local t = a == 'r' and 2 or (
+		a == 't' and 3 or (
+		a == 'c' and 4 or (
+		a == 'p' and 5 or nil
+	)));
 
-   for c in string.gmatch(b, ".") do
-      if(c == 'm') then
-         bMin = true;
-      elseif(c == 's') then
-         bSign = true;
-      elseif(c == 'p') then
-         bPerc = true;
-      elseif(tonumber(c)) then
-         iNum = tonumber(c);
-      end
-   end
-
-   local str_sec = "%" .. (bSign and "+" or "") .. "." .. iNum .. "f";
-
-   return t, str_sec, bMin, bPerc;
+	for c in string.gmatch(b, ".") do
+		if (c == 'm') then
+			bMin = true;
+		elseif (c == 's') then
+			bSign = true;
+		elseif (c == 'p') then
+			bPerc = true;
+		elseif (c == 'a') then
+			bIncPrecision = true;
+		elseif (tonumber(c)) then
+			decimals = tonumber(c);
+		end
+	end
+  
+	local str_sec = "%" .. (bSign and "+" or "") .. "." .. decimals .. "f";
+	local str_inc_prec = "%" .. (bSign and "+" or "") .. "." .. (decimals+1) .. "f"
+	local incprecval = 1.0 / math.pow(10, decimals);
+	bIncPrecision = bIncPrecision and (decimals == 0);
+   
+	return t, str_sec, bMin, bPerc, decimals, bIncPrecision, incprecval, str_inc_prec;
 end
 
 function Gnosis:GenerateTimeTable(cb, bIsTime)
@@ -1569,7 +1574,10 @@ function Gnosis:GenerateTimeTable(cb, bIsTime)
 				end
 
 				local item = {};
-				item.type, item.str, item.bMin, item.bPerc = GenerateTimeTable_GetFormat(string_sub(str, s, e));
+				item.type, item.str, item.bMin, item.bPerc, item.decimals,
+					item.bIncPrecision, item.incprecval, item.str_inc_prec
+						= GenerateTimeTable_GetFormat(string_sub(str, s, e));
+					
 				item.bMin = bIsTime and item.bMin or nil;
 				item.bIsTime = bIsTime;
 
@@ -1598,6 +1606,14 @@ local function GenerateTimeTable_Item(t, value, value_max)
 		if(value > 60.0 and t.bMin) then
 			return string_format("%.0f:%02.0f", floor(value/60.0), floor(value) % 60.0);
 		else
+			if (t.bIncPrecision and value < t.incprecval) then
+				if (value < 0.05) then
+					return "";
+				else
+					return string_format(t.str_inc_prec, value);
+				end
+			end
+						
 			return string_format(t.str, value);
 		end
 	else
@@ -1782,13 +1798,17 @@ function Gnosis:SetupPowerbar(cb, tiinfo)
 	self:SetupPowerbarString(cb, cfg, fCurTime, true);
 
 	-- castbar color
-	if(curtimer.sbcolor) then
+	if (curtimer.sbcolor) then
 		cb.bar:SetStatusBarColor(unpack(curtimer.sbcolor));
 	end
 
 	-- border color
-	self:SetBorderColor(cb, cfg.colBorder, cfg.colBarBg, curtimer.hideicon);
-
+	if (curtimer.bcolor) then
+		self:SetBorderColor(cb, curtimer.bcolor, cfg.colBarBg, curtimer.hideicon);
+	else
+		self:SetBorderColor(cb, cfg.colBorder, cfg.colBarBg, curtimer.hideicon);
+	end
+	
 	-- pushback irrelevant for timer bars
 	cb.pushback = 0;
 
@@ -1862,6 +1882,11 @@ function Gnosis:SetupTimerbar(cb, fCurTime, tiinfo)
 	-- castbar color
 	if(curtimer.sbcolor) then
 		cb.bar:SetStatusBarColor(unpack(curtimer.sbcolor));
+	end
+	
+	-- border color (override)
+	if (curtimer.bcolor) then
+		self:SetBorderColor(cb, curtimer.bcolor, cfg.colBarBg, curtimer.hideicon);
 	end
 	
 	-- castbar spark
