@@ -6,6 +6,7 @@ local UnitChannelInfo = UnitChannelInfo;
 local GetItemInfo = GetItemInfo;
 local GetSpellInfo = GetSpellInfo;
 local GetSpellCooldown = GetSpellCooldown;
+local GetSpellCharges = GetSpellCharges;
 local GetTime = GetTime;
 local UnitAura = UnitAura;
 local GetItemCooldown = GetItemCooldown;
@@ -269,7 +270,7 @@ function Gnosis:Timers_SpellCD(bar, timer, ti)
 			ti.ok = true;
 		end
 		set_times(timer, ti, dur*1000, fin*1000, true);
-	elseif(timer.bNot) then
+	elseif (timer.bNot) then
 		ti.cname = timer.spell;
 		ti.icon = timer.icon or select(3, GetSpellInfo(timer.spell));
 		set_not(ti);
@@ -507,6 +508,54 @@ function Gnosis:Timers_GroupAura(bar, timer, ti)
 		ti.cname = timer.spell;
 		ti.icon = timer.icon or select(3, GetSpellInfo(timer.spell));
 		set_not(ti);
+	end
+end
+
+function Gnosis:Timers_SpellRecharge(bar, timer, ti)
+	-- spell charges, player only
+	ti.unit = "player";
+	
+	local curcharges, maxcharges, cdstart, cddur = GetSpellCharges(timer.spell);
+		
+	if (curcharges == nil) then
+		return;
+	end
+	
+	if (timer.chargecnt) then
+		-- display amount of charges
+		ti.cname = timer.spell;
+		ti.icon = timer.icon;
+		ti.bSpecial = true;
+		
+		if (timer.brange) then
+			ti.ok = in_value_range(curcharges, curcharges*100/maxcharges, timer.range_tab);
+		else
+			ti.ok = true;
+		end
+		
+		set_times(timer, ti, maxcharges, curcharges);
+	else
+		-- recharge cooldown
+		if (curcharges ~= maxcharges) then
+			if (timer.brange) then
+				local rem = cddur-(GetTime()-cdstart);
+				ti.ok = in_value_range(rem, rem*100/cddur, timer.range_tab) and
+					in_stacks_range(curcharges, timer.range_tab);
+			else
+				ti.ok = true;
+			end
+			
+			ti.cname = timer.spell;
+			ti.stacks = curcharges;
+			ti.icon = timer.icon;
+			
+			set_times(timer, ti, cddur*1000, (cdstart+cddur)*1000, true);
+		elseif (timer.bNot) then			
+			ti.cname = timer.spell;
+			ti.stacks = curcharges;
+			ti.icon = timer.icon;
+			set_not(ti);
+		end
 	end
 end
 
@@ -1301,7 +1350,7 @@ function Gnosis:CreateSingleTimerTable()
 				local unit, recast, staticdur, zoom, spec, iconoverride, portraitunit,
 					shown, hidden, plays, playm, playf, mcnt, msize, tooltipvalue,
 					aurastacks, auraeffect, startcnt, startcntcpy, stopcnt, runetype,
-					resource_decimals;
+					resource_decimals, chargecnt;
 
 				-- extract commands from current line
 				unit, str = self:ExtractRegex(str, "unit=(%w+)", "unit=\"([^\"]+)\"", true);
@@ -1438,7 +1487,7 @@ function Gnosis:CreateSingleTimerTable()
 				local iconoverride = select(3, GetSpellInfo(iconoverride));
 				local ptun = portraitunit;
 				
-				local nfs, tfs, colstr, tsbcol;
+				local nfs, tfs, colstr, tsbcol, tbcol;
 				-- name format string
 				nfs, str = self:ExtractRegex(str, "nfs=\"([^\"]*)\"", "nfs=(%w+)");
 				-- time format string
@@ -1449,6 +1498,14 @@ function Gnosis:CreateSingleTimerTable()
 					local r,g,b,a = self:GetColorsFromString(colstr);
 					if(r) then
 						tsbcol = { r, g, b, a };
+					end
+				end
+				-- border color
+				colstr, str = self:ExtractRegex(str, "bcol=\"([^\"]+)\"");
+				if (colstr) then
+					local r,g,b,a = self:GetColorsFromString(colstr);
+					if(r) then
+						tbcol = { r, g, b, a };
 					end
 				end
 				-- command and spellname
@@ -1512,19 +1569,29 @@ function Gnosis:CreateSingleTimerTable()
 							-- valid spell or spell id given? (name of spell passed for icd does not
 							-- necessarily have to be a valid spell)
 							local spell_, _, icon_ = GetSpellInfo(spell);
-							if(spell_) then
+							if (spell_) then
 								spell = spell_;
 								icon__ = icon_;
-							end							
-							-- staticdur given? otherwise set duration to 5s
-							if(spell) then
+							end		
+							if (spell) then
 								tiType = 8;
 								cfinit = Gnosis.Timers_InnerCD;
-							
+								-- staticdur given? otherwise set duration to 5s
 								self.ti_icd[spell] = {
 									duration = staticdur or 5.0,
 									norefresh = false
 								};
+							end
+							unit = "player";
+						elseif (w == "recharge") then
+							local spell_, _, icon_ = GetSpellInfo(spell);
+							if (spell_) then
+								spell = spell_;
+								icon__ = icon_;
+							end
+							if (spell) then
+								tiType = 9;
+								cfinit = Gnosis.Timers_SpellRecharge;
 							end
 							unit = "player";
 						elseif (w == "fixed") then
@@ -1643,9 +1710,9 @@ function Gnosis:CreateSingleTimerTable()
 							bExists = true;
 						elseif (w == "not") then
 							bNot = true;
-						elseif (w == "hidespark") then
+						elseif (w == "hidespark" or w == "nospark") then
 							bHideSpark = true;
-						elseif (w == "hideicon") then
+						elseif (w == "hideicon" or w == "noicon") then
 							bHideIcon = true;
 						elseif (w == "and") then
 							if (boolop == 0) then
@@ -1669,6 +1736,8 @@ function Gnosis:CreateSingleTimerTable()
 							end
 						elseif (w == "norefresh") then
 							norefresh = true;
+						elseif (w == "chargecnt") then
+							chargecnt = true;
 						end
 					end
 				end
@@ -1694,6 +1763,7 @@ function Gnosis:CreateSingleTimerTable()
 						bExists = bExists,
 						bNot = bNot,
 						cfinit = cfinit,
+						bcolor = tbcol,
 						sbcolor = tsbcol,
 						cbs = not bHideSpark and conf.bShowCBS or false,
 						hideicon = bHideIcon,
@@ -1720,6 +1790,7 @@ function Gnosis:CreateSingleTimerTable()
 						countstop = countstop,
 						runetype = runetype,
 						resource_decimals = resource_decimals,
+						chargecnt = chargecnt,
 					};
 					
 					-- targeted unit
@@ -1757,6 +1828,11 @@ function Gnosis:CreateSingleTimerTable()
 						elseif (auraeffect) then
 							tTimer.type = tiType + 5001;
 						end
+					end
+					-- special handling for recharge command with
+					-- the chargecnt option
+					if (tiType == 9 and chargecnt) then
+						tTimer.type = 5002;
 					end
 					
 					-- do not check if unit exists for unitname/npc command
