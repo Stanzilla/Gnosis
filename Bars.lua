@@ -757,6 +757,10 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 	bar.nfs = tParams.strNameFormat;
 	bar.tfs = tParams.strTimeFormat;
 	self:GenerateTimeTable(bar, true);
+	
+	-- word wrapping for nfs and tfs
+	bar.ctext:SetWordWrap(tParams.bWordWrapNfs or false);
+	bar.rtext:SetWordWrap(tParams.bWordWrapTfs or false);
 
 	-- castbar? if not set bnIsCB to true
 	if (tParams.unit == "gcd" or tParams.unit == "gcd2" or
@@ -848,6 +852,12 @@ function Gnosis:CreateBarFrame(name, iconpath, minval, maxval)
 		f.rtext = self:FontString(f.bar, 20);
 		f.brtext = self:FontString(f.bar, 10);
 		f.bltext = self:FontString(f.bar, 10);
+		-- disable word wrap (default values)
+		f.ctext:SetWordWrap(false);
+		f.rtext:SetWordWrap(false);
+		f.bltext:SetWordWrap(false);
+		f.brtext:SetWordWrap(false);
+	
 		-- latency bar
 		f.lb = {};
 		for i = 1, 15 do		-- might be a bit extreme (hellfire ticks 15x)
@@ -1462,11 +1472,11 @@ function Gnosis:CreateCastnameFromString(name, rank, cb)
 		str = string_gsub(str, "target", "");
 	end
 
-	-- abbr and name
-	lenname = string_match(str, "abbr<(%d*)>");
-	str = string_gsub(str, "abbr<([^>]*)>", "abbr");
-
+	-- abbr
+	lenname = string_match(str, "abbr<(%d+)>");
 	lenname = tonumber(lenname) and tonumber(lenname) or nil;
+	str = string_gsub(str, "abbr<([^>]*)>", "abbr");
+	
 	if(lenname) then
 		local bMulti = false;
 
@@ -1503,7 +1513,21 @@ function Gnosis:CreateCastnameFromString(name, rank, cb)
 			str = string_gsub(str, "abbr", name);
 		end
 	end
-
+	
+	-- trunc
+	lenname = string_match(str, "trunc<(%d+)>");
+	lenname = tonumber(lenname) and tonumber(lenname) or nil;
+	str = string_gsub(str, "trunc<([^>]*)>", "trunc");
+		
+	if (lenname) then
+		if (string_len(name) > lenname) then
+			str = string_gsub(str, "trunc", string_sub(name, 1, lenname) .. "...");
+		else
+			str = string_gsub(str, "trunc", name);
+		end
+	end
+	
+	-- name
 	str = string_gsub(str, "name", name);
 	
 	-- unit name
