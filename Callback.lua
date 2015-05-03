@@ -384,39 +384,26 @@ function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dgu
 	if (sguid == self.guid) then	-- player
 		local fCurTime = GetTime() * 1000;
 
-		if (event == "SPELL_DAMAGE" or event == "SPELL_MISSED" or event == "SPELL_PERIODIC_DAMAGE" or event == "SPELL_PERIODIC_MISSED" or event == "SPELL_HEAL") then
+		local heal_done = (event == "SPELL_HEAL" or event == "SPELL_PERIODIC_HEAL");
+		local dmg_done = (event == "SPELL_DAMAGE" or event == "SPELL_PERIODIC_DAMAGE");
+		local dmg_missed = (event == "SPELL_MISSED" or event == "SPELL_PERIODIC_MISSED");
+		
+		if (dmg_done or heal_done or dmg_missed) then
 			-- ticks from channeled spell?
 			local cc, nc = self.curchannel, self.nextchannel;
 			local selcc = (cc and cc.spell == spellname) and cc or ((nc and nc.spell == spellname) and nc or nil);
 			local selccnext = (cc and cc.spell == spellname) and false or ((nc and nc.spell == spellname) and true or false);
-			local isheal = (event == "SPELL_HEAL");
 			
 			if (selcc) then
 				-- tick
-				local dmgdone = (event == "SPELL_DAMAGE" or event == "SPELL_PERIODIC_DAMAGE" or event == "SPELL_HEAL") and dmg or 0;
-				selcc.type = isheal;
+				local dmgdone = (dmg_done or heal_done) and dmg or 0;
+				selcc.type = heal_done;
 				selcc.dmg = selcc.dmg + dmgdone;
-				selcc.eh = selcc.eh + (isheal and (dmg - oh) or 0);
-				selcc.oh = selcc.oh + (isheal and oh or 0);
+				selcc.eh = selcc.eh + (heal_done and (dmg - oh) or 0);
+				selcc.oh = selcc.oh + (heal_done and oh or 0);
 
-				--[[
 				local isNormalTick = true;
-				if (not selcc.baeo and selcc.lastticktime and (fCurTime - selcc.lastticktime) < 250) then
-					-- mastery tick
-					selcc.mastery = selcc.mastery + 1;
-					isNormalTick = false;
-				else
-					-- non mastery tick
-					selcc.ticks = selcc.ticks + 1;
-					
-					if(selcc.bticksound) then
-						self:PlaySounds();
-					end
-				end
-				]]
-				
-				local isNormalTick = true;
-				if ((isheal and bmultiheal) or ((not isheal) and bmulti)) then
+				if ((heal_done and bmultiheal) or ((not heal_done) and bmulti)) then
 					-- multistrike
 					selcc.mastery = selcc.mastery + 1;
 					isNormalTick = false;
