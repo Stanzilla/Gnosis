@@ -2266,9 +2266,16 @@ function Gnosis:UpdateCastbar(cb, startTime, endTime, spell)
 			end
 
 			if (cfg.bExtChannels) then
-				if (cb.endTime - cb.ticks[cb.totalticks] > cb.channelticktime) then
-					cb.totalticks = cb.totalticks + 1;
-					cb.ticks[cb.totalticks] = cb.ticks[cb.totalticks-1] - cb.channelticktime;
+				if (cb.endTime - cb.ticks[cb.totalticks] > cb.channelticktime) then					
+					if (cb.totalticks < cb.shownticks) then
+						local newtickcnt = ceil(cb.duration / cb.channelticktime);
+						newtickcnt = (newtickcnt <= cb.shownticks) and newtickcnt or cb.shownticks;
+						
+						for i=(cb.totalticks+1), newtickcnt do
+							cb.ticks[i] = cb.ticks[i-1] - cb.channelticktime;
+						end
+						cb.totalticks = newtickcnt;						
+					end
 				end
 				
 				self:DrawTicks(cb, cfg);

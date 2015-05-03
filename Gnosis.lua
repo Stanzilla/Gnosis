@@ -708,7 +708,7 @@ function Gnosis:SetupChanneledSpellsTable()
 	
 	-- monk
 	self:AddChanneledSpellById(113656, 5, false, 4, true, true, "physical", false, 1);	-- fists of fury, first tick instant, aoe
-	self:AddChanneledSpellById(115175, 9, false, 8, true, false, "nature", true, 1);	-- soothing mist, first tick instant
+	self:AddChanneledSpellById(115175, 11, false, 8, false, false, "nature", true, 2);	-- soothing mist
 end
 
 function Gnosis:CreateColorString(r, g, b, a)
