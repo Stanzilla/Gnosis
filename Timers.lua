@@ -1212,6 +1212,10 @@ function Gnosis:Timers_GlobalCD(bar, timer, ti)
 	end
 end
 
+function Gnosis:Timers_Exit(bar, timer, ti)
+	ti.ok = true;
+end
+
 function Gnosis:ExtractRegex(str, regex_a, regex_b, dotrim)
 	local res = string_match(str, regex_a);
 	if (res) then
@@ -1523,6 +1527,7 @@ function Gnosis:CreateSingleTimerTable()
 
 						if (w == "exit") then
 							tiType = -1;
+							cfinit = Gnosis.Timers_Exit;
 						elseif (w == "cast") then
 							tiType = 0;
 							cfinit = Gnosis.Timers_Spell;
@@ -1998,24 +2003,13 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 						
 			-- check entry
 			if (checkentry) then
-				-- exit?
-				if (v.type == -1) then
-					-- start or stop counter?
-					self:CheckCounter(v);
-					-- exit, do not compute further
-					break;
-				end
-			
 				wipe(TimerInfo);
 				
 				-- call related timer function (Timers.lua)
 				v:cfinit(bar, v, TimerInfo);
 
 				-- related timer info valid
-				if (TimerInfo.ok and self:UnitRelationSelect(bar.conf.relationsel, TimerInfo.unit)) then
-					-- start or stop counter?				
-					self:CheckCounter(v, TimerInfo);
-					
+				if (TimerInfo.ok and self:UnitRelationSelect(bar.conf.relationsel, TimerInfo.unit)) then				
 					-- boolop?
 					if (v.boolop == 3) then
 						-- '?' (relaxed and, only one match necessary)
@@ -2029,6 +2023,19 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 							boolop_complete = true;
 						end
 					else
+						-- start or stop counter?				
+						self:CheckCounter(v, TimerInfo);
+					
+						-- exit?
+						if (v.type == -1) then
+							-- start or stop counter?
+							self:CheckCounter(v);
+							-- play sound/music/file
+							self:PlayBarAudio(v, bar.name);
+							-- exit, do not compute further
+							break;
+						end
+				
 						if (v.boolop == 2) then
 							boolop_complete = true;
 						end
@@ -2100,42 +2107,7 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 		end
 
 		-- play sound/music/file
-		local playinterval = SelectedTimerInfo.curtimer.playinterval;
-		if (playinterval) then
-			local fplay = SelectedTimerInfo.curtimer.fplay;
-			local tplay = SelectedTimerInfo.curtimer.tplay;
-			local toplay = SelectedTimerInfo.curtimer.toplay;
-			
-			if (not tplay[bar.name]) then
-				tplay[bar.name] = {};
-			end
-			
-			local tp = tplay[bar.name];
-			if ((not tp[toplay]) or tp[toplay].timer <= GetTime()) then
-				if (tp[toplay] and tp[toplay].handle) then
-					StopSound(tp[toplay].handle);
-				end
-				
-				local willPlay, handle = fplay(toplay, self.s.ct.channel and self.tSoundChannels[self.s.ct.channel] or self.tSoundChannels[1]);
-									
-				if (willPlay) then
-					if (tp[toplay]) then
-						tp[toplay].handle = handle;
-						tp[toplay].timer = GetTime() + playinterval;
-					else
-						tp[toplay] = {
-							["handle"] = handle,
-							["timer"] = GetTime() + playinterval,
-						};
-					end
-				else
-					if (tp[toplay]) then
-						wipe(tp[toplay]);
-					end
-					tp[toplay] = nil;
-				end
-			end
-		end
+		self:PlayBarAudio(SelectedTimerInfo.curtimer, bar.name);
 		
 		-- only minor changes to bar necessary?
 		if (bar.bActive and bar.timer_id == SelectedTimerInfo.curtimer.id and
@@ -2230,6 +2202,45 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 		else
 			self:PrepareCastbarForFadeout(bar, fCurTime, bar.forcecleanup);
 			bar.forcecleanup = false;
+		end
+	end
+end
+
+function Gnosis:PlayBarAudio(curtimer, barname)
+	local playinterval = curtimer.playinterval;
+	if (playinterval) then
+		local fplay = curtimer.fplay;
+		local tplay = curtimer.tplay;
+		local toplay = curtimer.toplay;
+		
+		if (not tplay[barname]) then
+			tplay[barname] = {};
+		end
+		
+		local tp = tplay[barname];
+		if ((not tp[toplay]) or tp[toplay].timer <= GetTime()) then
+			if (tp[toplay] and tp[toplay].handle) then
+				StopSound(tp[toplay].handle);
+			end
+			
+			local willPlay, handle = fplay(toplay, self.s.ct.channel and self.tSoundChannels[self.s.ct.channel] or self.tSoundChannels[1]);
+								
+			if (willPlay) then
+				if (tp[toplay]) then
+					tp[toplay].handle = handle;
+					tp[toplay].timer = GetTime() + playinterval;
+				else
+					tp[toplay] = {
+						["handle"] = handle,
+						["timer"] = GetTime() + playinterval,
+					};
+				end
+			else
+				if (tp[toplay]) then
+					wipe(tp[toplay]);
+				end
+				tp[toplay] = nil;
+			end
 		end
 	end
 end
