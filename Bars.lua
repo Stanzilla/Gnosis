@@ -1216,7 +1216,7 @@ function Gnosis:SetupGCDbar(cb, spell, rank, fCurTime, right2left, start, cd, sp
 		local spellcasttime = select(4, GetSpellInfo(spellid));
 		local playerischanneling = UnitChannelInfo("player");
 		
-		if (playerischanneling or not (spellcasttime and spellcasttime == 0)) then
+		if (playerischanneling or not (spellcasttime and spellcasttime <= 0)) then
 			return;
 		end
 	end
