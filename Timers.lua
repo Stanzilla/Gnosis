@@ -43,6 +43,9 @@ local string_split = strsplit;
 local strconcat = strconcat;
 local table_insert = table.insert;
 
+-- boolean operators for timer entries
+local BOOLOP_NONE, BOOLOP_AND, BOOLOP_OR, BOOLOP_RELAXEDAND = 0, 1, 2, 3;
+
 -- local variables
 local _;
 
@@ -102,13 +105,13 @@ function Gnosis:ParseTimer_GetCommand(bnwlist, linetostart)
 					curcmd = curcmd .. " " .. append;
 					linetostart = linetostart + 1;			
 				elseif (token == "&") then
-					boolop = 1;
+					boolop = BOOLOP_AND;
 					break;
 				elseif (token == "?") then
-					boolop = 3;
+					boolop = BOOLOP_RELAXEDAND;
 					break;
 				elseif (token == "*") then
-					boolop = 2;
+					boolop = BOOLOP_OR;
 					break;	
 				else
 					break;
@@ -1515,7 +1518,7 @@ function Gnosis:CreateSingleTimerTable()
 				-- command and spellname
 				local tiType, bSelf, bHarm, bHelp, bShowLag, bShowCasttime, iSort, bExists, bNot, bHideSpark, bHideIcon, cfinit, brange, range_tab, icon__;
 				local norefresh = false;
-				local boolop = cmd_boolop or 0;
+				local boolop = cmd_boolop or BOOLOP_NONE;
 				local cmd, spell = string_match(str, "(.-):(.+)");
 				if(spell) then
 					spell, brange, range_tab = get_valid_range_table(spell);
@@ -1720,12 +1723,12 @@ function Gnosis:CreateSingleTimerTable()
 						elseif (w == "hideicon" or w == "noicon") then
 							bHideIcon = true;
 						elseif (w == "and") then
-							if (boolop == 0) then
-								boolop = 1;
+							if (boolop == BOOLOP_NONE) then
+								boolop = BOOLOP_AND;
 							end
 						elseif (w == "or") then
-							if (boolop == 0) then
-								boolop = 2;
+							if (boolop == BOOLOP_NONE) then
+								boolop = BOOLOP_OR;
 							end
 						elseif (w == "sort") then
 							if (spell == "minrem") then
@@ -1974,7 +1977,7 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 			relaxed_and = nil;
 			
 			-- search for first timer entry without boolop
-			if (v.boolop == 0) then
+			if (v.boolop == BOOLOP_NONE) then
 				boolop_complete = false;
 			end
 		else
@@ -2009,34 +2012,32 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 				v:cfinit(bar, v, TimerInfo);
 
 				-- related timer info valid
-				if (TimerInfo.ok and self:UnitRelationSelect(bar.conf.relationsel, TimerInfo.unit)) then				
+				if (TimerInfo.ok and self:UnitRelationSelect(bar.conf.relationsel, TimerInfo.unit)) then						
+					-- start or stop counter?				
+					self:CheckCounter(v, TimerInfo);
+						
 					-- boolop?
-					if (v.boolop == 3) then
+					if (v.boolop == BOOLOP_RELAXEDAND) then
 						-- '?' (relaxed and, only one match necessary)
 						relaxed_and = 2;		-- store as valid
-					elseif (v.boolop == 1) then
+					elseif (v.boolop == BOOLOP_AND) then
 						-- timer is condition for next one(s), next please
 					elseif (relaxed_and == 1) then
 						-- relaxed and requested but no match found
 						relaxed_and = nil;
-						if (v.boolop == 2) then
+						if (v.boolop == BOOLOP_OR) then
 							boolop_complete = true;
 						end
 					else
-						-- start or stop counter?				
-						self:CheckCounter(v, TimerInfo);
-					
 						-- exit?
 						if (v.type == -1) then
-							-- start or stop counter?
-							self:CheckCounter(v);
 							-- play sound/music/file
 							self:PlayBarAudio(v, bar.name);
 							-- exit, do not compute further
 							break;
 						end
 				
-						if (v.boolop == 2) then
+						if (v.boolop == BOOLOP_OR) then
 							boolop_complete = true;
 						end
 
@@ -2051,9 +2052,9 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 							SelectedTimerInfo.bSpecial = false;
 							if (not bar.iTimerSort or not SelectedTimerInfo.duration) then
 								bTakeover = true;
-							elseif (bar.iTimerSort == 1 and SelectedTimerInfo.endTime > TimerInfo.fin) then	-- min remaining
+							elseif (bar.iTimerSort == 1 and SelectedTimerInfo.endTime > TimerInfo.fin) then		-- min remaining
 								bTakeover = true;
-							elseif (bar.iTimerSort == 2 and SelectedTimerInfo.endTime < TimerInfo.fin) then	-- max remaining
+							elseif (bar.iTimerSort == 2 and SelectedTimerInfo.endTime < TimerInfo.fin) then		-- max remaining
 								bTakeover = true;
 							elseif (bar.iTimerSort == 3 and SelectedTimerInfo.duration > TimerInfo.dur) then	-- min duration
 								bTakeover = true;
@@ -2081,17 +2082,17 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 							break;
 						end
 					end
-				elseif (v.boolop == 3) then
+				elseif (v.boolop == BOOLOP_RELAXEDAND) then
 					-- '?' (relaxed and, only one match necessary)
 					relaxed_and = relaxed_and or 1;	-- relaxed ok requested
-				elseif (v.boolop == 1) then
+				elseif (v.boolop == BOOLOP_AND) then
 					-- "and"/'&' but invalid entry, skip to next combined "and"/"or" block
 					boolop_complete = true;
 				end
-			elseif (v.boolop == 3) then
+			elseif (v.boolop == BOOLOP_RELAXEDAND) then
 				-- '?' (relaxed and, only one match necessary)
 				relaxed_and = 1;	-- relaxed ok requested
-			elseif (v.boolop == 1) then
+			elseif (v.boolop == BOOLOP_AND) then
 				-- "and"/'&' but invalid entry, skip to next combined "and"/"or" block
 				boolop_complete = true;
 			else
