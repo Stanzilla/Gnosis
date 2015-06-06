@@ -308,11 +308,40 @@ function Gnosis:Timers_Counter(bar, timer, ti)
 	end
 end
 
+local function GetAura(timer)
+	if (timer.spellid) then
+		-- aura id
+		local _, name, ic, sta, d, s, eff, id;
+		local i = 1;
+		
+		repeat
+			name, _, ic, sta, _, d, s, _, _, _, id, _, _, _, eff =
+				UnitAura(timer.unit, i, timer.filter);
+				
+			if (id and id == timer.spellid) then
+				timer.spell = name;
+				return ic, sta, d, s, eff;
+			end
+			
+			i = i + 1;
+		until id == nil or i > 40;
+
+		return;
+	else
+		-- aura name
+		local _, _, ic, sta, _, d, s, _, _, _, _, _, _, _, eff =
+			UnitAura(timer.unit, timer.spell, nil, timer.filter);
+			
+		return ic, sta, d, s, eff;
+	end	
+end
+
 function Gnosis:Timers_Aura(bar, timer, ti)
 	-- aura == buff or debuff (== hot or dot)
 	ti.unit = timer.unit;
-	local _, _, ic, sta, _, d, s, _, _, _, _, _, _, _, effect =
-		UnitAura(timer.unit, timer.spell, nil, timer.filter);
+	local ic, sta, d, s, effect = GetAura(timer);
+	--local _, _, ic, sta, _, d, s, _, _, _, _, _, _, _, effect =
+	--	UnitAura(timer.unit, timer.spell, nil, timer.filter);
 	
 	if (s) then
 		ti.cname = timer.spell;
@@ -1357,7 +1386,7 @@ function Gnosis:CreateSingleTimerTable()
 				local unit, recast, staticdur, zoom, spec, iconoverride, portraitunit,
 					shown, hidden, plays, playm, playf, mcnt, msize, tooltipvalue,
 					aurastacks, auraeffect, startcnt, startcntcpy, stopcnt, runetype,
-					resource_decimals, chargecnt;
+					resource_decimals, chargecnt, spellid;
 
 				-- extract commands from current line
 				unit, str = self:ExtractRegex(str, "unit=(%w+)", "unit=\"([^\"]+)\"", true);
@@ -1381,12 +1410,14 @@ function Gnosis:CreateSingleTimerTable()
 				auraeffect, str = self:ExtractRegex(str, "auraeffect=([+-]?[0-9]*%.?[0-9]*)", "auraeffect=\"([+-]?[0-9]*%.?[0-9]*)\"");
 				spec, str = self:ExtractRegex(str, "spec=(%d+)", "spec=\"(%d+)\"");
 				runetype, str = self:ExtractRegex(str, "runetype=(%d+)", "runetype=\"(%d+)\"");
+				spellid, str = self:ExtractRegex(str, "spellid=(%d+)", "spellid=\"(%d+)\"");
 				
-				recast, staticdur, zoom, spec =
+				recast, staticdur, zoom, spec, spellid =
 					recast and (tonumber(recast) * 1000),
 					staticdur and (tonumber(staticdur) * 1000),
 					zoom and (tonumber(zoom) * 1000),
-					spec and tonumber(spec);
+					spec and tonumber(spec),
+					spellid and tonumber(spellid);
 				
 				-- stack/effect value display variable
 				if (aurastacks and tonumber(aurastacks)) then
@@ -1799,6 +1830,7 @@ function Gnosis:CreateSingleTimerTable()
 						runetype = runetype,
 						resource_decimals = resource_decimals,
 						chargecnt = chargecnt,
+						spellid = spellid,
 					};
 					
 					-- targeted unit
