@@ -1915,7 +1915,7 @@ function Gnosis:SetupTimerbar(cb, fCurTime, tiinfo)
 	
 	-- castbar spark
 	cb.cbs_hidden = false;
-	cb.cbs_check = bStatic;
+	cb.cbs_check = curtimer.cbs and bStatic or false;
 	if(curtimer.cbs and not (bForceStaticDur and cb.cbs_check)) then
 		cb.cbs:SetPoint("CENTER", cb.bar, "LEFT", val * cb.barwidth, 0);
 		cb.cbs:Show();
