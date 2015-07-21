@@ -982,7 +982,7 @@ end
 function Gnosis:Timers_PowerAlternate(bar, timer, ti)
 	local s, d = UnitPower(timer.unit, ALTERNATE_POWER_INDEX), UnitPowerMax(timer.unit, ALTERNATE_POWER_INDEX);
 	if(d and d > 0) then
-		local altpowerinfo_cname = select(10, UnitAlternatePowerInfo(timer.unit));
+		local altpowerinfo_cname = select(11, UnitAlternatePowerInfo(timer.unit));
 		ti.cname = altpowerinfo_cname or "";
 		ti.icon = UnitAlternatePowerTextureInfo(timer.unit, 2);
 		ti.unit = timer.unit;
