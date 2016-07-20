@@ -144,7 +144,7 @@ Gnosis.tSoundChannels = {
 function Gnosis:StartupVariables()
 	local fCurTime = GetTime() * 1000;
 
-	self.ver = 4.60;
+	self.ver = 4.61;
 	self.optver = 3.25;
 	self.build = "@project-version@";
 	self.addonname = "Gnosis";
@@ -156,8 +156,7 @@ function Gnosis:StartupVariables()
 	end
 
 	-- initial latency
-	_, _, self.lag = GetNetStats();
-	self.lastSpellSent = fCurTime;
+	self.lag = select(4, GetNetStats());
 	self.lastTimerScan = fCurTime;
 
 	-- tables

@@ -145,10 +145,6 @@ function Gnosis:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell, rank, _, spellid)
 	end
 end
 
-function Gnosis:CalcLag(fCurTime)
-	self.lag = fCurTime - self.lastSpellSent;
-end
-
 function Gnosis:UNIT_SPELLCAST_START(event, unit, spell, rank, _, spellid)
 	local cb = self:FindCB(unit);
 	if (cb) then
@@ -159,9 +155,9 @@ function Gnosis:UNIT_SPELLCAST_START(event, unit, spell, rank, _, spellid)
 		until cb == nil;
 	end
 	
-	if (unit == "player") then
+	if (unit == "player") then		
 		local fCurTime = GetTime() * 1000.0;
-		self:CalcLag(fCurTime);
+		
 		self:FindGCDBars(spell, rank, fCurTime, spellid);
 		
 		if (self.iLastTradeSkillCnt) then
@@ -175,7 +171,6 @@ function Gnosis:UNIT_SPELLCAST_CHANNEL_START(event, unit, spell, rank, _, spelli
 	local cb = self:FindCB(unit);
 	if (cb) then
 		local fCurTime = GetTime() * 1000.0;
-		self:CalcLag(fCurTime);
 		repeat
 			self:SetupCastbar(cb, true, fCurTime);
 			cb = self:FindCBNext(unit);
@@ -474,9 +469,9 @@ end
 
 function Gnosis:UNIT_SPELLCAST_SENT(event, unit, _, _, target)
 	-- latency estimation
-	self.lastSpellSent = GetTime() * 1000;
 	self.strLastTarget = (target and target ~= "") and target or nil;
-
+	self.lag = select(4, GetNetStats());
+	
 	-- grab unit class of target if possible
 	if (self.strLastTarget) then
 		local _, class = UnitClass(target);
