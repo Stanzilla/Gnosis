@@ -380,21 +380,21 @@ end
 
 function Gnosis:SetupHooks()
 	-- tradeskill hooking
-	hooksecurefunc("DoTradeSkill", function(index, num)
+	hooksecurefunc(C_TradeSkillUI, 'CraftRecipe', function(index, num)
 			Gnosis.bNewTradeSkill = tonumber(num) and true or nil;
 			Gnosis.iLastTradeSkillCnt = tonumber(num);
 		end
 	);
-
-	hooksecurefunc("CloseTradeSkill", function()
+		
+	hooksecurefunc(C_TradeSkillUI, 'CloseTradeSkill', function()
 			Gnosis.bNewTradeSkill = nil;
 			Gnosis.iLastTradeSkillCnt = nil;
 			Gnosis:CloseAllTradeskillBars();
 		end
 	);
-
+	
 	-- SetCVar hook
-	hooksecurefunc("SetCVar", function(cv, val)
+	hooksecurefunc('SetCVar', function(cv, val)
 			if(cv == "uiscale") then
 				Gnosis:UIScaleUpdate();		-- called when changing ui scale in the blizzard menu
 			end
@@ -402,7 +402,7 @@ function Gnosis:SetupHooks()
 	);
 		
 	-- SetItemRef hook
-	hooksecurefunc("SetItemRef", function(link, text, ...)
+	hooksecurefunc('SetItemRef', function(link, text, ...)
 			Gnosis:SetItemRef(link, text);
 		end
 	);

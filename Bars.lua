@@ -444,16 +444,16 @@ function Gnosis:FontString(bar, height)
 end
 
 function Gnosis:SetBorderColor(bar, colBorder, colBarBg, bHideIconBorder)
-	bar.btop:SetTexture(unpack(colBorder));
-	bar.bbottom:SetTexture(unpack(colBorder));
-	bar.bleft:SetTexture(unpack(colBorder));
-	bar.bright:SetTexture(unpack(colBorder));
-	bar.bbg:SetTexture(unpack(colBarBg));
+	bar.btop:SetColorTexture(unpack(colBorder));
+	bar.bbottom:SetColorTexture(unpack(colBorder));
+	bar.bleft:SetColorTexture(unpack(colBorder));
+	bar.bright:SetColorTexture(unpack(colBorder));
+	bar.bbg:SetColorTexture(unpack(colBarBg));
 	bar.bdframe:SetBackdropBorderColor(unpack(colBorder));
 	if(bHideIconBorder) then
-		bar.bicon:SetTexture(0, 0, 0, 0);
+		bar.bicon:SetColorTexture(0, 0, 0, 0);
 	else
-		bar.bicon:SetTexture(unpack(colBorder));
+		bar.bicon:SetColorTexture(unpack(colBorder));
 	end
 end
 
@@ -622,7 +622,7 @@ function Gnosis:SetBarParams(name, cfgtab, bartab)
 		else
 			bar.lb[i]:SetHeight(tParams.height);
 		end
-		bar.lb[i]:SetTexture(unpack(tParams.colLagBar));
+		bar.lb[i]:SetColorTexture(unpack(tParams.colLagBar));
 	end
 
 	-- castbar spark
@@ -2294,7 +2294,8 @@ function Gnosis:DrawTicks(cb, cfg)
 	if (cfg.bShowTicks) then
 		-- calculate new tick marker size
 		local valLBperc = ((cfg.unit == "player")
-			and max(min(self.lag / cb.duration, cfg.latbarsize), cfg.latbarfixed)
+			--and max(min(self.lag / cb.duration, cfg.latbarsize), cfg.latbarfixed)
+			and min(self.lag / cb.duration, cfg.latbarsize)
 			or cfg.latbarfixed);
 
 		-- never create latency box larger than half of distance between ticks

@@ -84,7 +84,7 @@ function Gnosis:Update()
 			end
 		else
 			-- cleanup/fade out gcd castbars
-			if (conf.bUnlocked or conf.bShowWNC) then
+			if (conf.bUnlocked or conf.bShowWNC or conf.fadeout <= 0) then
 				self:CleanupCastbar(value);
 			else
 				self:PrepareCastbarForFadeout(value, fCurTime);
