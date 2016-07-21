@@ -2089,7 +2089,7 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 	if (bnTS) then
 		cb.bIsTrade = nil;
 
-		if((self.activebars[barname] or self.fadeoutbars[barname])) then
+		if ((self.activebars[barname] or self.fadeoutbars[barname])) then
 			self:CleanupCastbar(cb, true);
 		end
 
@@ -2120,7 +2120,7 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 	if (notInterruptible) then
 		cb.bar:SetStatusBarColor(unpack(cfg.colBarNI));
 		self:SetBorderColor(cb, cfg.colBorderNI, cfg.colBarBg);
-		if(cfg.bShowShield) then
+		if (cfg.bShowShield) then
 			cb.sicon:Show();
 		else
 			cb.sicon:Hide();
@@ -2174,14 +2174,14 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 		if (not(cs and cs.ben and cfg.bShowTicks) and cfg.bShowLat) then
 			cb.lb[1]:ClearAllPoints();
 			if (cfg.orient == 2) then
-				cb.lb[1]:SetHeight(cb.barheight * min(self.lag / cb.duration, cfg.latbarsize));
+				cb.lb[1]:SetHeight(cb.barheight * max(min(self.lag / cb.duration, cfg.latbarsize), cfg.latbarfixed));
 				local direction = (cb.channel and (not cfg.bChanAsNorm)) and "BOTTOM" or "TOP";
 				if (cfg.bInvDir) then
 					direction = (direction == "BOTTOM") and "TOP" or "BOTTOM";
 				end				
 				cb.lb[1]:SetPoint(direction);
 			else
-				cb.lb[1]:SetWidth(cb.barwidth * min(self.lag / cb.duration, cfg.latbarsize));
+				cb.lb[1]:SetWidth(cb.barwidth * max(min(self.lag / cb.duration, cfg.latbarsize), cfg.latbarfixed));
 				local direction = (cb.channel and (not cfg.bChanAsNorm)) and "LEFT" or "RIGHT";
 				if (cfg.bInvDir) then
 					direction = (direction == "LEFT") and "RIGHT" or "LEFT";
@@ -2233,9 +2233,9 @@ function Gnosis:CloseAllTradeskillBars()
 	local fCurTime = GetTime() * 1000.0;
 
 	local cb = self:FindCB("player");
-	if(cb) then
+	if (cb) then
 		repeat
-			if(cb.bIsTrade) then
+			if (cb.bIsTrade) then
 				local conf = cb.conf;
 				if(conf.bUnlocked or conf.bShowWNC) then
 					self:CleanupCastbar(cb, fCurTime);
@@ -2293,10 +2293,9 @@ end
 function Gnosis:DrawTicks(cb, cfg)
 	if (cfg.bShowTicks) then
 		-- calculate new tick marker size
-		local valLBperc = ((cfg.unit == "player")
-			--and max(min(self.lag / cb.duration, cfg.latbarsize), cfg.latbarfixed)
-			and min(self.lag / cb.duration, cfg.latbarsize)
-			or cfg.latbarfixed);
+		local valLBperc = (cfg.unit == "player")
+			and max(min(self.lag / cb.duration, cfg.latbarsize), cfg.latbarfixed)
+			or cfg.latbarfixed;
 
 		-- never create latency box larger than half of distance between ticks
 		-- vital for long channels with high number of ticks (e.g. hellfire with 15 ticks)
