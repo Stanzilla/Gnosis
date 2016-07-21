@@ -2363,35 +2363,41 @@ end
 function Gnosis:PrepareCastbarForFadeout(cb, fCurTime, bForce)
 	local barname, cfg = cb.name, cb.conf;
 
-	if(self.activebars[barname] or bForce) then
+	if (self.activebars[barname] or bForce) then
 		cb.bActive = false;
 		self.activebars[barname] = nil;
-		self.fadeoutbars[barname] = cb;
-		cb.endTime = fCurTime + cfg.fadeout * 1000;
-		cb.duration = cfg.fadeout * 1000;
+		
 		cb.alpha = cfg.alpha;
-
-		if(cfg.bFillup) then
+		cb.bIsTrade = nil;
+		
+		if (cfg.bFillup) then
 			cb.bar:SetValue(cb.channel and 0 or 1.0);
 			cb.cbs:Hide();
-		end
-
-		cb.bIsTrade = nil;
+		end	
+		
+		if (cfg.fadeout <= 0) then
+			cb:Hide();
+			self:CleanupCastbar(cb);
+		else
+			self.fadeoutbars[barname] = cb;
+			cb.endTime = fCurTime + cfg.fadeout * 1000;
+			cb.duration = cfg.fadeout * 1000;
+		end			
 	end
 end
 
 function Gnosis:CleanupCastbar(cb, bDoNotSetValue, bDoNotOverwriteNfsTfs)
 	local barname, cfg = cb.name, cb.conf;
 
-	if(not cb) then
+	if (not cb) then
 		return;
 	end
 
 	cb.bActive = false;
-	if(self.activebars[barname]) then
+	if (self.activebars[barname]) then
 		self.activebars[barname] = nil;
 	end
-	if(self.fadeoutbars[barname]) then
+	if (self.fadeoutbars[barname]) then
 		self.fadeoutbars[barname] = nil;
 	end
 
@@ -2399,7 +2405,7 @@ function Gnosis:CleanupCastbar(cb, bDoNotSetValue, bDoNotOverwriteNfsTfs)
 	cb.shownticks = 0;
 	cb.cbs:Hide();
 
-	if(not bDoNotSetValue) then
+	if (not bDoNotSetValue) then
 		cb.bar:SetValue(0);
 
 		cb.ctext:SetText(cfg.bUnlocked and cb.name or "");
@@ -2428,7 +2434,7 @@ function Gnosis:CleanupCastbar(cb, bDoNotSetValue, bDoNotOverwriteNfsTfs)
 	cb.dur = nil;
 
 	-- default format strings
-	if(not bDoNotOverwriteNfsTfs) then
+	if (not bDoNotOverwriteNfsTfs) then
 		cb.nfs = cfg.strNameFormat;
 		cb.tfs = cfg.strTimeFormat;
 		self:GenerateTimeTable(cb, true);
