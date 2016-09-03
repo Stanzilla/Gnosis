@@ -276,8 +276,17 @@ function Gnosis:OptCreateBasicTables()
 				end,
 				width = "full",
 			},
-			impbars = {
+			reanchorallbars = {
 				order = 12,
+				name = Gnosis.L["OptReanchorAllBars"],
+				type = "execute",
+				func = function()
+					Gnosis:AnchorAllBarsAndSetParams();
+				end,
+				width = "full",
+			},
+			impbars = {
+				order = 13,
 				name = Gnosis.L["OptImportBar"],
 				type = "execute",
 				func = function()
@@ -286,7 +295,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			expbars = {
-				order = 13,
+				order = 14,
 				name = Gnosis.L["OptExportAllBars"],
 				type = "execute",
 				func = function()
@@ -295,7 +304,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			respd = {
-				order = 14,
+				order = 15,
 				name = Gnosis.L["OptResetPlayerData"],
 				type = "execute",
 				func = function()
@@ -907,7 +916,7 @@ function Gnosis:CreateCastbarsOpt()
 					end,
 					set = function(info,val)
 						Gnosis.s.cbconf[key].spectab = 
-							Gnosis:CommaSeparatedNumbersToTable(val, 1, 6);
+							Gnosis:CommaSeparatedNumbersToTable(val, 1, 4);
 						Gnosis:SetBarParams(key);
 					end,
 					width = "full",

@@ -953,7 +953,7 @@ function Gnosis:UIScaleUpdate()
 	self:AnchorAllBars();
 
 	-- update coordinates of config options
-	if(Gnosis.optCBs:IsShown()) then
+	if (Gnosis.optCBs:IsShown()) then
 		Gnosis.optCBs:Hide();
 		Gnosis.optCBs:Show();
 	end
@@ -971,6 +971,13 @@ function Gnosis:AnchorAllBars()
 	end
 end
 
+function Gnosis:AnchorAllBarsAndSetParams()
+	for k, v in pairs(self.castbars) do
+		self:AnchorBar(k);
+		self:SetBarParams(k);
+	end
+end
+
 function Gnosis:AnchorBar(name)
 	local cb, cfg = self.castbars[name], self.s.cbconf[name];
 	cb.afrom, cb.ato = self.tPoints[cfg.anchorfrom], self.tPoints[cfg.anchorto];
@@ -981,7 +988,7 @@ function Gnosis:AnchorBar(name)
 	local mult = uis / cbs;
 	local xm, ym = GetScreenWidth(), GetScreenHeight();
 
-	if(not cfg.anchor or not(tonumber(cfg.anchor.px) and tonumber(cfg.anchor.py))) then
+	if (not cfg.anchor or not(tonumber(cfg.anchor.px) and tonumber(cfg.anchor.py))) then
 		cfg.anchor = {
 			["px"] = 0.5,		-- CENTER
 			["py"] = 0.5,		-- CENTER
@@ -991,10 +998,10 @@ function Gnosis:AnchorBar(name)
 	local px, py = cfg.anchor.px, cfg.anchor.py;
 	cb.reanchor = false;
 	cb:ClearAllPoints();
-	if(cfg.anchortype == 3) then		-- anchor to cursor
+	if (cfg.anchortype == 3) then		-- anchor to cursor
 		cb.reanchor = true;
 		self:ReAnchorBar(cb);
-	elseif(cfg.anchortype == 2 and _G[cfg.anchorframe]) then	-- anchor to frame
+	elseif (cfg.anchortype == 2 and _G[cfg.anchorframe]) then	-- anchor to frame
 		cb:SetPoint(cb.afrom, _G[cfg.anchorframe], cb.ato, cb.ax / uis, cb.ay / uis);
 	else	-- no anchor
 		cb:SetPoint("CENTER", UIParent, "BOTTOMLEFT", px * xm * mult, py * ym * mult);
