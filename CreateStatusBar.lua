@@ -1,6 +1,3 @@
--- Gnosis @project-version@ last changed @project-date-iso@
--- CreateStatusBar.lua last changed @file-date-iso@
-
 -- local functions
 local CreateFrame = CreateFrame;
 local min = min;

@@ -1,6 +1,3 @@
--- Gnosis @project-version@ last changed @project-date-iso@
--- Gnosis.lua last changed @file-date-iso@
-
 Gnosis = LibStub("AceAddon-3.0"):NewAddon("Gnosis", "AceConsole-3.0", "AceEvent-3.0");
 Gnosis.gui = LibStub("AceGUI-3.0");
 Gnosis.comm = LibStub("AceComm-3.0");

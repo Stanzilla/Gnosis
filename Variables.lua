@@ -1,6 +1,3 @@
--- Gnosis @project-version@ last changed @project-date-iso@
--- Variables.lua last changed @file-date-iso@
-
 -- local functions
 local GetSpellInfo = GetSpellInfo;
 local string_format = string.format;
@@ -145,7 +142,7 @@ function Gnosis:StartupVariables()
 	local fCurTime = GetTime() * 1000;
 
 	self.ver = 4.62;
-	self.optver = 3.25;
+	self.optver = 4.62;
 	self.build = "@project-version@";
 	self.addonname = "Gnosis";
 	local strVer = string_format("v%.2f", self.ver);
@@ -243,7 +240,7 @@ function Gnosis:StartupVariables()
 		ctt = 300,		-- clip test time (in ms)
 
 		-- timer scan
-		iTimerScanEvery = 200,	-- scan for spell/item cooldowns and auras every 200ms (default)
+		iTimerScanEvery = 150,	-- scan for spell/item cooldowns and auras every 150ms (default)
 	};
 
 	-- set default combat text addon, if multiple addons found than MSBT > Parrot > SCT
@@ -321,7 +318,8 @@ function Gnosis:StartupVariables()
 		-- bar settings
 		anchor = nil,
 		bEn = true,				-- enabled
-		spec = 0,				-- talent spec (both)
+		spectab =				-- active for all possible talent specializations
+			{ [1] = true, [2] = true, [3] = true, [4] = true },
 		bShowWNC = false,		-- show when not casting
 		bShowLat = true,		-- show latency box
 		bShowCBS = true,		-- show castbar spark

@@ -1,6 +1,3 @@
--- Gnosis @project-version@ last changed @project-date-iso@
--- Options.lua last changed @file-date-iso@
-
 -- local functions
 local tonumber = tonumber;
 local type = type;
@@ -35,8 +32,8 @@ function Gnosis:OptCreateBasicTables()
 		vehicle = "Vehicle",
 	};
 
-	Gnosis.tSpecs = { [0] = "1 & 2", [1] = "1", [2] = "2" };
-
+	Gnosis.tSpecs = { [0] = "1 & 2 & 3 & 4", [1] = "1", [2] = "2", [3] = "3", [4] = "4", [5] = Gnosis.L["tSpecsSelectSpec"] };
+	
 	Gnosis.tBarTypes = { cb = Gnosis.L["BT_Castbar"], ti = Gnosis.L["BT_MSTimer"] };
 
 	Gnosis.fontoutlines = { ["NONE"] = Gnosis.L["TabCapNONE"], ["OUTLINE"] = "OUTLINE", ["THICKOUTLINE"] = "THICKOUTLINE", ["MONOCHROME"] = "MONOCHROME", ["OUTLINE, MONOCHROME"] = "OUTLINE, MONOCHROME", ["THICKOUTLINE, MONOCHROME"] = "THICKOUTLINE, MONOCHROME" };
@@ -900,17 +897,34 @@ function Gnosis:CreateCastbarsOpt()
 					style = "dropdown",
 					width = "full",
 				},
-				specact = {
+				specactcustom = {
 					order = self:GetNextTableIndex(),
 					name = Gnosis.L["OptCBActiveSpec"],
+					desc = Gnosis.L["OptCBActiveSpecDesc"],
+					type = "input",
+					get = function(info)
+						return Gnosis:TableToCommaSeparatedNumbers(Gnosis.s.cbconf[key].spectab);
+					end,
+					set = function(info,val)
+						Gnosis.s.cbconf[key].spectab = 
+							Gnosis:CommaSeparatedNumbersToTable(val, 1, 6);
+						Gnosis:SetBarParams(key);
+					end,
+					width = "full",
+				},
+				specact = {
+					order = self:GetNextTableIndex(),
+					name = "",
 					type = "select",
 					values = Gnosis.tSpecs,
-					get = function(info) return Gnosis.s.cbconf[key].spec; end,
+					get = function(info) return 5; end,
 					set = function(info,val)
-							Gnosis.s.cbconf[key].spec = val;
-							Gnosis:SetBarParams(key);
-							Gnosis:CreateCBTables();
-						end,
+						local specstr = (val >= 1 and val <= 4) and ("" .. val) or "1,2,3,4";
+						Gnosis.s.cbconf[key].spectab = 
+							Gnosis:CommaSeparatedNumbersToTable(specstr, 1, 4);
+						Gnosis:SetBarParams(key);
+						Gnosis:CreateCBTables();
+					end,
 					style = "dropdown",
 					width = "full",
 				},
