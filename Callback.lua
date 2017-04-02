@@ -375,7 +375,7 @@ end
 function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dguid, dname, _, _, sid, spellname, _, dmg, oh, absorbed, bcritheal, bmultiheal, _, bcrit, _, _, _, bmulti)
 	if (sguid == self.guid) then	-- player
 		local fCurTime = GetTime() * 1000;
-
+		
 		local heal_done = (event == "SPELL_HEAL" or event == "SPELL_PERIODIC_HEAL");
 		local dmg_done = (event == "SPELL_DAMAGE" or event == "SPELL_PERIODIC_DAMAGE");
 		local dmg_missed = (event == "SPELL_MISSED" or event == "SPELL_PERIODIC_MISSED");
@@ -395,7 +395,7 @@ function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dgu
 				selcc.oh = selcc.oh + (heal_done and oh or 0);
 
 				local isNormalTick = true;
-				if ((heal_done and bmultiheal) or ((not heal_done) and bmulti)) then
+				if ((heal_done and bmultiheal) or ((not heal_done) and (bmulti or event == "SPELL_DAMAGE"))) then
 					-- multistrike
 					selcc.mastery = selcc.mastery + 1;
 					isNormalTick = false;
