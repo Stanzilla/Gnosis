@@ -1001,7 +1001,7 @@ function Gnosis:AnchorBar(name)
 	if (cfg.anchortype == 3) then		-- anchor to cursor
 		cb.reanchor = true;
 		self:ReAnchorBar(cb);
-	elseif (cfg.anchortype == 2 and _G[cfg.anchorframe]) then	-- anchor to frame
+	elseif (cfg.anchortype == 2 and _G[cfg.anchorframe] and cfg.anchorframe~=name) then	-- anchor to frame
 		cb:SetPoint(cb.afrom, _G[cfg.anchorframe], cb.ato, cb.ax / uis, cb.ay / uis);
 	else	-- no anchor
 		cb:SetPoint("CENTER", UIParent, "BOTTOMLEFT", px * xm * mult, py * ym * mult);
