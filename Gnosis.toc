@@ -1,4 +1,4 @@
-## Interface: 70200
+## Interface: 80000
 ## Title: Gnosis (|cffaaff44Castbars and Timers|r) @project-version@
 ## Notes: Highly configurable castbar and single timer addon.
 ## Author: @project-author@

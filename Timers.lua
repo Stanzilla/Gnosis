@@ -199,7 +199,7 @@ end
 
 function Gnosis:Timers_Spell(bar, timer, ti)
 	-- cast
-	local spell, _, _, icon, s, d, _, _, notInterruptible = UnitCastingInfo(timer.unit);
+	local spell, _, icon, s, d, _, _, notInterruptible = UnitCastingInfo(timer.unit);
 	if(d and d > 0) then
 		if(timer.spell == "all" or timer.spell == "any" or timer.spell == spell) then
 			ti.cname = spell;
@@ -216,7 +216,7 @@ function Gnosis:Timers_Spell(bar, timer, ti)
 			set_times(timer, ti, dur, fin, false);
 		end
 	else
-		spell, _, _, icon, s, d, _, _, notInterruptible = UnitChannelInfo(timer.unit);
+		spell, _, icon, s, d, _, _, notInterruptible = UnitChannelInfo(timer.unit);
 		if(d and d > 0) then
 			if(timer.spell == "all" or timer.spell == "any" or timer.spell == spell) then
 				ti.cname = spell;
@@ -312,7 +312,7 @@ local function GetAura(timer, unit)
 		local i = 1;
 		
 		repeat
-			name, _, ic, sta, _, d, s, _, _, _, id, _, _, _, _, _, eff1, eff2, eff3 =
+			name, ic, sta, _, d, s, _, _, _, id, _, _, _, _, _, eff1, eff2, eff3 =
 				UnitAura(unit, i, timer.filter);
 			
 			if (id and id == timer.spellid) then
@@ -349,8 +349,8 @@ local function GetAura(timer, unit)
 		return;
 	else
 		-- aura name
-		local _, _, ic, sta, _, d, s, _, _, _, _, _, _, _, _, _, eff1, eff2, eff3 =
-			UnitAura(unit, timer.spell, nil, timer.filter);
+		local _, ic, sta, _, d, s, _, _, _, _, _, _, _, _, _, eff1, eff2, eff3 =
+			AuraUtil.FindAuraByName(timer.spell, unit, timer.filter);
 		
 		if (timer.auraeffect3) then
 			if (eff3 and eff3 > 0) then
@@ -1892,10 +1892,11 @@ function Gnosis:CreateSingleTimerTable()
 
 					-- get name and icon if cast/aura and passed as spellid
 					if ((tiType <= 2 or tiType == 10 or tiType == 11 or tiType == 21) and tonumber(spell)) then
-						local name_, _, icon_ = GetSpellInfo(tonumber(spell));
+						local name_, _, icon_, _, _, _, spellid_ = GetSpellInfo(tonumber(spell));
 						if(name_ and icon_) then
 							tTimer.spell = name_;
 							tTimer.icon = icon_;
+							tTimer.spellid = spellid_;
 						end
 					end
 					
