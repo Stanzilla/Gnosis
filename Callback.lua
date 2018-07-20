@@ -121,8 +121,7 @@ function Gnosis:Update()
 end
 
 -- events
-function Gnosis:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell_guid, spellid)
-	local rank = nil
+function Gnosis:UNIT_SPELLCAST_SUCCEEDED(event, unit, _, spellid)
 	local spell = GetSpellInfo(spellid)
 	if (unit == "player") then
 		local fCurTime = GetTime() * 1000.0;
@@ -144,7 +143,8 @@ function Gnosis:UNIT_SPELLCAST_SUCCEEDED(event, unit, spell_guid, spellid)
 	end
 end
 
-function Gnosis:UNIT_SPELLCAST_START(event, unit, spell, rank, _, spellid)
+function Gnosis:UNIT_SPELLCAST_START(event, unit, _, spellid)
+	local spell = GetSpellInfo(spellid)
 	local cb = self:FindCB(unit);
 	if (cb) then
 		local fCurTime = GetTime() * 1000.0;
@@ -157,7 +157,7 @@ function Gnosis:UNIT_SPELLCAST_START(event, unit, spell, rank, _, spellid)
 	if (unit == "player") then
 		local fCurTime = GetTime() * 1000.0;
 
-		self:FindGCDBars(spell, rank, fCurTime, spellid);
+		self:FindGCDBars(spell, fCurTime, spellid);
 
 		if (self.iLastTradeSkillCnt) then
 			self.iLastTradeSkillCnt = self.iLastTradeSkillCnt - 1;
@@ -166,7 +166,8 @@ function Gnosis:UNIT_SPELLCAST_START(event, unit, spell, rank, _, spellid)
 	end
 end
 
-function Gnosis:UNIT_SPELLCAST_CHANNEL_START(event, unit, spell, rank, _, spellid)
+function Gnosis:UNIT_SPELLCAST_CHANNEL_START(event, unit, _, spellid)
+	local spell = GetSpellInfo(spellid)
 	local cb = self:FindCB(unit);
 	if (cb) then
 		local fCurTime = GetTime() * 1000.0;
@@ -183,7 +184,8 @@ function Gnosis:UNIT_SPELLCAST_CHANNEL_START(event, unit, spell, rank, _, spelli
 	end
 end
 
-function Gnosis:UNIT_SPELLCAST_STOP(event, unit, spell, rank, _, spellid)
+function Gnosis:UNIT_SPELLCAST_STOP(event, unit, _, spellid)
+	local spell = GetSpellInfo(spellid)
 	local cb = self:FindCB(unit);
 	if (cb) then
 		local fCurTime = GetTime() * 1000.0;
@@ -206,7 +208,8 @@ function Gnosis:UNIT_SPELLCAST_STOP(event, unit, spell, rank, _, spellid)
 	end
 end
 
-function Gnosis:UNIT_SPELLCAST_CHANNEL_STOP(event, unit, spell, rank, _, spellid)
+function Gnosis:UNIT_SPELLCAST_CHANNEL_STOP(event, unit, _, spellid)
+	local spell = GetSpellInfo(spellid)
 	local cb = self:FindCB(unit);
 	if (cb) then
 		local fCurTime = GetTime() * 1000.0;
@@ -298,7 +301,8 @@ function Gnosis:UNIT_SPELLCAST_NOT_INTERRUPTIBLE(event, unit)
 	end
 end
 
-function Gnosis:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell, rank, lineid, spellid)
+function Gnosis:UNIT_SPELLCAST_INTERRUPTED(event, unit, lineid, spellid)
+	local spell = GetSpellInfo(spellid)
 	local cb = self:FindCB(unit);
 	if (cb) then
 		local fCurTime = GetTime() * 1000.0;
@@ -334,7 +338,8 @@ function Gnosis:UNIT_SPELLCAST_INTERRUPTED(event, unit, spell, rank, lineid, spe
 	end
 end
 
-function Gnosis:UNIT_SPELLCAST_FAILED(event, unit, spell, rank, lineid, spellid)
+function Gnosis:UNIT_SPELLCAST_FAILED(event, unit, lineid, spellid)
+	local spell = GetSpellInfo(spellid)
 	local cb = self:FindCB(unit);
 	if (cb) then
 		local fCurTime = GetTime() * 1000.0;
