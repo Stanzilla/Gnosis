@@ -974,8 +974,8 @@ function Gnosis:UpdateClipTest()
 end
 
 function Gnosis:PlaySounds()
-	if (self.s.ct.bsound and self.s.ct.sound) then
-		PlaySound(self.s.ct.sound, self.s.ct.channel and
+	if (self.s.ct.bsound and self.s.ct.sound and SOUNDKIT[self.s.ct.sound]) then
+		PlaySound(SOUNDKIT[self.s.ct.sound], self.s.ct.channel and
 			self.tSoundChannels[self.s.ct.channel] or self.tSoundChannels[1]);
 	end
 	if (self.s.ct.bmusic and self.s.ct.music) then

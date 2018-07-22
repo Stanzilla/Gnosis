@@ -379,7 +379,13 @@ function Gnosis:PLAYER_REGEN_ENABLED()
 	self.curincombattype = 3;	-- out of combat "flag"
 end
 
-function Gnosis:COMBAT_LOG_EVENT_UNFILTERED(_, ts, event, _, sguid, _, _, _, dguid, dname, _, _, sid, spellname, _, dmg, oh, absorbed, bcritheal, bmultiheal, _, bcrit, _, _, _, bmulti)
+function Gnosis:COMBAT_LOG_EVENT_UNFILTERED()
+	-- not certain about the values/order returned by CombatLogGetCurrentEventInfo()
+	-- seems ok from initial (very short) testing
+	local ts, event, _, sguid, _, _, _, dguid, dname, _, _,
+		sid, spellname, _, dmg, oh, absorbed, bcritheal,
+		bmultiheal, _, bcrit, _, _, _, bmulti = CombatLogGetCurrentEventInfo();
+
 	if (sguid == self.guid) then	-- player
 		local fCurTime = GetTime() * 1000;
 

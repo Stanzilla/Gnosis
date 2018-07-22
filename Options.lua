@@ -385,8 +385,8 @@ function Gnosis:OptCreateCTpage()
 					order = 3,
 					name = Gnosis.L["OptPlaySnd"],
 					type = "execute",
-					func = function() if(Gnosis.s.ct.sound) then
-						 PlaySound(Gnosis.s.ct.sound, Gnosis.s.ct.channel and Gnosis.tSoundChannels[Gnosis.s.ct.channel] or Gnosis.tSoundChannels[1]); end
+					func = function() if(Gnosis.s.ct.sound and SOUNDKIT[Gnosis.s.ct.sound]) then
+						 PlaySound(SOUNDKIT[Gnosis.s.ct.sound], Gnosis.s.ct.channel and Gnosis.tSoundChannels[Gnosis.s.ct.channel] or Gnosis.tSoundChannels[1]); end
 					end,
 					width = "full",
 				},
