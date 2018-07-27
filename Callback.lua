@@ -477,7 +477,7 @@ function Gnosis:COMBAT_LOG_EVENT_UNFILTERED()
 	end
 end
 
-function Gnosis:UNIT_SPELLCAST_SENT(event, unit, _, _, target)
+function Gnosis:UNIT_SPELLCAST_SENT(event, unit, target)
 	-- latency estimation
 	self.strLastTarget = (target and target ~= "") and target or nil;
 	self.lag = select(4, GetNetStats());
