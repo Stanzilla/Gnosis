@@ -1,7 +1,5 @@
 -- local functions
 local GetTime = GetTime;
-local UnitChannelInfo = UnitChannelInfo;
-local UnitCastingInfo = UnitCastingInfo;
 local UnitDamage = UnitDamage;
 local UnitName = UnitName;
 local UnitClass = UnitClass;
@@ -14,6 +12,33 @@ local abs = abs;
 
 -- local variables
 local _;
+
+-- WOW classic support
+local UnitCastingInfo = UnitCastingInfo;
+local UnitChannelInfo = UnitChannelInfo;
+local GetSpecialization = GetSpecialization;
+
+if (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) then
+	UnitCastingInfo = function(unit)
+		if (unit == "player") then
+			return CastingInfo();
+		else
+			return;
+		end
+	end
+	
+	UnitChannelInfo = function(unit)
+		if (unit == "player") then
+			return ChannelInfo();
+		else
+			return;
+		end
+	end
+	
+	GetSpecialization = function()
+		return 1;
+	end
+end
 
 -- init OnUpdate handler, anchoring bars
 function Gnosis:OnUpdate()

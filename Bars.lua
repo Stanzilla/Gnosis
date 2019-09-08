@@ -1,6 +1,4 @@
 -- local functions
-local UnitCastingInfo = UnitCastingInfo;
-local UnitChannelInfo = UnitChannelInfo;
 local UnitAttackSpeed = UnitAttackSpeed;
 local UnitRangedDamage = UnitRangedDamage;
 local UnitName = UnitName;
@@ -36,6 +34,28 @@ local select = select;
 
 -- local variables
 local _;
+
+-- WOW classic support
+local UnitCastingInfo = UnitCastingInfo;
+local UnitChannelInfo = UnitChannelInfo;
+
+if (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) then
+	UnitCastingInfo = function(unit)
+		if (unit == "player") then
+			return CastingInfo();
+		else
+			return;
+		end
+	end
+	
+	UnitChannelInfo = function(unit)
+		if (unit == "player") then
+			return ChannelInfo();
+		else
+			return;
+		end
+	end
+end
 
 function Gnosis:UpgradeTable(dst, src)
 	for key, value in pairs(src) do

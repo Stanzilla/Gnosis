@@ -7,7 +7,7 @@ local string_format = string.format;
 local _;
 
 -- global Gnosis event tables
-Gnosis.tCastbarEvents = {
+Gnosis.tCastbarEventsMainline = {
 	"UNIT_SPELLCAST_CHANNEL_START",
 	"UNIT_SPELLCAST_CHANNEL_STOP",
 	"UNIT_SPELLCAST_CHANNEL_UPDATE",
@@ -22,7 +22,20 @@ Gnosis.tCastbarEvents = {
 	"UNIT_SPELLCAST_SUCCEEDED",
 };
 
-Gnosis.tMiscEvents = {
+Gnosis.tCastbarEventsClassic = {
+	"UNIT_SPELLCAST_CHANNEL_START",
+	"UNIT_SPELLCAST_CHANNEL_STOP",
+	"UNIT_SPELLCAST_CHANNEL_UPDATE",
+	"UNIT_SPELLCAST_START",
+	"UNIT_SPELLCAST_STOP",
+	"UNIT_SPELLCAST_DELAYED",
+	"UNIT_SPELLCAST_INTERRUPTED",
+	"UNIT_SPELLCAST_FAILED",
+	"UNIT_SPELLCAST_FAILED_QUIET",
+	"UNIT_SPELLCAST_SUCCEEDED",
+};
+
+Gnosis.tMiscEventsMainline = {
 	"PLAYER_REGEN_DISABLED",
 	"PLAYER_REGEN_ENABLED",
 	"COMBAT_LOG_EVENT_UNFILTERED",
@@ -32,6 +45,16 @@ Gnosis.tMiscEvents = {
 	"PLAYER_TARGET_CHANGED",
 	"DISPLAY_SIZE_CHANGED",
 	"PLAYER_TALENT_UPDATE",
+};
+
+Gnosis.tMiscEventsClassic = {
+	"PLAYER_REGEN_DISABLED",
+	"PLAYER_REGEN_ENABLED",
+	"COMBAT_LOG_EVENT_UNFILTERED",
+	"UNIT_SPELLCAST_SENT",
+	"PLAYER_ENTERING_WORLD",
+	"PLAYER_TARGET_CHANGED",
+	"DISPLAY_SIZE_CHANGED",
 };
 
 Gnosis.tMirrorEvents = {
@@ -142,7 +165,7 @@ Gnosis.tSoundChannels = {
 function Gnosis:StartupVariables()
 	local fCurTime = GetTime() * 1000;
 
-	self.ver = 4.70;
+	self.ver = 4.71;
 	self.optver = 4.62;
 	self.build = "@project-version@";
 	self.addonname = "Gnosis";

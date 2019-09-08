@@ -376,19 +376,21 @@ function Gnosis:OnInitialize()
 end
 
 function Gnosis:SetupHooks()
-	-- tradeskill hooking
-	hooksecurefunc(C_TradeSkillUI, 'CraftRecipe', function(index, num)
-			Gnosis.bNewTradeSkill = tonumber(num) and true or nil;
-			Gnosis.iLastTradeSkillCnt = tonumber(num);
-		end
-	);
-		
-	hooksecurefunc(C_TradeSkillUI, 'CloseTradeSkill', function()
-			Gnosis.bNewTradeSkill = nil;
-			Gnosis.iLastTradeSkillCnt = nil;
-			Gnosis:CloseAllTradeskillBars();
-		end
-	);
+	if (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) then
+		-- tradeskill hooking
+		hooksecurefunc(C_TradeSkillUI, 'CraftRecipe', function(index, num)
+				Gnosis.bNewTradeSkill = tonumber(num) and true or nil;
+				Gnosis.iLastTradeSkillCnt = tonumber(num);
+			end
+		);
+			
+		hooksecurefunc(C_TradeSkillUI, 'CloseTradeSkill', function()
+				Gnosis.bNewTradeSkill = nil;
+				Gnosis.iLastTradeSkillCnt = nil;
+				Gnosis:CloseAllTradeskillBars();
+			end
+		);
+	end
 	
 	-- SetCVar hook
 	hooksecurefunc('SetCVar', function(cv, val)
@@ -571,13 +573,23 @@ end
 function Gnosis:RegisterEvents()
 	local key, value;
 
-	for key, value in pairs(Gnosis.tCastbarEvents) do
-		self:RegisterEvent(value);
-	end
-
-	for key, value in pairs(Gnosis.tMiscEvents) do
-		self:RegisterEvent(value);
-	end
+	if (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) then
+		for key, value in pairs(Gnosis.tCastbarEventsClassic) do
+			self:RegisterEvent(value);
+		end
+		
+		for key, value in pairs(Gnosis.tMiscEventsClassic) do
+			self:RegisterEvent(value);
+		end
+	else
+		for key, value in pairs(Gnosis.tCastbarEventsMainline) do
+			self:RegisterEvent(value);
+		end
+		
+		for key, value in pairs(Gnosis.tMiscEventsMainline) do
+			self:RegisterEvent(value);
+		end
+	end	
 
 	for key, value in pairs(Gnosis.tMirrorEvents) do
 		self:RegisterEvent(value);
