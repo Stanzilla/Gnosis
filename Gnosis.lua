@@ -27,6 +27,10 @@ local string_len = strlenutf8;
 -- local variables
 local _;
 
+-- mainline or classic
+local wowmainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE);
+local wowclassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC);
+
 -- LibSharedMedia
 if(Gnosis.lsm) then
 	-- statusbar textures
@@ -376,7 +380,7 @@ function Gnosis:OnInitialize()
 end
 
 function Gnosis:SetupHooks()
-	if (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE) then
+	if (wowmainline) then
 		-- tradeskill hooking
 		hooksecurefunc(C_TradeSkillUI, 'CraftRecipe', function(index, num)
 				Gnosis.bNewTradeSkill = tonumber(num) and true or nil;
@@ -390,8 +394,22 @@ function Gnosis:SetupHooks()
 				Gnosis:CloseAllTradeskillBars();
 			end
 		);
+	elseif (wowclassic) then
+		-- tradeskill hooking
+		hooksecurefunc('DoTradeSkill', function(index, num)
+				Gnosis.bNewTradeSkill = tonumber(num) and true or nil;
+				Gnosis.iLastTradeSkillCnt = tonumber(num);
+			end
+		);
+			
+		hooksecurefunc('CloseTradeSkill', function()
+				Gnosis.bNewTradeSkill = nil;
+				Gnosis.iLastTradeSkillCnt = nil;
+				Gnosis:CloseAllTradeskillBars();
+			end
+		);
 	end
-	
+
 	-- SetCVar hook
 	hooksecurefunc('SetCVar', function(cv, val)
 			if(cv == "uiscale") then
