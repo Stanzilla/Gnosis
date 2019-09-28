@@ -35,5 +35,11 @@ externals:
 	Libs/LibCompress:
 		url: svn://svn.wowace.com/wow/libcompress/mainline/trunk
 		tag: latest
-		
+	Libs/LibClassicDurations:
+		url: https://repos.curseforge.com/wow/libclassicdurations
+		tag: latest
+	Libs/LibClassicCasterino:
+		url: https://github.com/rgd87/LibClassicCasterino
+		tag: latest
+
 enable-nolib-creation: yes
