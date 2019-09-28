@@ -46,10 +46,13 @@ end
 
 -- init OnUpdate handler, anchoring bars
 function Gnosis:OnUpdate()
-	-- initial bar anchoring
-	Gnosis:AnchorAllBars();
+	-- variables already initialized?
+	if (Gnosis.ver ~= nil) then
+		-- initial bar anchoring
+		Gnosis:AnchorAllBars();
 
-	Gnosis.OnUpdate = Gnosis.Update;
+		Gnosis.OnUpdate = Gnosis.Update;
+	end
 end
 
 -- timer update
