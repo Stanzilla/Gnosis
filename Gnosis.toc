@@ -1,4 +1,4 @@
-## Interface: 80205
+## Interface: 11302
 ## Title: Gnosis (|cffaaff44Castbars and Timers|r) @project-version@
 ## Notes: Highly configurable castbar and single timer addon.
 ## Author: @project-author@
@@ -29,7 +29,7 @@ Libs\LibDialog-1.0\lib.xml
 Libs\AceSerializer-3.0\AceSerializer-3.0.xml
 Libs\LibCompress\lib.xml
 
-## X-Embeds: Ace3, AceGUI-3.0-SharedMediaWidgets, LibBetterBlizzOptions-1.0, LibCompress, LibDialog-1.0, LibRangeCheck-2.0, LibSharedMedia-3.0
+## X-Embeds: Ace3, AceGUI-3.0-SharedMediaWidgets, LibBetterBlizzOptions-1.0, LibClassicCasterino, LibCompress, LibDialog-1.0, LibRangeCheck-2.0, LibSharedMedia-3.0
 #@end-no-lib-strip@
 
 # xml
