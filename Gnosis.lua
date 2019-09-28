@@ -591,23 +591,13 @@ end
 function Gnosis:RegisterEvents()
 	local key, value;
 
-	if (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) then
-		for key, value in pairs(Gnosis.tCastbarEventsClassic) do
-			self:RegisterEvent(value);
-		end
-		
-		for key, value in pairs(Gnosis.tMiscEventsClassic) do
-			self:RegisterEvent(value);
-		end
-	else
-		for key, value in pairs(Gnosis.tCastbarEventsMainline) do
-			self:RegisterEvent(value);
-		end
-		
-		for key, value in pairs(Gnosis.tMiscEventsMainline) do
-			self:RegisterEvent(value);
-		end
-	end	
+	for key, value in pairs(Gnosis.tCastbarEvents) do
+		self:RegisterEvent(value);
+	end
+	
+	for key, value in pairs(Gnosis.tMiscEvents) do
+		self:RegisterEvent(value);
+	end
 
 	for key, value in pairs(Gnosis.tMirrorEvents) do
 		self:RegisterEvent(value);

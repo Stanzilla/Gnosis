@@ -13,12 +13,16 @@ local abs = abs;
 -- local variables
 local _;
 
+-- mainline or classic
+local wowmainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE);
+local wowclassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC);
+
 -- WOW classic support
 local UnitCastingInfo = UnitCastingInfo;
 local UnitChannelInfo = UnitChannelInfo;
 local GetSpecialization = GetSpecialization;
 
-if (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) then
+if (wowclassic) then
 	UnitCastingInfo = function(unit)
 		if (unit == "player") then
 			return CastingInfo();
@@ -147,8 +151,8 @@ end
 
 -- events
 function Gnosis:UNIT_SPELLCAST_SUCCEEDED(event, unit, _, spellid)
-	local spell = GetSpellInfo(spellid)
 	if (unit == "player") then
+		local spell = GetSpellInfo(spellid);
 		local fCurTime = GetTime() * 1000.0;
 		self:FindGCDBars(spell, fCurTime, spellid);
 		-- update timer bars now (to make gcd bars appear instantly)
@@ -169,12 +173,16 @@ function Gnosis:UNIT_SPELLCAST_SUCCEEDED(event, unit, _, spellid)
 end
 
 function Gnosis:UNIT_SPELLCAST_START(event, unit, _, spellid)
-	local spell = GetSpellInfo(spellid)
+	local spell, rank, icon, castTime = GetSpellInfo(spellid);
 	local cb = self:FindCB(unit);
 	if (cb) then
 		local fCurTime = GetTime() * 1000.0;
 		repeat
-			self:SetupCastbar(cb, false, fCurTime);
+			if (wowclassic and unit ~= "player") then
+				self:SetupCastbar(cb, false, fCurTime, spellid, spell, icon, fCurTime + castTime);
+			else
+				self:SetupCastbar(cb, false, fCurTime);
+			end
 			cb = self:FindCBNext(unit);
 		until cb == nil;
 	end
@@ -192,12 +200,16 @@ function Gnosis:UNIT_SPELLCAST_START(event, unit, _, spellid)
 end
 
 function Gnosis:UNIT_SPELLCAST_CHANNEL_START(event, unit, _, spellid)
-	local spell = GetSpellInfo(spellid)
+	local spell, rank, icon, castTime = GetSpellInfo(spellid);
 	local cb = self:FindCB(unit);
 	if (cb) then
 		local fCurTime = GetTime() * 1000.0;
 		repeat
-			self:SetupCastbar(cb, true, fCurTime);
+			if (wowclassic and unit ~= "player") then
+				self:SetupCastbar(cb, true, fCurTime, spellid, spell, icon, castTime);
+			else
+				self:SetupCastbar(cb, true, fCurTime);
+			end
 			cb = self:FindCBNext(unit);
 		until cb == nil;
 	end
@@ -210,7 +222,6 @@ function Gnosis:UNIT_SPELLCAST_CHANNEL_START(event, unit, _, spellid)
 end
 
 function Gnosis:UNIT_SPELLCAST_STOP(event, unit, _, spellid)
-	local spell = GetSpellInfo(spellid)
 	local cb = self:FindCB(unit);
 	if (cb) then
 		local fCurTime = GetTime() * 1000.0;
@@ -234,7 +245,6 @@ function Gnosis:UNIT_SPELLCAST_STOP(event, unit, _, spellid)
 end
 
 function Gnosis:UNIT_SPELLCAST_CHANNEL_STOP(event, unit, _, spellid)
-	local spell = GetSpellInfo(spellid)
 	local cb = self:FindCB(unit);
 	if (cb) then
 		local fCurTime = GetTime() * 1000.0;
