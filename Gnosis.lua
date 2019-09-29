@@ -7,6 +7,9 @@ Gnosis.range = LibStub("LibRangeCheck-2.0");
 Gnosis.dialog = LibStub("LibDialog-1.0");
 Gnosis.libs = LibStub("AceSerializer-3.0");
 Gnosis.libc = LibStub("LibCompress");
+Gnosis.libclcno = LibStub("LibClassicCasterino");
+Gnosis.libcldur = LibStub("LibClassicDurations");
+Gnosis.libcldur:Register("Gnosis")
 
 -- local functions
 local UnitName = UnitName;
@@ -51,6 +54,12 @@ if(Gnosis.lsm) then
 	Gnosis.lsm:Register("sound", "Gnosis_Wharf", "Interface\\Addons\\Gnosis\\Sounds\\announcementonawharf.ogg");	
 end
 
+-- LibClassicDurations
+if (wowclassic and Gnosis.libcldur) then
+
+end
+
+-- generate configuration frames
 function Gnosis:InitialConfig()
 	self.optFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Gnosis", self.L["AddonName"]);
 	self.optCBs = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Gnosis Castbars", Gnosis.L["TabCastbars"], "Gnosis");
@@ -592,7 +601,11 @@ function Gnosis:RegisterEvents()
 	local key, value;
 
 	for key, value in pairs(Gnosis.tCastbarEvents) do
-		self:RegisterEvent(value);
+		if (wowclassic and self.libclcno) then
+			self.libclcno.RegisterCallback(Gnosis, value, value);
+		else
+			self:RegisterEvent(value);
+		end
 	end
 	
 	for key, value in pairs(Gnosis.tMiscEvents) do
@@ -612,7 +625,11 @@ function Gnosis:UnregisterEvents()
 	local key, value;
 
 	for key, value in pairs(Gnosis.tCastbarEvents) do
-		self:UnregisterEvent(value);
+		if (wowclassic and self.libclcno) then
+			self.libclcno.UnregisterCallback(Gnosis, value, value);
+		else
+			self:UnregisterEvent(value);
+		end
 	end
 
 	for key, value in pairs(Gnosis.tMiscEvents) do

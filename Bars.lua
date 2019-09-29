@@ -43,21 +43,13 @@ local wowclassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC);
 local UnitCastingInfo = UnitCastingInfo;
 local UnitChannelInfo = UnitChannelInfo;
 
-if (wowclassic) then
+if (wowclassic and Gnosis.libclcno) then
 	UnitCastingInfo = function(unit)
-		if (unit == "player") then
-			return CastingInfo();
-		else
-			return;
-		end
+		return Gnosis.libclcno:UnitCastingInfo(unit);
 	end
 	
 	UnitChannelInfo = function(unit)
-		if (unit == "player") then
-			return ChannelInfo();
-		else
-			return;
-		end
+		return Gnosis.libclcno:UnitChannelInfo(unit);
 	end
 end
 
@@ -2048,17 +2040,14 @@ function Gnosis:SetupTimerLagBox(cb, showlag, showcasttime, castname, recast, bR
 end
 
 
-function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime, cl_spellid, cl_spellname, cl_icon, cl_endTime)
+function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 	local barname, cfg = cb.name, cb.conf;
 	local name, displayName, texture, startTime, endTime, isTradeSkill, notInterruptible, id;
-	if (cl_spellid) then
-		name, texture, startTime, endTime = cl_spellname, cl_icon, fCurTime, cl_endTime;
+	
+	if (bIsChannel) then
+		name, displayName, texture, startTime, endTime, isTradeSkill, notInterruptible = UnitChannelInfo(cfg.unit);
 	else
-		if (bIsChannel) then
-			name, displayName, texture, startTime, endTime, isTradeSkill, notInterruptible = UnitChannelInfo(cfg.unit);
-		else
-			name, displayName, texture, startTime, endTime, isTradeSkill, id, notInterruptible = UnitCastingInfo(cfg.unit);
-		end
+		name, displayName, texture, startTime, endTime, isTradeSkill, id, notInterruptible = UnitCastingInfo(cfg.unit);
 	end
 
 	if (not name) then

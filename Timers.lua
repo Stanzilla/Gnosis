@@ -1,11 +1,8 @@
-local UnitCastingInfo = UnitCastingInfo;
-local UnitChannelInfo = UnitChannelInfo;
 local GetItemInfo = GetItemInfo;
 local GetSpellInfo = GetSpellInfo;
 local GetSpellCooldown = GetSpellCooldown;
 local GetSpellCharges = GetSpellCharges;
 local GetTime = GetTime;
-local UnitAura = UnitAura;
 local GetItemCooldown = GetItemCooldown;
 local GetRuneCooldown = GetRuneCooldown;
 local GetRuneType = GetRuneType;
@@ -46,6 +43,49 @@ local BOOLOP_NONE, BOOLOP_AND, BOOLOP_OR, BOOLOP_RELAXEDAND = 0, 1, 2, 3;
 -- local variables
 local _;
 
+-- mainline or classic
+local wowmainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE);
+local wowclassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC);
+
+-- WOW classic support
+local AuraUtil_FindAuraByName = AuraUtil.FindAuraByName;
+local UnitAura = UnitAura;
+local UnitCastingInfo = UnitCastingInfo;
+local UnitChannelInfo = UnitChannelInfo;
+
+if (wowclassic and Gnosis.libcldur) then
+	UnitAura = function(...)
+		return Gnosis.libcldur:UnitAura(...);
+	end
+	
+	AuraUtil_FindAuraByName = function(spellname, unit, filter)
+		local i = 1;
+		repeat
+			local name, ic, sta, _, d, s, _, _, _, id, _, _, _, _, _, eff1, eff2, eff3 =
+				UnitAura(unit, i, filter);		
+			
+			if (spellname == name) then
+				return name, ic, sta, _, d, s, _, _, _, id, _, _, _, _, _, eff1, eff2, eff3;
+			end
+				
+			i = i + 1;
+		until id == nil or i > 40;
+
+		return nil;
+	end
+end
+
+if (wowclassic and Gnosis.libclcno) then
+	UnitCastingInfo = function(unit)
+		return Gnosis.libclcno:UnitCastingInfo(unit);
+	end
+	
+	UnitChannelInfo = function(unit)
+		return Gnosis.libclcno:UnitChannelInfo(unit);
+	end
+end
+
+-- string helper functions
 function Gnosis:ParseTimer_TrimCmd(line)
 	return string_gsub(line, "^[%s%.,]*(.-)%s*$", "%1");
 end
@@ -315,6 +355,10 @@ local function GetAura(timer, unit)
 			name, ic, sta, _, d, s, _, _, _, id, _, _, _, _, _, eff1, eff2, eff3 =
 				UnitAura(unit, i, timer.filter);
 			
+			if (unit == "target") then
+				print(name, d, s);
+			end
+			
 			if (id and id == timer.spellid) then
 				timer.spell = name;
 				
@@ -350,7 +394,7 @@ local function GetAura(timer, unit)
 	else
 		-- aura name
 		local _, ic, sta, _, d, s, _, _, _, _, _, _, _, _, _, eff1, eff2, eff3 =
-			AuraUtil.FindAuraByName(timer.spell, unit, timer.filter);
+			AuraUtil_FindAuraByName(timer.spell, unit, timer.filter);
 		
 		if (timer.auraeffect3) then
 			if (eff3 and eff3 > 0) then

@@ -22,23 +22,15 @@ local UnitCastingInfo = UnitCastingInfo;
 local UnitChannelInfo = UnitChannelInfo;
 local GetSpecialization = GetSpecialization;
 
-if (wowclassic) then
+if (wowclassic and Gnosis.libclcno) then
 	UnitCastingInfo = function(unit)
-		if (unit == "player") then
-			return CastingInfo();
-		else
-			return;
-		end
+		return Gnosis.libclcno:UnitCastingInfo(unit);
 	end
 	
 	UnitChannelInfo = function(unit)
-		if (unit == "player") then
-			return ChannelInfo();
-		else
-			return;
-		end
+		return Gnosis.libclcno:UnitChannelInfo(unit);
 	end
-	
+		
 	GetSpecialization = function()
 		return 1;
 	end
@@ -176,21 +168,17 @@ function Gnosis:UNIT_SPELLCAST_SUCCEEDED(event, unit, _, spellid)
 end
 
 function Gnosis:UNIT_SPELLCAST_START(event, unit, _, spellid)
-	local spell, rank, icon, castTime = GetSpellInfo(spellid);
 	local cb = self:FindCB(unit);
 	if (cb) then
 		local fCurTime = GetTime() * 1000.0;
 		repeat
-			if (wowclassic and unit ~= "player") then
-				self:SetupCastbar(cb, false, fCurTime, spellid, spell, icon, fCurTime + castTime);
-			else
-				self:SetupCastbar(cb, false, fCurTime);
-			end
+			self:SetupCastbar(cb, false, fCurTime);
 			cb = self:FindCBNext(unit);
 		until cb == nil;
 	end
 
 	if (unit == "player") then
+		local spell = GetSpellInfo(spellid);
 		local fCurTime = GetTime() * 1000.0;
 
 		self:FindGCDBars(spell, fCurTime, spellid);
@@ -203,16 +191,11 @@ function Gnosis:UNIT_SPELLCAST_START(event, unit, _, spellid)
 end
 
 function Gnosis:UNIT_SPELLCAST_CHANNEL_START(event, unit, _, spellid)
-	local spell, rank, icon, castTime = GetSpellInfo(spellid);
 	local cb = self:FindCB(unit);
 	if (cb) then
 		local fCurTime = GetTime() * 1000.0;
 		repeat
-			if (wowclassic and unit ~= "player") then
-				self:SetupCastbar(cb, true, fCurTime, spellid, spell, icon, castTime);
-			else
-				self:SetupCastbar(cb, true, fCurTime);
-			end
+			self:SetupCastbar(cb, true, fCurTime);
 			cb = self:FindCBNext(unit);
 		until cb == nil;
 	end
