@@ -34,6 +34,20 @@ local _;
 local wowmainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE);
 local wowclassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC);
 
+-- WOW classic support
+local UnitCastingInfo = UnitCastingInfo;
+local UnitChannelInfo = UnitChannelInfo;
+
+if (wowclassic and Gnosis.libclcno) then
+	UnitCastingInfo = function(unit)
+		return Gnosis.libclcno:UnitCastingInfo(unit);
+	end
+	
+	UnitChannelInfo = function(unit)
+		return Gnosis.libclcno:UnitChannelInfo(unit);
+	end
+end
+
 -- LibSharedMedia
 if(Gnosis.lsm) then
 	-- statusbar textures
@@ -52,11 +66,6 @@ if(Gnosis.lsm) then
 	Gnosis.lsm:Register("sound", "Gnosis_Electric", "Interface\\Addons\\Gnosis\\Sounds\\Electrical_Sweep-Sweeper-1760111493.ogg");
 	Gnosis.lsm:Register("sound", "Gnosis_MusicBox", "Interface\\Addons\\Gnosis\\Sounds\\Music_Box-Big_Daddy-1389738694.ogg");
 	Gnosis.lsm:Register("sound", "Gnosis_Wharf", "Interface\\Addons\\Gnosis\\Sounds\\announcementonawharf.ogg");	
-end
-
--- LibClassicDurations
-if (wowclassic and Gnosis.libcldur) then
-
 end
 
 -- generate configuration frames
