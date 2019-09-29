@@ -30,7 +30,9 @@ if (wowclassic and Gnosis.libclcno) then
 	UnitChannelInfo = function(unit)
 		return Gnosis.libclcno:UnitChannelInfo(unit);
 	end
-		
+end
+
+if (wowclassic) then
 	GetSpecialization = function()
 		return 1;
 	end

@@ -1094,26 +1094,26 @@ function Gnosis:AddCustomBar(name, unit, width, height, scale, movefactor_y, mov
 end
 
 function Gnosis:CreateCustomCastbarSet()
-	self:AddCustomBar(self.L["CBSetPlayer"], "player", 300, 28, 1.0, 3, 0, true);
-	self:AddCustomBar(self.L["CBSetTarget"], "target", 250, 20, 1.0, 1, 0, false);
-	self:AddCustomBar(self.L["CBSetFocus"], "focus", 250, 20, 1.0, -1, 0, false);
-	self:AddCustomBar(self.L["CBSetPet"], "pet", 250, 20, 1.0, -3, 0, false);
-	self:AddCustomBar(self.L["CBSetMirror"], "mirror", 250, 20, 1.0, 6, 0, false);
+	self:AddCustomBar("gn" .. self.L["CBSetPlayer"], "player", 300, 28, 1.0, 3, 0, true);
+	self:AddCustomBar("gn" .. self.L["CBSetTarget"], "target", 250, 20, 1.0, 1, 0, false);
+	self:AddCustomBar("gn" .. self.L["CBSetFocus"], "focus", 250, 20, 1.0, -1, 0, false);
+	self:AddCustomBar("gn" .. self.L["CBSetPet"], "pet", 250, 20, 1.0, -3, 0, false);
+	self:AddCustomBar("gn" .. self.L["CBSetMirror"], "mirror", 250, 20, 1.0, 6, 0, false);
 end
 
 function Gnosis:CreateGCDSwingTimers()
-	self:AddCustomBar(self.L["CBSetGCD"], "gcd", 250, 3, 1.0, -5, 0);
-	self:AddCustomBar(self.L["CBSetSwing"], "smr", 250, 3, 1.0, -6, 0);
+	self:AddCustomBar("gn" .. self.L["CBSetGCD"], "gcd", 250, 3, 1.0, -5, 0);
+	self:AddCustomBar("gn" .. self.L["CBSetSwing"], "smr", 250, 3, 1.0, -6, 0);
 
-	local cfg = self.s.cbconf[self.L["CBSetGCD"]];
+	local cfg = self.s.cbconf["gn" .. self.L["CBSetGCD"]];
 	cfg.border = 0;
 	cfg.colBar = { 0.85, 0.85, 0.85, 0.70 };
 	cfg.strNameFormat = "";
 	cfg.strTimeFormat = "";
 	cfg.iconside = "NONE";
-	self:SetBarParams(self.L["CBSetGCD"]);
+	self:SetBarParams("gn" .. self.L["CBSetGCD"]);
 
-	cfg = self.s.cbconf[self.L["CBSetSwing"]];
+	cfg = self.s.cbconf["gn" .. self.L["CBSetSwing"]];
 	cfg.border = 0;
 	cfg.colBar = { 0.85, 0.85, 0.85, 0.70 };
 	cfg.strNameFormat = "";
@@ -1122,7 +1122,7 @@ function Gnosis:CreateGCDSwingTimers()
 	cfg.coord.casttime.y = -9;
 	cfg.iconside = "NONE";
 	cfg.alignment = "FREE";
-	self:SetBarParams(self.L["CBSetSwing"]);
+	self:SetBarParams("gn" .. self.L["CBSetSwing"]);
 end
 
 function Gnosis:RedoLocalization()

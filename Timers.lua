@@ -85,6 +85,20 @@ if (wowclassic and Gnosis.libclcno) then
 	end
 end
 
+if (wowclassic) then
+	GetSpecialization = function()
+		return 1;
+	end
+	
+	GetSpecializationInfo = function()
+		return nil, "";
+	end
+	
+	GetTalentInfo = function()
+		return 1, "";
+	end
+end
+
 -- string helper functions
 function Gnosis:ParseTimer_TrimCmd(line)
 	return string_gsub(line, "^[%s%.,]*(.-)%s*$", "%1");
