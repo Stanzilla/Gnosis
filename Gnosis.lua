@@ -724,7 +724,11 @@ function Gnosis:SetupChanneledSpellsTable()
 	-- multi mob (no clipping detection), spellschool, isheal, upgrade_num
 
 	-- priest
-	self:AddChanneledSpellById(15407, 4, false, 5, false, false, "shadow", false, 3);	-- mind flay
+	if (wowclassic) then
+		self:AddChanneledSpellById(15407, 3, false, 4, false, false, "shadow", false, 4);	-- mind flay
+	else
+		self:AddChanneledSpellById(15407, 4, false, 5, false, false, "shadow", false, 3);	-- mind flay
+	end
 	self:AddChanneledSpellById(48045, 4, false, 5, false, true, "shadow", false, 3); 	-- mind sear
 	self:AddChanneledSpellById(47540, 3, false, 2, true, false, "holy", true, 1);		-- penance, first tick instant
 	self:AddChanneledSpellById(64843, 4, false, 15, false, true, "holy", true, 4);		-- divine hymn
