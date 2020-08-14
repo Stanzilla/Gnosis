@@ -915,7 +915,11 @@ function Gnosis:CreateBarFrame(name, iconpath, minval, maxval)
 		f.ticks = {};
 
 		-- border texture
-		f.bdframe = CreateFrame("Frame", nil, f);
+		if (wowmainline) then
+			f.bdframe = CreateFrame("Frame", nil, f, BackdropTemplateMixin and "BackdropTemplate");
+		else
+			f.bdframe = CreateFrame("Frame", nil, f);
+		end if
 		f.backdrop = { bgFile = "", edgeFile = nil,
 			tile = true, tileSize = 16, edgeSize = 16,
 			insets = { left = 6, right = -6, top = -6, bottom = 6 }
