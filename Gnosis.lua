@@ -7,9 +7,11 @@ Gnosis.range = LibStub("LibRangeCheck-2.0");
 Gnosis.dialog = LibStub("LibDialog-1.0");
 Gnosis.libs = LibStub("AceSerializer-3.0");
 Gnosis.libc = LibStub("LibCompress");
+if (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) then
 Gnosis.libclcno = LibStub("LibClassicCasterino");
 Gnosis.libcldur = LibStub("LibClassicDurations");
 Gnosis.libcldur:Register("Gnosis")
+end
 
 -- local functions
 local UnitName = UnitName;
