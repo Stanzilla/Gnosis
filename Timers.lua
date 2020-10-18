@@ -86,10 +86,6 @@ if (wowclassic and Gnosis.libclcno) then
 end
 
 if (wowclassic) then
-	GetSpecialization = function()
-		return 1;
-	end
-	
 	GetSpecializationInfo = function()
 		return nil, "";
 	end
@@ -1196,7 +1192,7 @@ function Gnosis:Timers_Npc(bar, timer, ti)
 end
 
 function Gnosis:Timers_Charspec(bar, timer, ti)
-	local current_spec = GetSpecialization();
+	local current_spec = self:SafeGetSpecialization();
 	
 	if (current_spec) then
 		-- spec active

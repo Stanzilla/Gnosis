@@ -32,12 +32,6 @@ if (wowclassic and Gnosis.libclcno) then
 	end
 end
 
-if (wowclassic) then
-	GetSpecialization = function()
-		return 1;
-	end
-end
-
 -- init OnUpdate handler, anchoring bars
 function Gnosis:OnUpdate()
 	-- variables already initialized?
@@ -674,7 +668,7 @@ function Gnosis:DISPLAY_SIZE_CHANGED()
 end
 
 function Gnosis:PLAYER_TALENT_UPDATE()
-	self.iCurSpec = GetSpecialization();
+	self.iCurSpec = self:SafeGetSpecialization();
 
 	for key, value in pairs(self.castbars) do
 		local conf = Gnosis.s.cbconf[key];
@@ -684,4 +678,22 @@ function Gnosis:PLAYER_TALENT_UPDATE()
 	end
 
 	self:CreateCBTables();
+end
+
+function Gnosis:SafeGetSpecialization()
+	-- always return 1 for classic
+	if (wowclassic) then
+		return 1;
+	end
+	
+	-- get current specialization
+	local currentspec = GetSpecialization();	
+	
+	-- set to 1 in case GetSpecialization() returns nil or 5
+	-- GetSpecialization() returns 5 for newly created players since 9.0.1	
+	if (not currentspec or currentspec > 4) then
+		return 1;
+	else
+		return currentspec;
+	end
 end
