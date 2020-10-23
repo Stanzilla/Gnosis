@@ -1,18 +1,3 @@
-Gnosis = LibStub("AceAddon-3.0"):NewAddon("Gnosis", "AceConsole-3.0", "AceEvent-3.0");
-Gnosis.gui = LibStub("AceGUI-3.0");
-Gnosis.comm = LibStub("AceComm-3.0");
-Gnosis.lsm = LibStub("LibSharedMedia-3.0", 1);
-Gnosis.smw = LibStub("AceGUISharedMediaWidgets-1.0");
-Gnosis.range = LibStub("LibRangeCheck-2.0");
-Gnosis.dialog = LibStub("LibDialog-1.0");
-Gnosis.libs = LibStub("AceSerializer-3.0");
-Gnosis.libc = LibStub("LibCompress");
-if (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC) then
-Gnosis.libclcno = LibStub("LibClassicCasterino");
-Gnosis.libcldur = LibStub("LibClassicDurations");
-Gnosis.libcldur:Register("Gnosis")
-end
-
 -- local functions
 local UnitName = UnitName;
 local UnitIsDead = UnitIsDead;
@@ -36,7 +21,25 @@ local _;
 local wowmainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE);
 local wowclassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC);
 
--- WOW classic support
+-- libraries
+Gnosis = LibStub("AceAddon-3.0"):NewAddon("Gnosis", "AceConsole-3.0", "AceEvent-3.0");
+Gnosis.gui = LibStub("AceGUI-3.0");
+Gnosis.comm = LibStub("AceComm-3.0");
+Gnosis.lsm = LibStub("LibSharedMedia-3.0", 1);
+Gnosis.smw = LibStub("AceGUISharedMediaWidgets-1.0");
+Gnosis.range = LibStub("LibRangeCheck-2.0");
+Gnosis.dialog = LibStub("LibDialog-1.0");
+Gnosis.libs = LibStub("AceSerializer-3.0");
+Gnosis.libc = LibStub("LibCompress");
+
+-- classic only libraries
+if (wowclassic) then
+	Gnosis.libclcno = LibStub("LibClassicCasterino");
+	Gnosis.libcldur = LibStub("LibClassicDurations");
+	Gnosis.libcldur:Register("Gnosis");
+end
+
+-- classic: use LibClassicCasterino casting functions
 local UnitCastingInfo = UnitCastingInfo;
 local UnitChannelInfo = UnitChannelInfo;
 
