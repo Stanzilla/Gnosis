@@ -53,20 +53,6 @@ if (wowclassic and Gnosis.libclcno) then
 	end
 end
 
--- bandaid for LibDialog-1.0 (MINOR <= 8, until it is fixed)
-if (wowmainline) then
-	_, libdialog_ver = LibStub:GetLibrary("LibDialog-1.0");
-	
-	if (libdialog_ver and libdialog_ver <= 8) then
-		hooksecurefunc(_G, 'CreateFrame', function(frameType, frameName)
-				if (frameName and string_find(frameName, "LibDialog%-1%.0_Dialog") and _G[frameName]) then
-					_G[frameName] = Mixin(_G[frameName], BackdropTemplateMixin);
-				end
-			end
-		);
-	end
-end
-
 -- LibSharedMedia
 if(Gnosis.lsm) then
 	-- statusbar textures
@@ -435,6 +421,18 @@ function Gnosis:SetupHooks()
 				Gnosis:CloseAllTradeskillBars();
 			end
 		);
+		
+		-- bandaid for LibDialog-1.0 (MINOR <= 8, until it is fixed)
+		local ld_name, ld_ver = LibStub:GetLibrary("LibDialog-1.0");
+	
+		if (ld_ver and ld_ver <= 8) then
+			hooksecurefunc(_G, 'CreateFrame', function(frameType, frameName)
+					if (frameName and string_find(frameName, "LibDialog%-1%.0_Dialog") and _G[frameName]) then
+						_G[frameName] = Mixin(_G[frameName], BackdropTemplateMixin);
+					end
+				end
+			);
+		end
 	elseif (wowclassic) then
 		-- tradeskill hooking
 		hooksecurefunc('DoTradeSkill', function(index, num)
