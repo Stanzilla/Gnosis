@@ -318,10 +318,7 @@ function Gnosis:OptCreateBasicTables()
 				order = 16,
 				name = Gnosis.L["OptResetPlayerData"],
 				type = "execute",
-				func = function()
-					wipe(GnosisCharConfig);
-					ReloadUI();
-				end,
+				func = function() Gnosis:ResetPlayerData(); end,
 				width = "full",
 			},
 			reloadui = {
@@ -2209,4 +2206,33 @@ function Gnosis:ImportBars()
 	);
 	
 	Gnosis.dialog:Spawn("GNOSIS_IMPORT");
+end
+
+function Gnosis:ResetPlayerData()
+	Gnosis.dialog:Register("GNOSIS_RESETPLAYERDATA",
+		{
+			text = Gnosis.L["OptResetPlayerData"],
+			buttons = {
+				{
+					text = Gnosis.L["Yes"],
+					on_click = function(self)
+						wipe(GnosisCharConfig);
+						ReloadUI();
+					end,
+				},
+				{
+					text = Gnosis.L["No"],
+					on_click = function(self)
+					end,
+				},
+			},
+			hide_on_escape = false,
+			show_while_dead = true,
+			exclusive = true,
+			width = 350,
+			strata = 5,
+		}
+	);
+
+	Gnosis.dialog:Spawn("GNOSIS_RESETPLAYERDATA");
 end
