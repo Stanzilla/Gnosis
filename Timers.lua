@@ -364,11 +364,7 @@ local function GetAura(timer, unit)
 		repeat
 			name, ic, sta, _, d, s, _, _, _, id, _, _, _, _, _, eff1, eff2, eff3 =
 				UnitAura(unit, i, timer.filter);
-			
-			if (unit == "target") then
-				print(name, d, s);
-			end
-			
+						
 			if (id and id == timer.spellid) then
 				timer.spell = name;
 				
