@@ -119,16 +119,20 @@ function Gnosis:En(status)
 		self:DefaultAllBars();
 
 		-- blizzard castbar
-		if(self.s.bHideBlizz) then
+		if (self.s.bHideBlizz) then
 			self:HideBlizzardCastbar(true);
 		end
 		-- mirror castbar
-		if(self.s.bHideMirror) then
+		if (self.s.bHideMirror) then
 			self:HideBlizzardMirrorCastbar(true);
 		end
 		-- pet/vehicle castbar
-		if(self.s.bHidePetVeh) then
+		if (self.s.bHidePetVeh) then
 			self:HideBlizzardPetCastbar(true);
+		end
+		-- unregister global mouse events
+		if (self.s.bUnregGlobalMouse) then
+			self:UnregisterGlobalMouseEvents();
 		end
 		
 		-- scan table, fast lookup tablese
@@ -1680,4 +1684,22 @@ function Gnosis:ImportBarsFromStr(str)
 	repeat
 		str, found = Gnosis:ExtractAndImportEncStr(str);
 	until (found == nil);
+end
+
+function Gnosis:UnregisterGlobalMouseEvents()
+	if (Gnosis.s.bUnregGlobalMouse) then
+		if (not UIParent:IsEventRegistered("GLOBAL_MOUSE_DOWN") and
+			not UIParent:IsEventRegistered("GLOBAL_MOUSE_DOWN")) then
+			if (not self.s.bHideAddonMsgs) then
+				self:Print(Gnosis.L["MsgUnregGlobalMouseNotReq"]);
+			end
+		else
+			UIParent:UnregisterEvent("GLOBAL_MOUSE_DOWN");
+			UIParent:UnregisterEvent("GLOBAL_MOUSE_UP");
+			
+			if (not self.s.bHideAddonMsgs) then
+				self:Print(Gnosis.L["MsgUnregGlobalMouse"]);
+			end
+		end
+	end
 end

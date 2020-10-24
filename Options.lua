@@ -234,8 +234,19 @@ function Gnosis:OptCreateBasicTables()
 				end,
 				width = "full",
 			},
-			rotctext = {
+			unregglobalmouse = {
 				order = 8,
+				name = Gnosis.L["OptUnregGlobalMouse"],
+				type = "toggle",
+				get = function(info) return Gnosis.s.bUnregGlobalMouse; end,
+				set = function(info,val)
+					Gnosis.s.bUnregGlobalMouse = val;
+					Gnosis:UnregisterGlobalMouseEvents();
+				end,
+				width = "full",
+			},
+			rotctext = {
+				order = 9,
 				name = Gnosis.L["OptTimerScanEveryN"],
 				type = "range",
 				min = 10, max = 1000,
@@ -246,7 +257,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			locale = {
-				order = 9,
+				order = 10,
 				name = Gnosis.L["OptLocale"],
 				type = "select",
 				values = Gnosis.LSet,
@@ -259,7 +270,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			fsframe = {
-				order = 10,
+				order = 11,
 				name = Gnosis.L["OptFirstStartFrame"],
 				type = "execute",
 				func = function()
@@ -268,7 +279,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			ccbset = {
-				order = 11,
+				order = 12,
 				name = Gnosis.L["OptCreateCBSet"],
 				type = "execute",
 				func = function()
@@ -277,7 +288,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			reanchorallbars = {
-				order = 12,
+				order = 13,
 				name = Gnosis.L["OptReanchorAllBars"],
 				type = "execute",
 				func = function()
@@ -286,7 +297,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			impbars = {
-				order = 13,
+				order = 14,
 				name = Gnosis.L["OptImportBar"],
 				type = "execute",
 				func = function()
@@ -295,7 +306,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			expbars = {
-				order = 14,
+				order = 15,
 				name = Gnosis.L["OptExportAllBars"],
 				type = "execute",
 				func = function()
@@ -304,7 +315,7 @@ function Gnosis:OptCreateBasicTables()
 				width = "full",
 			},
 			respd = {
-				order = 15,
+				order = 16,
 				name = Gnosis.L["OptResetPlayerData"],
 				type = "execute",
 				func = function()
@@ -312,7 +323,16 @@ function Gnosis:OptCreateBasicTables()
 					ReloadUI();
 				end,
 				width = "full",
-			},			
+			},
+			reloadui = {
+				order = 17,
+				name = Gnosis.L["OptReloadUI"],
+				type = "execute",
+				func = function()
+					ReloadUI();
+				end,
+				width = "full",
+			},
 		},
 	};
 
