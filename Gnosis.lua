@@ -97,11 +97,11 @@ function Gnosis:InitialConfig()
 end
 
 function Gnosis:En(status)
-	if(status) then
+	if (status) then
 		-- enable addon
 		self.bGnosisEnabled = true;
 
-		if(self.bOptionsCreated) then
+		if (self.bOptionsCreated) then
 			LibStub("AceConfig-3.0"):RegisterOptionsTable("Gnosis", self.opt);
 			LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Gnosis Castbars", self.opt_cbs);
 			LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Gnosis Channeled Spells", self.opt_css);
@@ -148,7 +148,7 @@ function Gnosis:En(status)
 		-- disable addon
 		self.bGnosisEnabled = false;
 
-		if(self.bOptionsCreated) then
+		if (self.bOptionsCreated) then
 			LibStub("AceConfig-3.0"):RegisterOptionsTable("Gnosis", self.optdisabled);
 			LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Gnosis Castbars", self.optempty);
 			LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Gnosis Channeled Spells", self.optempty);
@@ -166,15 +166,15 @@ function Gnosis:En(status)
 		self:HideAllBars();
 
 		-- blizzard castbar
-		if(self.s.bHideBlizz) then
+		if (self.s.bHideBlizz) then
 			self:HideBlizzardCastbar(false);
 		end
 		-- mirror castbar
-		if(self.s.bHideMirror) then
+		if (self.s.bHideMirror) then
 			self:HideBlizzardMirrorCastbar(false);
 		end
 		-- pet/vehicle castbar
-		if(self.s.bHidePetVeh) then
+		if (self.s.bHidePetVeh) then
 			self:HideBlizzardPetCastbar(false);
 		end
 
@@ -214,14 +214,14 @@ function Gnosis:OpenCastbarOptions()
 end
 
 function Gnosis:HideBlizzardCastbarIfStatusChange(status)
-	if(self.s.bHideBlizz ~= status) then
+	if (self.s.bHideBlizz ~= status) then
 		self.s.bHideBlizz = status;
 		self:HideBlizzardCastbar(self.s.bHideBlizz);
 	end
 end
 
 function Gnosis:HideBlizzardCastbar(status)
-	if(status) then	-- hide castbar
+	if (status) then	-- hide castbar
 		for key, value in pairs(self.tBlizzCastbar) do
 			if(CastingBarFrame:IsEventRegistered(value)) then
 				table_insert(self.blizzcastbar, value);
@@ -229,7 +229,7 @@ function Gnosis:HideBlizzardCastbar(status)
 			end			
 		end
 		
-		if(#self.blizzcastbar > 0) then
+		if (#self.blizzcastbar > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgDisBlizCB"]);
 			end
@@ -243,7 +243,7 @@ function Gnosis:HideBlizzardCastbar(status)
 			CastingBarFrame:RegisterEvent(value);
 		end
 		
-		if(#self.blizzcastbar > 0) then
+		if (#self.blizzcastbar > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgBlizCBRestored"]);
 			end
@@ -253,25 +253,25 @@ function Gnosis:HideBlizzardCastbar(status)
 end
 
 function Gnosis:HideBlizzardPetCastbarIfStatusChange(status)
-	if(status == nil) then
+	if (status == nil) then
 		status = false;
 	end
 
-	if(self.s.bHidePetVeh ~= status) then
+	if (self.s.bHidePetVeh ~= status) then
 		self.s.bHidePetVeh = status;
 		self:HideBlizzardPetCastbar(self.s.bHidePetVeh);
 	end
 end
 
 function Gnosis:HideBlizzardMirrorCastbarIfStatusChange(status)
-	if(self.s.bHideMirror ~= status) then
+	if (self.s.bHideMirror ~= status) then
 		self.s.bHideMirror = status;
 		self:HideBlizzardMirrorCastbar(self.s.bHideMirror);
 	end
 end
 
 function Gnosis:HideBlizzardPetCastbar(status)
-	if(status) then	-- hide pet castbar
+	if (status) then	-- hide pet castbar
 		for key, value in pairs(self.tBlizzCastbar) do
 			if(PetCastingBarFrame:IsEventRegistered(value)) then
 				table_insert(self.petcastbar, value);
@@ -279,7 +279,7 @@ function Gnosis:HideBlizzardPetCastbar(status)
 			end			
 		end
 		
-		if(#self.petcastbar > 0) then
+		if (#self.petcastbar > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgDisPetCB"]);
 			end
@@ -293,7 +293,7 @@ function Gnosis:HideBlizzardPetCastbar(status)
 			PetCastingBarFrame:RegisterEvent(value);
 		end
 		
-		if(#self.petcastbar > 0) then
+		if (#self.petcastbar > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgPetCBRestored"]);
 			end
@@ -304,7 +304,7 @@ function Gnosis:HideBlizzardPetCastbar(status)
 end
 
 function Gnosis:HideBlizzardMirrorCastbar(status)
-	if(status) then	-- hide castbar
+	if (status) then	-- hide castbar
 		for key, value in pairs(self.tBlizzMirrorUiParent) do
 			if(UIParent:IsEventRegistered(value)) then
 				table_insert(self.blizzmirroruiparent, value);
@@ -331,7 +331,7 @@ function Gnosis:HideBlizzardMirrorCastbar(status)
 		MirrorTimer2:Hide();
 		MirrorTimer3:Hide();
 		
-		if(#self.blizzmirroruiparent > 0) then
+		if (#self.blizzmirroruiparent > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgDisMirrCB"]);
 			end
@@ -354,7 +354,7 @@ function Gnosis:HideBlizzardMirrorCastbar(status)
 			MirrorTimer3:RegisterEvent(value);
 		end
 		
-		if(#self.blizzmirroruiparent > 0) then
+		if (#self.blizzmirroruiparent > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgMirrCBRestored"]);
 			end
@@ -369,42 +369,42 @@ end
 
 function Gnosis:OnInitialize()
 	local unitkey = UnitName("player") .. " - " .. GetRealmName();
-	if(GnosisDB and GnosisDB.profiles and GnosisDB.profiles[unitkey] and
+	if (GnosisDB and GnosisDB.profiles and GnosisDB.profiles[unitkey] and
 		GnosisDB.profileKeys and GnosisDB.profileKeys[unitkey]) then
 		-- copy to new char only based profile (to heavily cut down on mem usage)
-		if(not GnosisChar) then GnosisChar = {}; end
-		if(not GnosisChar.profileKeys) then GnosisChar.profileKeys = {}; end
-		if(not GnosisChar.profiles) then GnosisChar.profiles = {}; end
+		if (not GnosisChar) then GnosisChar = {}; end
+		if (not GnosisChar.profileKeys) then GnosisChar.profileKeys = {}; end
+		if (not GnosisChar.profiles) then GnosisChar.profiles = {}; end
 		GnosisChar.profileKeys[unitkey] = unitkey;
 		GnosisChar.profiles[unitkey] = self:deepcopy(GnosisDB.profiles[unitkey]);
 		GnosisDB.profileKeys[unitkey] = nil;
 		GnosisDB.profiles[unitkey] = nil;
 
 		-- fully remove from db if empty
-		if(self:tsize(GnosisDB.profiles) == 0) then
+		if (self:tsize(GnosisDB.profiles) == 0) then
 			GnosisDB.profiles = nil;
 		end
-		if(self:tsize(GnosisDB.profileKeys) == 0) then
+		if (self:tsize(GnosisDB.profileKeys) == 0) then
 			GnosisDB.profileKeys = nil;
 		end
 	end
 
 	-- remove character specific profile name in character specific configuration file
-	if(not GnosisCharConfig) then
+	if (not GnosisCharConfig) then
 		GnosisCharConfig = {};
 		
 		self.db = LibStub("AceDB-3.0"):New("GnosisChar", defaults);	
-		if(self.db and self.db.profile and self:tsize(self.db.profile) > 0) then
+		if (self.db and self.db.profile and self:tsize(self.db.profile) > 0) then
 			-- copy AceDB profile to GnosisCharConfig
 			GnosisCharConfig = self:deepcopy(self.db.profile);
 		end
-	elseif(self:tsize(GnosisCharConfig) == 0) then
+	elseif (self:tsize(GnosisCharConfig) == 0) then
 		self.db = LibStub("AceDB-3.0"):New("GnosisChar", defaults);	
 		if(self.db and self.db.profile and self:tsize(self.db.profile) > 0) then
 			-- copy AceDB profile to GnosisCharConfig
 			GnosisCharConfig = self:deepcopy(self.db.profile);
 		end
-	elseif(self:tsize(GnosisCharConfig) > 0 and GnosisChar) then
+	elseif (self:tsize(GnosisCharConfig) > 0 and GnosisChar) then
 		-- empty GnosisChar table (removing AceDB character specific profile)
 		wipe(GnosisChar);
 		GnosisChar = nil;
@@ -481,9 +481,9 @@ function Gnosis:OnEnable()
 	self:SetupHooks();
 
 	-- load localization
-	if(not self.s.strLocale and self.LSet[GetLocale()]) then
+	if (not self.s.strLocale and self.LSet[GetLocale()]) then
 		self.s.strLocale = GetLocale();
-	elseif(not self.s.strLocale) then
+	elseif (not self.s.strLocale) then
 		self.s.strLocale = "default";
 	end
 	self:SetupLocale();
@@ -492,7 +492,7 @@ function Gnosis:OnEnable()
 	self:OptCreateBasicTables();
 
 	-- set default saved variables
-	if(self.s.bAddonEn == nil) then
+	if (self.s.bAddonEn == nil) then
 		self.s.optver = self.optver;
 	end
 	for key, value in pairs(self.tDefaults) do
@@ -512,7 +512,7 @@ function Gnosis:OnEnable()
 	end
 	
 	
-	if(not self.s.bHideAddonMsgs) then
+	if (not self.s.bHideAddonMsgs) then
 		self:Print(self.title .. " " .. Gnosis.L["MsgLoaded"] .. " " .. (self.s.bAddonEn and Gnosis.L["MsgEn"] or Gnosis.L["MsgDis"]));
 	end
 
@@ -520,7 +520,7 @@ function Gnosis:OnEnable()
 	self:CheckStoredCastbarOptions();
 	
 	-- upgrade character specific options version number?
-	if(self.s.optver < self.optver) then
+	if (self.s.optver < self.optver) then
 		self.s.optver = self.optver;
 	end
 
@@ -534,7 +534,7 @@ function Gnosis:OnEnable()
 	self:SetupChanneledSpellsTable();
 
 	-- create castbar options table
-	if(self.s.bAutoCreateOptions or bFirstStart) then
+	if (self.s.bAutoCreateOptions or bFirstStart) then
 		self.bOptionsCreated = true;
 
 		self:CreateCastbarsOpt();
@@ -557,7 +557,7 @@ function Gnosis:OnEnable()
 end
 
 function Gnosis:CreateOptions()
-	if(not self.bOptionsCreated) then
+	if (not self.bOptionsCreated) then
 		self.bOptionsCreated = true;
 		self:CreateCastbarsOpt();
 		self:CreateChannelSpellsOpt();
@@ -565,7 +565,7 @@ function Gnosis:CreateOptions()
 		self:OptCreateConfigurations();
 	end
 
-	if(self.bGnosisEnabled) then
+	if (self.bGnosisEnabled) then
 		LibStub("AceConfig-3.0"):RegisterOptionsTable("Gnosis", self.opt);
 		LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Gnosis Castbars", self.opt_cbs);
 		LibStub("AceConfigRegistry-3.0"):RegisterOptionsTable("Gnosis Channeled Spells", self.opt_css);
@@ -582,7 +582,7 @@ end
 
 function Gnosis:HandleChatCommand(cmd)
 	local subcmd = string_match(cmd, "(%w+)");
-	if(subcmd and subcmd == "reanchor") then
+	if (subcmd and subcmd == "reanchor") then
 		Gnosis:UIScaleUpdate();
 	elseif(subcmd and subcmd == "load") then
 		subcmd = string_match(cmd, "load (.+)");
@@ -686,15 +686,15 @@ end
 
 function Gnosis:AddChanneledSpellByName(name, tickcount, bdoaddticks, bars, binit, baoe, school, bheal, iUpdate)
 	local tx = "";
-	if(name) then
-		if(bheal) then
-			if(baoe) then
+	if (name) then
+		if (bheal) then
+			if (baoe) then
 				tx = "col<0,1,0>(spellname) [tickscrits] +eh <oh> col<pre>dps HPShittext< Hits>crittext< Crits>ticktext< Ticks>";
 			else
 				tx = "col<0,1,0>(spellname - col<1,1,1>col<class>targetcol<cpre>col<pre>col<0,1,0>) [tickscrits] +eh <oh> col<pre>dps HPShittext< Hits>crittext< Crits>ticktext< Ticks>";
 			end
 		else
-			if(school) then
+			if (school) then
 				tx = "col<" .. school .. ">dmg col<pre>col<1,1,0>(spellname) [tickscrits]col<pre>clipped dps DPScliptext<(Clipped) >hittext< Hits>crittext< Crits>ticktext< Ticks>";
 			else
 				tx = "dmg col<1,1,0>(spellname) [tickscrits]col<pre>clipped dps DPScliptext<(Clipped) >hittext< Hits>crittext< Crits>ticktext< Ticks>";
@@ -705,7 +705,7 @@ function Gnosis:AddChanneledSpellByName(name, tickcount, bdoaddticks, bars, bini
 		local bStoredcombattext = false;
 
 		-- update existing
-		if(iUpdate and self.s.channeledspells[name] and (self.s.channeledspells[name].iupdate == nil or self.s.channeledspells[name].iupdate < iUpdate)) then
+		if (iUpdate and self.s.channeledspells[name] and (self.s.channeledspells[name].iupdate == nil or self.s.channeledspells[name].iupdate < iUpdate)) then
 			bStoredcliptest = self.s.channeledspells[name] and self.s.channeledspells[name].bcliptest or false;
 			bStoredcombattext = self.s.channeledspells[name] and self.s.channeledspells[name].bcombattext or false;
 			tx = self.s.channeledspells[name] and self.s.channeledspells[name].ctstring or tx;
@@ -713,7 +713,7 @@ function Gnosis:AddChanneledSpellByName(name, tickcount, bdoaddticks, bars, bini
 		end
 
 		-- do not overwrite (possibly user edited) entry
-		if(self.s.channeledspells[name] == nil) then
+		if (self.s.channeledspells[name] == nil) then
 			self.s.channeledspells[name] = {
 				ben = true,
 				ticks = tickcount,
@@ -780,7 +780,7 @@ function Gnosis:SetupChanneledSpellsTable()
 end
 
 function Gnosis:CreateColorString(r, g, b, a)
-	if(not (tonumber(r) and tonumber(g) and tonumber(b) and tonumber (a))) then
+	if (not (tonumber(r) and tonumber(g) and tonumber(b) and tonumber (a))) then
 		return "";
 	end
 
@@ -793,7 +793,7 @@ function Gnosis:GetCoordinatesFromString(str)
 
 	local x, y = string_match(str, ".-([%+%-%.%d]+).-([%+%-%.%d]+)");
 
-	if(not(x and y and tonumber(x) and tonumber(y))) then
+	if (not(x and y and tonumber(x) and tonumber(y))) then
 		return 0.0, 0.0;
 	else
 		return tonumber(x), tonumber(y);
@@ -811,7 +811,7 @@ function Gnosis:StringToScreenPercentage(str)
 
 	local x, y = string_match(str, ".-([%+%-%.%d]+).-([%+%-%.%d]+)");
 
-	if(not(x and y and tonumber(x) and tonumber(y))) then
+	if (not(x and y and tonumber(x) and tonumber(y))) then
 		return 0.0, 0.0;
 	else
 		local uis = UIParent:GetEffectiveScale();
@@ -828,11 +828,11 @@ function Gnosis:GetColorsFromString(str, dst)
 	);
 
 	r, g, b, a = tonumber(r), tonumber(g), tonumber(b), tonumber(a);
-	if(not a) then
+	if (not a) then
 		r, g, b, a = nil, nil, nil, nil;
 	end
 
-	if(dst and r) then
+	if (dst and r) then
 		dst.r, dst.g, dst.b, dst.a = r, g, b, a;
 	end
 
@@ -841,11 +841,11 @@ end
 
 local RCS_strClass = "";
 local function ReplaceColorsStrings_GSubFunc(sub)
-	if(sub == "pre" or sub == "prev") then
+	if (sub == "pre" or sub == "prev") then
 		return "|r";
-	elseif(sub == "cpre") then
+	elseif (sub == "cpre") then
 		return RCS_strClass and "|r" or "";
-	elseif(sub == "class" and not RCS_strClass) then
+	elseif (sub == "class" and not RCS_strClass) then
 		return "";
 	end
 
@@ -905,7 +905,7 @@ function Gnosis:GenerateCombattext(cc, cs, bClip)
 	-- hits, crits, ticks, dmg, dps, clipped
 	local dpstime = (cc.freqtest and min(cc.freqtest-cc.starttime,cc.duration) or cc.duration) / 1000;
 	local tickscrits = string_format("%d%s", cc.ticks + cc.mastery, tick);
-	if(cc.crits > 0) then tickscrits = string_format("%s, %d%s", tickscrits, cc.crits, crit); end
+	if (cc.crits > 0) then tickscrits = string_format("%s, %d%s", tickscrits, cc.crits, crit); end
 
 	str = string_gsub(str, "tickscrits", tickscrits);
 	str = string_gsub(str, "spellname", string_format("%s", cc.spell));
@@ -917,7 +917,7 @@ function Gnosis:GenerateCombattext(cc, cs, bClip)
 	str = string_gsub(str, "eh", string_format("%d", cc.eh));
 	str = string_gsub(str, "oh", string_format("%d", cc.oh));
 	str = string_gsub(str, "target", cc.target or "");
-	if(bClip)	then
+	if (bClip)	then
 		str = string_gsub(str, "clipped", clipped);
 	else
 		str = string_gsub(str, "clipped", "");
@@ -926,24 +926,24 @@ function Gnosis:GenerateCombattext(cc, cs, bClip)
 	-- string ready for combat text output
 	local strTex = nil;
 	local bSticky = nil;
-	if(cs.bicon) then strTex = cc.texture; end
-	if(cs.bsticky and bClip) then bSticky = true; end
+	if (cs.bicon) then strTex = cc.texture; end
+	if (cs.bsticky and bClip) then bSticky = true; end
 
 	-- font size
 	local fs = nil;
-	if(bClip and cs.fontsizeclip > 0) then
+	if (bClip and cs.fontsizeclip > 0) then
 		fs = cs.fontsizeclip;
-	elseif(not bClip and cs.fontsizenclip > 0) then
+	elseif (not bClip and cs.fontsizenclip > 0) then
 		fs = cs.fontsizenclip;
 	end
 
-	if(self.s.ct.addon == "MSBT" and MikSBT and MikSBT.IsModDisabled() == nil) then
+	if (self.s.ct.addon == "MSBT" and MikSBT and MikSBT.IsModDisabled() == nil) then
 		MikSBT.DisplayMessage(str, MikSBT.DISPLAYTYPE_OUTGOING, bSticky, nil, nil, nil, fs, nil, nil, strTex);
-	elseif(self.s.ct.addon == "SCT" and SCT and (cc.type or SCTD)) then
+	elseif (self.s.ct.addon == "SCT" and SCT and (cc.type or SCTD)) then
 		SCT:DisplayText(str, nil, bSticky, "damage", cc.type and SCT.FRAME2 or SCT.FRAME3, nil, nil, strTex);
-	elseif(self.s.ct.addon == "Parrot" and Parrot) then
+	elseif (self.s.ct.addon == "Parrot" and Parrot) then
 		Parrot:ShowMessage(str, "Outgoing", bSticky, 1, 1, 1, nil, fs, nil, strTex);
-	elseif(self.s.ct.addon == "Blizz" and tostring(SHOW_COMBAT_TEXT) ~= "0") then
+	elseif (self.s.ct.addon == "Blizz" and tostring(SHOW_COMBAT_TEXT) ~= "0") then
 		CombatText_AddMessage(str, CombatText_StandardScroll, 1, 1, 1, bSticky, false);
 	end
 end
@@ -954,7 +954,7 @@ function Gnosis:SetupChannelData()
 	local name, displayName, texture, startTime, endTime = UnitChannelInfo("player");
 
 	local cs = self.s.channeledspells[name];
-	if(cs and cs.ben and (cs.bcliptest or cs.bcombattext or cs.bticksound)) then
+	if (cs and cs.ben and (cs.bcliptest or cs.bcombattext or cs.bticksound)) then
 		local cc = {};
 		local totalticks = cs.ticks;
 		local noninitticks = cs.binit and (totalticks-1) or totalticks;
@@ -998,7 +998,7 @@ function Gnosis:SetupChannelData()
 			idx = idx - 1;
 		end
 
-		if(self.curchannel) then
+		if (self.curchannel) then
 			self.nextchannel = cc;
 		else
 			self.curchannel = cc;
@@ -1010,7 +1010,7 @@ function Gnosis:RequestClipTest()
 	local fCurTime = GetTime() * 1000.0;
 
 	local cc, nc = self.curchannel, self.nextchannel;
-	if(cc) then
+	if (cc) then
 		cc.freqtest = cc.freqtest and min(cc.freqtest,fCurTime) or fCurTime;
 		cc.fforcedtest = cc.fforcedtest and min(cc.fforcedtest,fCurTime + self.s.wfcl) or (fCurTime + self.s.wfcl);
 	end
@@ -1021,18 +1021,18 @@ function Gnosis:UpdateClipTest()
 	local cc = (self.nextchannel and self.nextchannel.spell == spell) and self.nextchannel or
 		((self.curchannel and self.curchannel.spell == spell) and self.curchannel or nil);
 
-	if(cc) then
+	if (cc) then
 		local fspb = endTime - cc.endtime;
 		cc.endtime = endTime;
 		cc.testtime = cc.testtime + fspb;
 
-		if(fspb > 0) then
+		if (fspb > 0) then
 			-- chain channeling
 			for i = 1, cc.maxticks do
 				cc.tticks[i] = cc.tticks[i] + fspb;
 			end
 			cc.duration = cc.duration + fspb;
-		elseif(fspb < 0) then
+		elseif (fspb < 0) then
 			local max_ = cc.maxticks;
 			for i = 1, max_ do
 				if(cc.tticks[i] > cc.endtime) then
@@ -1062,18 +1062,18 @@ end
 function Gnosis:ClipTest(fCurTime)
 	local cc, nc = self.curchannel, self.nextchannel;
 
-	if(cc) then
+	if (cc) then
 		local cs = self.s.channeledspells[cc.spell];
 		local bClip, bOutput = false, false;
 
-		if((not cs.baoe and cc.ticks == cc.maxticks) or fCurTime >= cc.testtime) then
+		if ((not cs.baoe and cc.ticks == cc.maxticks) or fCurTime >= cc.testtime) then
 			-- check spell out, no clipping
 			bOutput = true;
-		elseif(cc.fforcedtest and fCurTime >= cc.fforcedtest) then	-- clip test requested
+		elseif (cc.fforcedtest and fCurTime >= cc.fforcedtest) then	-- clip test requested
 			bOutput = true;
 			-- test for clipping
-			if(cs.bcliptest and not cs.baoe) then
-				if(cc.tticks[cc.ticks+1] and (cc.tticks[cc.ticks+1] - cc.freqtest) <= self.s.ctt) then
+			if (cs.bcliptest and not cs.baoe) then
+				if (cc.tticks[cc.ticks+1] and (cc.tticks[cc.ticks+1] - cc.freqtest) <= self.s.ctt) then
 					-- unintentional clipping detected, do not output as clip if player had no target when clip test was requested
 					local tarname = UnitName("target");
 					if((not nc or nc.spellname ~= cc.spellname) and tarname and not UnitIsDead("target")) then
@@ -1083,13 +1083,13 @@ function Gnosis:ClipTest(fCurTime)
 			end
  		end
 
-		if(bOutput) then
+		if (bOutput) then
 			-- play clip sound and output to combat text
-			if(bClip and cs.bcliptest and not cs.bticksound) then
+			if (bClip and cs.bcliptest and not cs.bticksound) then
 				self:PlaySounds();
 			end
 
-			if(cs.bcombattext and cc.ticks > 0) then
+			if (cs.bcombattext and cc.ticks > 0) then
 				self:GenerateCombattext(cc, cs, bClip);
 			end
 
@@ -1099,7 +1099,7 @@ function Gnosis:ClipTest(fCurTime)
 			self.nextchannel = nil;
 		end
 
-	elseif(nc) then
+	elseif (nc) then
 		self.curchannel = nil;
 		self.curchannel = self.nextchannel;
 		self.nextchannel = nil;
@@ -1110,7 +1110,7 @@ function Gnosis:AddCustomBar(name, unit, width, height, scale, movefactor_y, mov
 	local fScale = UIParent:GetScale();
 	local cfg;
 
-	if(self.s.cbconf[name]) then
+	if (self.s.cbconf[name]) then
 		self:RemoveCastbar(name);
 	end
 
@@ -1180,7 +1180,7 @@ end
 
 function Gnosis:tsize(t)
 	local i = 0;
-	if(t and type(t) == "table") then
+	if (t and type(t) == "table") then
 		for k, v in pairs(t) do
 			i = i + 1;
 		end
@@ -1190,12 +1190,12 @@ function Gnosis:tsize(t)
 end
 
 function Gnosis:CheckForFirstStart(bForce)
-	if(self.s.bAddonEn and (bForce or ((not Gnosis.s) or self:tsize(Gnosis.s.cbconf) == 0))) then
+	if (self.s.bAddonEn and (bForce or ((not Gnosis.s) or self:tsize(Gnosis.s.cbconf) == 0))) then
 		-- create window
 		local f = self.gui:Create("Window");
 
 		local _, uc = UnitClass("player");
-		if(UnitLevel("player") == 1 or (uc == "DEATHKNIGHT" and UnitLevel("player") == 55)) then
+		if (UnitLevel("player") == 1 or (uc == "DEATHKNIGHT" and UnitLevel("player") == 55)) then
 			-- probably newly created char, don't release widget for OnClose callback,
 			-- otherwise window will be gone after the intro sequence
 			f:SetCallback("OnClose", function(w) end);
@@ -1210,7 +1210,7 @@ function Gnosis:CheckForFirstStart(bForce)
 		f:SetFullHeight(true);
 
 		local h1 = self.gui:Create("Heading");
-		if((not Gnosis.s) or self:tsize(Gnosis.s.cbconf) == 0) then
+		if ((not Gnosis.s) or self:tsize(Gnosis.s.cbconf) == 0) then
 			h1:SetText(Gnosis.L["IfNoCBs"]);
 		end
 		h1.width = "fill";
@@ -1242,7 +1242,7 @@ function Gnosis:CheckForFirstStart(bForce)
 		);
 		f:AddChild(btnLCS);
 
-		if(self:tsize(GnosisConfigs) > 0) then
+		if (self:tsize(GnosisConfigs) > 0) then
 			local h2 = self.gui:Create("Heading");
 			h2:SetText(Gnosis.L["IfConfigs"]);
 			h2.width = "fill";
