@@ -741,44 +741,45 @@ function Gnosis:AddChanneledSpellById(id, tickcount, bdoaddticks, bars, binit, b
 end
 
 function Gnosis:SetupChanneledSpellsTable()
-	-- spellid, #ticks, addticks, #shown ticks, first tick instant,
-	-- multi mob (no clipping detection), spellschool, isheal, upgrade_num
+	-- spellid, #ticks, addticks, #shown ticks, first tick instant, multi mob (no clipping detection), spellschool, isheal, upgrade_num
 
 	-- priest
 	if (wowclassic) then
 		self:AddChanneledSpellById(15407, 3, false, 4, false, false, "shadow", false, 4);	-- mind flay
 	else
-		self:AddChanneledSpellById(15407, 4, false, 5, false, false, "shadow", false, 3);	-- mind flay
+		self:AddChanneledSpellById(15407, 6, false, 7, false, false, "shadow", false, 3);	-- mind flay
 	end
-	self:AddChanneledSpellById(48045, 4, false, 5, false, true, "shadow", false, 3); 	-- mind sear
+	self:AddChanneledSpellById(48045, 6, false, 7, false, true, "shadow", false, 3); 	-- mind sear
 	self:AddChanneledSpellById(47540, 3, false, 2, true, false, "holy", true, 1);		-- penance, first tick instant
 	self:AddChanneledSpellById(64843, 4, false, 15, false, true, "holy", true, 4);		-- divine hymn
 	
 	-- mage
-	self:AddChanneledSpellById(10, 8, false, 15, false, true, "frost", false, 2);		-- blizzard
+	if (wowclassic) then
+		self:AddChanneledSpellById(10, 8, false, 15, false, true, "frost", false, 2);		-- blizzard
+	end
 	self:AddChanneledSpellById(5143, 5, false, 6, false, false, "arcane", false, 2);	-- arcane missiles
-	self:AddChanneledSpellById(12051, 4, false, 3, true, false, "arcane", false, 2);	-- evocation
+	self:AddChanneledSpellById(12051, 6, false, 7, true, false, "arcane", false, 2);	-- evocation
 
 	-- warlock
 	if (wowclassic) then
+		self:AddChanneledSpellById(689, 6, false, 15, false, false, "shadow", false, 3);	-- drain life
 		self:AddChanneledSpellById(1120, 4, false, 5, false, false, "shadow", false, 4);	-- drain soul
+		self:AddChanneledSpellById(4629, 6, false, 15, false, true, "fire", false, 3);		-- rain of fire
 	else
+		self:AddChanneledSpellById(234153, 5, false, 6, false, false, "shadow", false, 3);	-- drain life
 		self:AddChanneledSpellById(198590, 5, false, 6, false, false, "shadow", false, 4);	-- drain soul
 	end
-	self:AddChanneledSpellById(689, 6, false, 15, false, false, "shadow", false, 3);	-- drain life
-	self:AddChanneledSpellById(108371, 6, false, 15, false, true, "shadow", false, 1);	-- harvest life
-	self:AddChanneledSpellById(4629, 6, false, 15, false, true, "fire", false, 3);		-- rain of fire
-	self:AddChanneledSpellById(1949, 15, false, 15, true, true, "fire", false, 3);		-- hellfire, first tick instant
 	self:AddChanneledSpellById(755, 6, false, 6, false, false, "shadow", false, 3);		-- health funnel
-	self:AddChanneledSpellById(103103, 4, false, 5, false, false, "shadow", false, 1);	-- malefic grasp
-
+	
 	-- druid
 	self:AddChanneledSpellById(740, 4, false, 15, false, true, "nature", true, 3);		-- tranquility
-	self:AddChanneledSpellById(16914, 10, false, 15, false, true, "nature", false, 2);	-- hurricane
+	if (wowclassic) then
+		self:AddChanneledSpellById(16914, 10, false, 15, false, true, "nature", false, 2);	-- hurricane
+	end
 	
 	-- monk
-	self:AddChanneledSpellById(113656, 5, false, 4, true, true, "physical", false, 1);	-- fists of fury, first tick instant, aoe
-	self:AddChanneledSpellById(115175, 8, false, 11, false, false, "nature", true, 3);	-- soothing mist
+	self:AddChanneledSpellById(113656, 20, false, 21, true, true, "physical", false, 1);	-- fists of fury, first tick instant, aoe
+	self:AddChanneledSpellById(115175, 8, false, 9, false, false, "nature", true, 3);	-- soothing mist
 end
 
 function Gnosis:CreateColorString(r, g, b, a)
