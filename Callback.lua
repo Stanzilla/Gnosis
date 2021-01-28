@@ -26,7 +26,7 @@ if (wowclassic and Gnosis.libclcno) then
 	UnitCastingInfo = function(unit)
 		return Gnosis.libclcno:UnitCastingInfo(unit);
 	end
-	
+
 	UnitChannelInfo = function(unit)
 		return Gnosis.libclcno:UnitChannelInfo(unit);
 	end
@@ -685,12 +685,12 @@ function Gnosis:SafeGetSpecialization()
 	if (wowclassic) then
 		return 1;
 	end
-	
+
 	-- get current specialization
-	local currentspec = GetSpecialization();	
-	
+	local currentspec = GetSpecialization();
+
 	-- set to 1 in case GetSpecialization() returns nil or 5
-	-- GetSpecialization() returns 5 for newly created players since 9.0.1	
+	-- GetSpecialization() returns 5 for newly created players since 9.0.1
 	if (not currentspec or currentspec > 4) then
 		return 1;
 	else

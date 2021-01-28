@@ -33,7 +33,7 @@ function Gnosis:OptCreateBasicTables()
 	};
 
 	Gnosis.tSpecs = { [0] = "1 & 2 & 3 & 4", [1] = "1", [2] = "2", [3] = "3", [4] = "4", [5] = Gnosis.L["tSpecsSelectSpec"] };
-	
+
 	Gnosis.tBarTypes = { cb = Gnosis.L["BT_Castbar"], ti = Gnosis.L["BT_MSTimer"] };
 
 	Gnosis.fontoutlines = { ["NONE"] = Gnosis.L["TabCapNONE"], ["OUTLINE"] = "OUTLINE", ["THICKOUTLINE"] = "THICKOUTLINE", ["MONOCHROME"] = "MONOCHROME", ["OUTLINE, MONOCHROME"] = "OUTLINE, MONOCHROME", ["THICKOUTLINE, MONOCHROME"] = "THICKOUTLINE, MONOCHROME" };
@@ -43,7 +43,7 @@ function Gnosis:OptCreateBasicTables()
 	Gnosis.tAlignName = { LEFT = Gnosis.L["TabCapLEFT"], CENTER = Gnosis.L["TabCapCENTER"], RIGHT = Gnosis.L["TabCapRIGHT"] };
 	Gnosis.tAlignTime = { LEFT = Gnosis.L["TabCapLEFT"], CENTER = Gnosis.L["TabCapCENTER"], RIGHT = Gnosis.L["TabCapRIGHT"] };
 	Gnosis.tAlignLat = { LEFT = Gnosis.L["TabCapLEFT"], RIGHT = Gnosis.L["TabCapRIGHT"], ADAPT = Gnosis.L["TabAdaptToCT"] };
-	
+
 	Gnosis.tStrata = {
 		BACKGROUND = Gnosis.L["Strata_BACK"],
 		LOW = Gnosis.L["Strata_LOW"],
@@ -56,7 +56,7 @@ function Gnosis:OptCreateBasicTables()
 		[1] = Gnosis.L["Horizontal"],
 		[2] = Gnosis.L["Vertical"],
 	};
-	
+
 	Gnosis.tPremadeNfsDisplay = {
 		[1] = Gnosis.L["PremadeNfs1"],
 		[2] = Gnosis.L["PremadeNfs2"],
@@ -413,7 +413,7 @@ function Gnosis:OptCreateCTpage()
 					type = "toggle",
 					get = function(info) return Gnosis.s.ct.bmusic; end,
 					set = function(info,val) Gnosis.s.ct.bmusic = val; end,
-				},		
+				},
 				music = {
 					order = 5,
 					name = Gnosis.L["OptMusic"],
@@ -424,7 +424,7 @@ function Gnosis:OptCreateCTpage()
 					set = function(info,val) Gnosis.s.ct.music = val; end,
 					style = "dropdown",
 					width = "double",
-				},		
+				},
 				playmusic = {
 					order = 6,
 					name = Gnosis.L["OptPlayMusic"],
@@ -506,7 +506,7 @@ function Gnosis:OptCreateCTpage()
 					width = "full",
 				},
 			},
-		},			
+		},
 	};
 end
 
@@ -519,14 +519,14 @@ function Gnosis:OptCreateNewCastbar(passedname, passedunit)
 		self:Print(self.L["OptCreatenewbarExists"]);
 	else
 		self.s.cbconf[name] = self:CreateDefaultBarTable(passedunit and passedunit or "player");
-		
+
 		if (IsShiftKeyDown()) then
 			-- convert to icon-like bar
 			for k, v in pairs(self.tIconLikeOverrides) do
 				self.s.cbconf[name][k] = v;
 			end
 		end
-		
+
 		self.castbars[name] = self:CreateBarFrame(name, nil, 0, 1.0);
 		self:SetBarParams(name);
 
@@ -554,7 +554,7 @@ end
 
 function Gnosis:OptCreateNewChanneledSpell()
 	local id = tonumber(self.s.nameNewSpell);
-	
+
 	if(id == nil) then
 		self:AddChanneledSpellByName(self.s.nameNewSpell, 1, false, 1, false, false);
 	else
@@ -582,7 +582,7 @@ function Gnosis:CreateChannelSpellsOpt()
 		get = function(info) return Gnosis.s.nameNewSpell; end,
 		set = function(info,val) Gnosis.s.nameNewSpell = val; end,
 	};
-	
+
 	-- created sorted table
 	local tSorted = {};
 	for key, value in pairs(self.s.channeledspells) do
@@ -762,7 +762,7 @@ function Gnosis:CreateCastbarsOpt()
 		table_insert(tSorted, key);
 	end
 	table_sort(tSorted);
-	
+
 	-- new bar button
 	tCBs.newbarbutton = {
 		order = 1,
@@ -781,7 +781,7 @@ function Gnosis:CreateCastbarsOpt()
 		get = function(info) return Gnosis.s.nameNewBar; end,
 		set = function(info,val) Gnosis.s.nameNewBar = val; end,
 	};
-	
+
 	-- lock all bars button
 	tCBs.lockallbars = {
 		order = 3,
@@ -797,14 +797,14 @@ function Gnosis:CreateCastbarsOpt()
 					bDidLock = true;
 				end
 			end
-			
+
 			if (bDidLock) then
 				self:CreateCastbarsOpt();
 			end
 		end,
 		width = "half",
 	};
-	
+
 	-- unlock all bars button
 	tCBs.unlockallbars = {
 		order = 4,
@@ -820,14 +820,14 @@ function Gnosis:CreateCastbarsOpt()
 					bDidUnlock = true;
 				end
 			end
-			
+
 			if (bDidUnlock) then
 				self:CreateCastbarsOpt();
 			end
 		end,
 		width = "half",
 	};
-	
+
 	for keyindex, key in ipairs(tSorted) do
 		iCount = iCount + 1;
 		tCBs[key] = {
@@ -887,7 +887,7 @@ function Gnosis:CreateCastbarsOpt()
 					type = "execute",
 					func = function() Gnosis:ExportBarChatlink(key); end,
 					width = "full",
-				},				
+				},
 				removecb = {
 					order = self:GetNextTableIndex(),
 					name = Gnosis.L["OptCBRemCB"],
@@ -932,7 +932,7 @@ function Gnosis:CreateCastbarsOpt()
 						return Gnosis:TableToCommaSeparatedNumbers(Gnosis.s.cbconf[key].spectab);
 					end,
 					set = function(info,val)
-						Gnosis.s.cbconf[key].spectab = 
+						Gnosis.s.cbconf[key].spectab =
 							Gnosis:CommaSeparatedNumbersToTable(val, 1, 4);
 						Gnosis:SetBarParams(key);
 					end,
@@ -946,7 +946,7 @@ function Gnosis:CreateCastbarsOpt()
 					get = function(info) return 5; end,
 					set = function(info,val)
 						local specstr = (val >= 1 and val <= 4) and ("" .. val) or "1,2,3,4";
-						Gnosis.s.cbconf[key].spectab = 
+						Gnosis.s.cbconf[key].spectab =
 							Gnosis:CommaSeparatedNumbersToTable(specstr, 1, 4);
 						Gnosis:SetBarParams(key);
 						Gnosis:CreateCBTables();
@@ -1379,7 +1379,7 @@ function Gnosis:CreateCastbarsOpt()
 							get = function(info) return Gnosis.s.cbconf[key].latbarsize; end,
 							set = function(info,val) Gnosis.s.cbconf[key].latbarsize = val; end,
 							isPercent = true,
-						},						
+						},
 						baralpha = {
 							order = self:GetNextTableIndex(),
 							name = Gnosis.L["OptCBAlpha"],
@@ -1734,7 +1734,7 @@ function Gnosis:LoadConfig(name, bMainTab, bCastbars, bChanneledSpells, bClipTes
 			Gnosis.s.bAutoCreateOptions = c.bAutoCreateOptions == nil and Gnosis.tDefaults.bAutoCreateOptions or c.bAutoCreateOptions;
 			Gnosis.s.iTimerScanEvery = c.iTimerScanEvery == nil and Gnosis.tDefaults.iTimerScanEvery or c.iTimerScanEvery;
 			Gnosis.s.bResizeOptions = c.bResizeOptions == nil and Gnosis.tDefaults.bResizeOptions or c.bResizeOptions;
-			
+
 			local strLocale = c.strLocale and c.strLocale or nil;
 			if(strLocale and Gnosis.s.strLocale ~= strLocale) then
 				Gnosis.s.strLocale = strLocale;
@@ -1895,7 +1895,7 @@ function Gnosis:OptCreateConfigurations()
 				Gnosis.dialog:Register("GNOSIS_UPDCFG",
 					{
 						text = string_format(Gnosis.L["OptConfUpdConfMBText"], key),
-						buttons = { 
+						buttons = {
 							{
 								text = Gnosis.L["Yes"],
 								on_click = function(self)
@@ -1922,7 +1922,7 @@ function Gnosis:OptCreateConfigurations()
 						strata = 5,
 					}
 				);
-				
+
 				Gnosis.dialog:Spawn("GNOSIS_UPDCFG");
 			end,
 		};
@@ -1931,11 +1931,11 @@ function Gnosis:OptCreateConfigurations()
 			order = self:GetNextTableIndexInner(),
 			name = Gnosis.L["OptConfDelConf"],
 			type = "execute",
-			func = function()			
+			func = function()
 				Gnosis.dialog:Register("GNOSIS_DELCFG",
 					{
 						text = string_format(Gnosis.L["OptConfDelConfMBText"], key),
-						buttons = { 
+						buttons = {
 							{
 								text = Gnosis.L["Yes"],
 								on_click = function(self)
@@ -1957,7 +1957,7 @@ function Gnosis:OptCreateConfigurations()
 						strata = 5,
 					}
 				);
-				
+
 				Gnosis.dialog:Spawn("GNOSIS_DELCFG");
 			end,
 		};
@@ -1987,7 +1987,7 @@ function Gnosis:OptSaveNewConfig(_name, _def, _cb, _cs, _ct)
 				GnosisConfigs[name].maintab.bAutoCreateOptions = self.s.bAutoCreateOptions;
 				GnosisConfigs[name].maintab.strLocale = self.s.strLocale;
 				GnosisConfigs[name].maintab.iTimerScanEvery = self.s.iTimerScanEvery;
-				GnosisConfigs[name].maintab.bResizeOptions = self.s.bResizeOptions;				
+				GnosisConfigs[name].maintab.bResizeOptions = self.s.bResizeOptions;
 			end
 
 			if(bcb) then
@@ -2058,24 +2058,24 @@ end
 function Gnosis:ExportAllBars()
 	if (self.s and self.s.cbconf) then
 		local output = "";
-		
+
 		-- created sorted table
 		local tSorted = {};
 		for key, value in pairs(self.castbars) do
 			table_insert(tSorted, key);
 		end
 		table_sort(tSorted);
-	
+
 		for i, cbname in ipairs(tSorted) do
 			if (self.s.cbconf[cbname]) then
 				local barexpstr = Gnosis:ExportBarEncStr(cbname);
-				
+
 				if (barexpstr) then
 					output = output .. barexpstr .. "\n\n";
 				end
 			end
 		end
-		
+
 		Gnosis.dialog:Register("GNOSIS_EXPORT",
 			{
 				text = string_format(Gnosis.L["CpyScriptFromEditBox"], "*"),
@@ -2085,7 +2085,7 @@ function Gnosis:ExportAllBars()
 						height = 200,
 					},
 				},
-				on_show = function(self, data) 
+				on_show = function(self, data)
 					self.editboxes[1]:SetText(output);
 					self.editboxes[1]:HighlightText();
 					self.editboxes[1]:SetFocus();
@@ -2097,14 +2097,14 @@ function Gnosis:ExportAllBars()
 				strata = 5,
 			}
 		);
-		
+
 		Gnosis.dialog:Spawn("GNOSIS_EXPORT");
 	end
 end
 
 function Gnosis:ExportBar(key)
 	local encstr = self:ExportBarEncStr(key);
-	
+
 	-- send 6bit encoded bar table information
 	if (encstr) then
 		Gnosis.dialog:Register("GNOSIS_EXPORT",
@@ -2116,7 +2116,7 @@ function Gnosis:ExportBar(key)
 						height = 200,
 					},
 				},
-				on_show = function(self, data) 
+				on_show = function(self, data)
 					self.editboxes[1]:SetText(encstr);
 					self.editboxes[1]:HighlightText();
 					self.editboxes[1]:SetFocus();
@@ -2128,7 +2128,7 @@ function Gnosis:ExportBar(key)
 				strata = 5,
 			}
 		);
-		
+
 		Gnosis.dialog:Spawn("GNOSIS_EXPORT");
 	end
 end
@@ -2136,7 +2136,7 @@ end
 function Gnosis:ExportBarChatlink(key)
 	local link = "[Gnosis:" .. UnitName("player") .. '-' .. GetRealmName() .. ":" ..
 		self:ExchangeEscapeSequenceChars(key, "\\:%[%]") .. "]";
-		
+
 	local eb = GetCurrentKeyBoardFocus();
 	if (eb) then
 		eb:Insert(link);
@@ -2152,7 +2152,7 @@ end
 function Gnosis:ImportBarFinalize(key)
 	-- make sure imported bar is up to date
 	self:CheckStoredCastbarOptions();
-	
+
 	-- config bar and create options
 	self:SetBarParams(key);
 	self:CreateCastbarsOpt();
@@ -2169,7 +2169,7 @@ function Gnosis:ImportBars()
 					height = 200,
 				},
 			},
-			buttons = { 
+			buttons = {
 				{
 					text = Gnosis.L["Import"],
 					on_click = function(self)
@@ -2182,7 +2182,7 @@ function Gnosis:ImportBars()
 								Gnosis:OpenCastbarOptions();
 							else
 								Gnosis:ImportBarsFromStr(str);
-							end								
+							end
 						end
 					end,
 				},
@@ -2192,7 +2192,7 @@ function Gnosis:ImportBars()
 					end,
 				},
 			},
-			on_show = function(self, data) 
+			on_show = function(self, data)
 				self.editboxes[1]:SetText("");
 				self.editboxes[1]:HighlightText();
 				self.editboxes[1]:SetFocus();
@@ -2204,7 +2204,7 @@ function Gnosis:ImportBars()
 			strata = 5,
 		}
 	);
-	
+
 	Gnosis.dialog:Spawn("GNOSIS_IMPORT");
 end
 

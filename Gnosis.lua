@@ -47,7 +47,7 @@ if (wowclassic and Gnosis.libclcno) then
 	UnitCastingInfo = function(unit)
 		return Gnosis.libclcno:UnitCastingInfo(unit);
 	end
-	
+
 	UnitChannelInfo = function(unit)
 		return Gnosis.libclcno:UnitChannelInfo(unit);
 	end
@@ -59,18 +59,18 @@ if(Gnosis.lsm) then
 	Gnosis.lsm:Register("statusbar", "Waterline", "Interface\\Addons\\Gnosis\\Textures\\Waterline");
 	Gnosis.lsm:Register("statusbar", "Gnosis_Plain", "Interface\\Addons\\Gnosis\\Textures\\Gnosis_Plain");
 	Gnosis.lsm:Register("statusbar", "Gnosis_Gradient", "Interface\\Addons\\Gnosis\\Textures\\Gnosis_Gradient");
-	
+
 	-- fonts
 	Gnosis.lsm:Register("font", "Desyrel", "Interface\\Addons\\Gnosis\\Fonts\\DESYREL_.ttf");
 	Gnosis.lsm:Register("font", "Accidental Presidency", "Interface\\Addons\\Gnosis\\Fonts\\Accidental Presidency\\accid___.ttf");
-	
+
 	-- sound files
 	Gnosis.lsm:Register("sound", "Gnosis_Coin", "Interface\\Addons\\Gnosis\\Sounds\\coin_dropped_on_wooden_floor.ogg");
 	Gnosis.lsm:Register("sound", "Gnosis_CompStart", "Interface\\Addons\\Gnosis\\Sounds\\Computer_Start-Up-Your_Mom-1280862923.ogg");
 	Gnosis.lsm:Register("sound", "Gnosis_Cuckoo", "Interface\\Addons\\Gnosis\\Sounds\\Cuckoo Clock-SoundBible.com-1776874523.ogg");
 	Gnosis.lsm:Register("sound", "Gnosis_Electric", "Interface\\Addons\\Gnosis\\Sounds\\Electrical_Sweep-Sweeper-1760111493.ogg");
 	Gnosis.lsm:Register("sound", "Gnosis_MusicBox", "Interface\\Addons\\Gnosis\\Sounds\\Music_Box-Big_Daddy-1389738694.ogg");
-	Gnosis.lsm:Register("sound", "Gnosis_Wharf", "Interface\\Addons\\Gnosis\\Sounds\\announcementonawharf.ogg");	
+	Gnosis.lsm:Register("sound", "Gnosis_Wharf", "Interface\\Addons\\Gnosis\\Sounds\\announcementonawharf.ogg");
 end
 
 -- generate configuration frames
@@ -120,12 +120,12 @@ function Gnosis:En(status)
 		if (self.s.bUnregGlobalMouse) then
 			self:UnregisterGlobalMouseEvents();
 		end
-		
+
 		-- scan table, fast lookup tablese
 		self:CreateCBTables();
 		-- trigger talent update event (gone with 5.04 sent too early)
 		self:PLAYER_TALENT_UPDATE();
-		
+
 		-- resize interface options frame
 		if (self.s.bResizeOptions) then
 			InterfaceOptionsFrame:SetWidth(835);
@@ -174,7 +174,7 @@ function Gnosis:OpenOptions()
 		-- call twice the first time
 		InterfaceOptionsFrame_OpenToCategory(Gnosis.optFrame);
 	end
-		
+
 	InterfaceOptionsFrame_OpenToCategory(Gnosis.optFrame);
 	self.iofcalled = true;
 end
@@ -184,7 +184,7 @@ function Gnosis:OpenCfgOptions()
 		-- call twice the first time
 		InterfaceOptionsFrame_OpenToCategory(Gnosis.optCfgs);
 	end
-		
+
 	InterfaceOptionsFrame_OpenToCategory(Gnosis.optCfgs);
 	self.iofcfgcalled = true;
 end
@@ -194,7 +194,7 @@ function Gnosis:OpenCastbarOptions()
 		-- call twice the first time
 		InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
 	end
-		
+
 	InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
 	self.iofcbcalled = true;
 end
@@ -212,9 +212,9 @@ function Gnosis:HideBlizzardCastbar(status)
 			if(CastingBarFrame:IsEventRegistered(value)) then
 				table_insert(self.blizzcastbar, value);
 				CastingBarFrame:UnregisterEvent(value);
-			end			
+			end
 		end
-		
+
 		if (#self.blizzcastbar > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgDisBlizCB"]);
@@ -228,7 +228,7 @@ function Gnosis:HideBlizzardCastbar(status)
 		for key, value in pairs(self.blizzcastbar) do
 			CastingBarFrame:RegisterEvent(value);
 		end
-		
+
 		if (#self.blizzcastbar > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgBlizCBRestored"]);
@@ -262,9 +262,9 @@ function Gnosis:HideBlizzardPetCastbar(status)
 			if(PetCastingBarFrame:IsEventRegistered(value)) then
 				table_insert(self.petcastbar, value);
 				PetCastingBarFrame:UnregisterEvent(value);
-			end			
+			end
 		end
-		
+
 		if (#self.petcastbar > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgDisPetCB"]);
@@ -278,13 +278,13 @@ function Gnosis:HideBlizzardPetCastbar(status)
 		for key, value in pairs(self.petcastbar) do
 			PetCastingBarFrame:RegisterEvent(value);
 		end
-		
+
 		if (#self.petcastbar > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgPetCBRestored"]);
 			end
 		end
-		
+
 		self.petcastbar = {};
 	end
 end
@@ -295,9 +295,9 @@ function Gnosis:HideBlizzardMirrorCastbar(status)
 			if(UIParent:IsEventRegistered(value)) then
 				table_insert(self.blizzmirroruiparent, value);
 				UIParent:UnregisterEvent(value);
-			end			
+			end
 		end
-		
+
 		for key, value in pairs(self.tBlizzMirror123) do
 			if(MirrorTimer1:IsEventRegistered(value)) then
 				table_insert(self.blizzmirror1, value);
@@ -312,11 +312,11 @@ function Gnosis:HideBlizzardMirrorCastbar(status)
 				MirrorTimer3:UnregisterEvent(value);
 			end
 		end
-		
+
 		MirrorTimer1:Hide();
 		MirrorTimer2:Hide();
 		MirrorTimer3:Hide();
-		
+
 		if (#self.blizzmirroruiparent > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgDisMirrCB"]);
@@ -339,13 +339,13 @@ function Gnosis:HideBlizzardMirrorCastbar(status)
 		for key, value in pairs(self.blizzmirror3) do
 			MirrorTimer3:RegisterEvent(value);
 		end
-		
+
 		if (#self.blizzmirroruiparent > 0) then
 			if(not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgMirrCBRestored"]);
 			end
 		end
-		
+
 		self.blizzmirroruiparent = {};
 		self.blizzmirror1 = {};
 		self.blizzmirror2 = {};
@@ -378,14 +378,14 @@ function Gnosis:OnInitialize()
 	-- remove character specific profile name in character specific configuration file
 	if (not GnosisCharConfig) then
 		GnosisCharConfig = {};
-		
-		self.db = LibStub("AceDB-3.0"):New("GnosisChar", defaults);	
+
+		self.db = LibStub("AceDB-3.0"):New("GnosisChar", defaults);
 		if (self.db and self.db.profile and self:tsize(self.db.profile) > 0) then
 			-- copy AceDB profile to GnosisCharConfig
 			GnosisCharConfig = self:deepcopy(self.db.profile);
 		end
 	elseif (self:tsize(GnosisCharConfig) == 0) then
-		self.db = LibStub("AceDB-3.0"):New("GnosisChar", defaults);	
+		self.db = LibStub("AceDB-3.0"):New("GnosisChar", defaults);
 		if(self.db and self.db.profile and self:tsize(self.db.profile) > 0) then
 			-- copy AceDB profile to GnosisCharConfig
 			GnosisCharConfig = self:deepcopy(self.db.profile);
@@ -395,7 +395,7 @@ function Gnosis:OnInitialize()
 		wipe(GnosisChar);
 		GnosisChar = nil;
 	end
-	
+
 	-- set link to GnosisCharConfig
 	self.s = GnosisCharConfig;
 
@@ -414,17 +414,17 @@ function Gnosis:SetupHooks()
 				Gnosis.iLastTradeSkillCnt = tonumber(num);
 			end
 		);
-			
+
 		hooksecurefunc(C_TradeSkillUI, 'CloseTradeSkill', function()
 				Gnosis.bNewTradeSkill = nil;
 				Gnosis.iLastTradeSkillCnt = nil;
 				Gnosis:CloseAllTradeskillBars();
 			end
 		);
-		
+
 		-- bandaid for LibDialog-1.0 (MINOR <= 8, until it is fixed)
 		local ld_name, ld_ver = LibStub:GetLibrary("LibDialog-1.0");
-	
+
 		if (ld_ver and ld_ver <= 8) then
 			hooksecurefunc(_G, 'CreateFrame', function(frameType, frameName)
 					if (frameName and string_find(frameName, "LibDialog%-1%.0_Dialog") and _G[frameName]) then
@@ -440,7 +440,7 @@ function Gnosis:SetupHooks()
 				Gnosis.iLastTradeSkillCnt = tonumber(num);
 			end
 		);
-			
+
 		hooksecurefunc('CloseTradeSkill', function()
 				Gnosis.bNewTradeSkill = nil;
 				Gnosis.iLastTradeSkillCnt = nil;
@@ -456,13 +456,13 @@ function Gnosis:SetupHooks()
 			end
 		end
 	);
-		
+
 	-- SetItemRef hook
 	hooksecurefunc('SetItemRef', function(link, text, ...)
 			Gnosis:SetItemRef(link, text);
 		end
 	);
-	
+
 	--[[
 	hooksecurefunc("ChatFrame_OnHyperlinkShow", function(frame, link, text, ...)
 			Gnosis:SetItemRef(link, text);
@@ -508,15 +508,15 @@ function Gnosis:OnEnable()
 			self.s.configs[key] = value;
 		end
 	end
-	
-	
+
+
 	if (not self.s.bHideAddonMsgs) then
 		self:Print(self.title .. " " .. Gnosis.L["MsgLoaded"] .. " " .. (self.s.bAddonEn and Gnosis.L["MsgEn"] or Gnosis.L["MsgDis"]));
 	end
 
 	-- check castbar options
 	self:CheckStoredCastbarOptions();
-	
+
 	-- upgrade character specific options version number?
 	if (self.s.optver < self.optver) then
 		self.s.optver = self.optver;
@@ -546,10 +546,10 @@ function Gnosis:OnEnable()
 	-- enable/disable addon
 	self:InitialConfig();
 	self:En(self.s.bAddonEn);
-	
+
 	-- get player GUID
 	self.guid = UnitGUID("player");
-	
+
 	-- enable AceComm-3.0 addon communication channel
 	self.comm:RegisterComm("GnosisComm", Gnosis.CommCb);
 end
@@ -595,7 +595,7 @@ function Gnosis:HandleChatCommand(cmd)
 		spell, cmd = Gnosis:ExtractRegex(cmd, "spell=(%w+)", "spell=\"([^\"]+)\"", true);
 		cnt, cmd = Gnosis:ExtractRegex(cmd, "time=([+-]?[0-9]*%.?[0-9]*)", "time=\"([+-]?[0-9]*%.?[0-9]*)\"", true);
 		iscast = string_match(cmd, ".*(cast).*");
-				
+
 		if (bar and text and cnt) then
 			self:InjectTimer(bar, text, cnt, spell, iscast);
 		else
@@ -637,7 +637,7 @@ function Gnosis:RegisterEvents()
 			self:RegisterEvent(value);
 		end
 	end
-	
+
 	for key, value in pairs(Gnosis.tMiscEvents) do
 		self:RegisterEvent(value);
 	end
@@ -752,7 +752,7 @@ function Gnosis:SetupChanneledSpellsTable()
 	self:AddChanneledSpellById(48045, 6, false, 7, false, true, "shadow", false, 3); 	-- mind sear
 	self:AddChanneledSpellById(47540, 3, false, 2, true, false, "holy", true, 1);		-- penance, first tick instant
 	self:AddChanneledSpellById(64843, 4, false, 15, false, true, "holy", true, 4);		-- divine hymn
-	
+
 	-- mage
 	if (wowclassic) then
 		self:AddChanneledSpellById(10, 8, false, 15, false, true, "frost", false, 2);		-- blizzard
@@ -770,13 +770,13 @@ function Gnosis:SetupChanneledSpellsTable()
 		self:AddChanneledSpellById(198590, 5, false, 6, false, false, "shadow", false, 4);	-- drain soul
 	end
 	self:AddChanneledSpellById(755, 6, false, 6, false, false, "shadow", false, 3);		-- health funnel
-	
+
 	-- druid
 	self:AddChanneledSpellById(740, 4, false, 15, false, true, "nature", true, 3);		-- tranquility
 	if (wowclassic) then
 		self:AddChanneledSpellById(16914, 10, false, 15, false, true, "nature", false, 2);	-- hurricane
 	end
-	
+
 	-- monk
 	self:AddChanneledSpellById(113656, 20, false, 21, true, true, "physical", false, 1);	-- fists of fury, first tick instant, aoe
 	self:AddChanneledSpellById(115175, 8, false, 9, false, false, "nature", true, 3);	-- soothing mist
@@ -1120,16 +1120,16 @@ function Gnosis:AddCustomBar(name, unit, width, height, scale, movefactor_y, mov
 	self:OptCreateNewCastbar(name, unit);
 
 	cfg = self.s.cbconf[name];
-	
+
 	cfg.scale = scale;
 	cfg.width = width;
 	cfg.height = height;
 	cfg.bIconUnlocked = unlockicon;
 	Gnosis:SetBarParams(name);
-	
+
 	cfg.anchor.py = cfg.anchor.py + movefactor_y * (self.tCastbarDefaults.height/GetScreenHeight() + 0.01) * fScale;
 	cfg.anchor.px = cfg.anchor.px + movefactor_x * (self.tCastbarDefaults.height/GetScreenHeight()*2.5 + self.tCastbarDefaults.width/GetScreenWidth() + 0.01) * fScale;
-	self:AnchorBar(name);	
+	self:AnchorBar(name);
 end
 
 function Gnosis:CreateCustomCastbarSet()
@@ -1295,10 +1295,10 @@ function Gnosis:ExtractEmbeddedString(str, first, last, dotrim)
 	-- check parameters
 	if (first and (type(first) ~= "string" or string_len(first) < 1)) then
 		return;
-	end   
+	end
 	if (last and (type(last) ~= "string" or string_len(last) < 1)) then
-		return;   
-	end 
+		return;
+	end
 	if (type(str) == "string") then
 		-- trim string (remove leading and trailing whitespace)
 		if (dotrim) then
@@ -1321,8 +1321,8 @@ function Gnosis:ExtractEmbeddedString(str, first, last, dotrim)
 
 	-- find first
 	if (pattern_first) then
-		local s, f, match_first = string_find(str, pattern_first); 
-	  
+		local s, f, match_first = string_find(str, pattern_first);
+
 		if (match_first) then -- pattern_first
 			first_found = match_first;
 			before = string_sub(str, 1, s-1);
@@ -1335,15 +1335,15 @@ function Gnosis:ExtractEmbeddedString(str, first, last, dotrim)
 	-- find last
 	while (true) do
 		local s1, f1, s2, f2, s3, f3, match_esc, match_last, new_match_first;
-		
+
 		s1, f1, match_esc = string_find(cur, pattern_esc);
 		if (pattern_last) then
-			s2, f2, match_last = string_find(cur, pattern_last); 
+			s2, f2, match_last = string_find(cur, pattern_last);
 		end
 		if (pattern_first) then
 			s3, f3, new_match_first = string_find(cur, pattern_first);
 		end
-		
+
 		local bContinue = true;
 		-- matched both, pattern_esc < pattern_first?
 		if (new_match_first) then
@@ -1355,7 +1355,7 @@ function Gnosis:ExtractEmbeddedString(str, first, last, dotrim)
 			elseif (s2) then
 				bNewMatch = s3 < s2;
 			end
-			
+
 			if (bNewMatch) then
 				-- found new beginning
 				first_found = new_match_first;
@@ -1364,12 +1364,12 @@ function Gnosis:ExtractEmbeddedString(str, first, last, dotrim)
 				bContinue = false;
 			end
 		end
-		
+
 		if (bContinue) then
 			if (s1 and s2 and s1 < s2) then
 				match_last = nil;
 			end
-		  
+
 			if (match_last) then -- pattern_last
 				-- found substring ending
 				last_found = match_last;
@@ -1401,8 +1401,8 @@ end
 
 -- exchanges all chars in charsToEscape string with \char, don't forget % if "magic" character
 function Gnosis:ExchangeEscapeSequenceChars(str, charsToEscape)
-   local pattern = "([" .. charsToEscape .. "])";   
-   return string_gsub(str, pattern, "\\%1");   
+   local pattern = "([" .. charsToEscape .. "])";
+   return string_gsub(str, pattern, "\\%1");
 end
 
 -- hook SetItemRef (import Gnosis bar via chatlink)
@@ -1418,24 +1418,24 @@ function Gnosis:SetItemRef(link, text)
 		s, f, name, server = link:find("^gnosis([^%s/]+)/(.+)$");
 		s, f, barname = text:find("%[[^:]+: (.-)%]\124h$");
 	end
-		
+
 	if (name and server and barname) then
 		if (not IsShiftKeyDown()) then
 			Gnosis.comm:SendCommMessage("GnosisComm", "req:" .. barname, "WHISPER", name .. "-" .. server);
 		end
-	end	
+	end
 end
 
 -- communication events
 function Gnosis:CommCb(message, distribution, sender)
 	local s, f, barname = message:find("req:(.+)");
 	local hash, serial_tab;
-	
+
 	local importname, before, after, match_first, match_last = Gnosis:ExtractEmbeddedString(message, "%[", "%]");
 	if (importname and string_len(after) > 0) then
 		s, f, hash, serial_tab = string_find(after, "(.-):(.+)$");
 	end
-	
+
 	if (barname) then
 		-- request received, send bar via addon channel
 		if (Gnosis.s.cbconf[barname]) then
@@ -1449,16 +1449,16 @@ function Gnosis:CommCb(message, distribution, sender)
 			local comp_hash = lc:fcs32final(lc:fcs32update(lc:fcs32init(), comp));
 			-- complete message to send
 			local msg = "[" .. Gnosis:ExchangeEscapeSequenceChars(barname, "\\:%[%]") .. "]" .. comp_hash .. ":" .. comp;
-			
+
 			-- send to sender of request
-			Gnosis.comm:SendCommMessage("GnosisComm", msg, distribution, sender);			
-		end	
+			Gnosis.comm:SendCommMessage("GnosisComm", msg, distribution, sender);
+		end
 	elseif (importname and hash and serial_tab) then
 		-- bar data received
 		local lc = Gnosis.libc;
 		-- compute hash
 		local comp_hash = lc:fcs32final(lc:fcs32update(lc:fcs32init(), serial_tab));
-		
+
 		-- check hash
 		if (comp_hash == tonumber(hash)) then
 			-- message ok, import
@@ -1469,13 +1469,13 @@ function Gnosis:CommCb(message, distribution, sender)
 			uncomp = lc:Decompress(uncomp);
 			-- deserialize, uncomp holds original table afterwards
 			ok, uncomp = Gnosis.libs:Deserialize(uncomp);
-			
+
 			if (ok) then
 				-- create import dialog
 				Gnosis.dialog:Register("GNOSIS_IMPORT_HYPERLINK",
 					{
 						text = sender .. " -> |cffdddd22" .. importname .. "|r\n\n" .. Gnosis.L["ImportFromHyperlink"],
-						buttons = { 
+						buttons = {
 							{
 								text = Gnosis.L["Import"],
 								on_click = function(self)
@@ -1508,7 +1508,7 @@ function Gnosis:CommCb(message, distribution, sender)
 						strata = 5,
 					}
 				);
-			
+
 				Gnosis.dialog:Spawn("GNOSIS_IMPORT_HYPERLINK");
 			end
 		end
@@ -1520,29 +1520,29 @@ function ItemRefTooltip:SetHyperlink(link, ...)
 	if (link and link:find("^gnosis")) then
 		return;
     end
-	
+
     return oldSetHyperlink(self, link, ...);
 end
 
 local function exchangeHyperlink(_, _, msg, ...)
     local msgToPrint = "";
-	
+
 	while (true) do
 		local embedded, before, after, match_first = Gnosis:ExtractEmbeddedString(msg, "%[Gnosis:[^%s%-]+%-[^%s%:]+:", "]");
-		
+
 		if (embedded) then
 			local s, f, name, server = string_find(match_first, "%[Gnosis:([^%s%-]+)%-([^%s%-]+):");
 			msgToPrint = msgToPrint .. before ..
-				"\124Hgnosis" .. name .. "/" .. server .. "\124h" .. 
+				"\124Hgnosis" .. name .. "/" .. server .. "\124h" ..
 				"\124cffdddd22[" .. name .. "\124r\124cffdddd22: " .. embedded .. "]\124r\124h";
-				
+
 			msg = after;
 		else
 			msgToPrint = msgToPrint .. msg;
 			break;
 		end
 	end
-	
+
 	return false, msgToPrint, ...;
 end
 
@@ -1575,10 +1575,10 @@ local function repaste_hyperlink(self, link, text, ...)
 		s, f, name, server = link:find("^gnosis([^%s/]+)/(.+)$");
 		s, f, barname = text:find("%[[^:]+: (.-)%]\124h$");
 	end
-	
+
 	if (name and server and barname and IsShiftKeyDown()) then
 		local link = "[Gnosis:" .. name .. "-" .. server .. ":" .. Gnosis:ExchangeEscapeSequenceChars(barname, "\\:%[%]") .. "]";
-		
+
 		local eb = GetCurrentKeyBoardFocus();
 		if (eb) then
 			eb:Insert(link);
@@ -1602,7 +1602,7 @@ function Gnosis:ExportBarEncStr(key)
 		-- complete message to send
 		local msg = "[" .. Gnosis:ExchangeEscapeSequenceChars(key, "\\:%[%]") .. ":" ..
 			comp_hash .. ":" .. len .. ":=" .. comp .. ";]";
-	
+
 		return msg;
 	end
 end
@@ -1610,11 +1610,11 @@ end
 function Gnosis:ExtractAndImportEncStr(str)
 	local import, _;
 	local importname, before, after, match_first, match_last = Gnosis:ExtractEmbeddedString(str, "%[", ":%d+:%d+:=[0-9A-Za-z%#%*]+;%]");
-	
+
 	if (importname) then
 		local lc = Gnosis.libc;
 		local s, f, hash, len, import = string_find(match_last, ":(%d+):(%d+):=([0-9A-Za-z%#%*]+);%]");
-		
+
 		if (s) then
 			if (tonumber(hash) == lc:fcs32final(lc:fcs32update(lc:fcs32init(), import))) then
 				-- compress and encode for communication via addon channel
@@ -1626,13 +1626,13 @@ function Gnosis:ExtractAndImportEncStr(str)
 				uncomp = lc:Decompress(uncomp);
 				-- deserialize, uncomp holds original table afterwards
 				ok, uncomp = Gnosis.libs:Deserialize(uncomp);
-			
+
 				if (ok) then
 					-- create import dialog
 					Gnosis.dialog:Register("GNOSIS_IMPORT_ENCSTR",
 						{
 							text = "|cffdddd22" .. importname .. "|r\n\n" .. Gnosis.L["ImportFromHyperlink"],
-							buttons = { 
+							buttons = {
 								{
 									text = Gnosis.L["Import"],
 									on_click = function(self)
@@ -1669,20 +1669,20 @@ function Gnosis:ExtractAndImportEncStr(str)
 							strata = 5,
 						}
 					);
-				
+
 					Gnosis.dialog:Spawn("GNOSIS_IMPORT_ENCSTR");
 				end
 				return before .. after, true;
 			end
-		end		
+		end
 	end
-	
+
 	return str;
 end
 
 function Gnosis:ImportBarsFromStr(str)
 	local found;
-	
+
 	-- import encoded bars
 	repeat
 		str, found = Gnosis:ExtractAndImportEncStr(str);
@@ -1699,7 +1699,7 @@ function Gnosis:UnregisterGlobalMouseEvents()
 		else
 			UIParent:UnregisterEvent("GLOBAL_MOUSE_DOWN");
 			UIParent:UnregisterEvent("GLOBAL_MOUSE_UP");
-			
+
 			if (not self.s.bHideAddonMsgs) then
 				self:Print(Gnosis.L["MsgUnregGlobalMouse"]);
 			end

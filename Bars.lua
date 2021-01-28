@@ -47,7 +47,7 @@ if (wowclassic and Gnosis.libclcno) then
 	UnitCastingInfo = function(unit)
 		return Gnosis.libclcno:UnitCastingInfo(unit);
 	end
-	
+
 	UnitChannelInfo = function(unit)
 		return Gnosis.libclcno:UnitChannelInfo(unit);
 	end
@@ -2043,7 +2043,7 @@ end
 function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 	local barname, cfg = cb.name, cb.conf;
 	local name, displayName, texture, startTime, endTime, isTradeSkill, notInterruptible, id;
-	
+
 	if (bIsChannel) then
 		name, displayName, texture, startTime, endTime, isTradeSkill, notInterruptible = UnitChannelInfo(cfg.unit);
 	else

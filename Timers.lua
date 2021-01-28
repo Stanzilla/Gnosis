@@ -57,17 +57,17 @@ if (wowclassic and Gnosis.libcldur) then
 	UnitAura = function(...)
 		return Gnosis.libcldur:UnitAura(...);
 	end
-	
+
 	AuraUtil_FindAuraByName = function(spellname, unit, filter)
 		local i = 1;
 		repeat
 			local name, ic, sta, _, d, s, _, _, _, id, _, _, _, _, _, eff1, eff2, eff3 =
-				UnitAura(unit, i, filter);		
-			
+				UnitAura(unit, i, filter);
+
 			if (spellname == name) then
 				return name, ic, sta, _, d, s, _, _, _, id, _, _, _, _, _, eff1, eff2, eff3;
 			end
-				
+
 			i = i + 1;
 		until id == nil or i > 40;
 
@@ -79,7 +79,7 @@ if (wowclassic and Gnosis.libclcno) then
 	UnitCastingInfo = function(unit)
 		return Gnosis.libclcno:UnitCastingInfo(unit);
 	end
-	
+
 	UnitChannelInfo = function(unit)
 		return Gnosis.libclcno:UnitChannelInfo(unit);
 	end
@@ -89,7 +89,7 @@ if (wowclassic) then
 	GetSpecializationInfo = function()
 		return nil, "";
 	end
-	
+
 	GetTalentInfo = function()
 		return 1, "";
 	end
@@ -102,7 +102,7 @@ end
 
 local function ParseTimer_IsComment(line)
 	local comment = string_find(line, "^[%s%.,]*(%-%-)");
-	
+
 	if (comment) then
 		return true;
 	else
@@ -112,21 +112,21 @@ end
 
 function Gnosis:ParseTimer_GetCommand(bnwlist, linetostart)
 	local curcmd, boolop;
-	
+
 	-- is valid table?
 	if (type(bnwlist) ~= "table") then
 		return;
 	end
-	
+
 	-- remove comments
 	while (#bnwlist >= linetostart and ParseTimer_IsComment(bnwlist[linetostart])) do
-		linetostart = linetostart + 1;		
+		linetostart = linetostart + 1;
 	end
-	
+
 	if (linetostart > #bnwlist) then
 		return;
 	end
-	
+
 	-- grab first non comment (and remove tokens)
 	-- remove tokens '\\'. '&', '+'. '*'
 	-- '\\': append line; '&': previous and current line have to be valid, same as 'and'
@@ -136,21 +136,21 @@ function Gnosis:ParseTimer_GetCommand(bnwlist, linetostart)
 	linetostart = linetostart + 1;
 	if (not curcmd) then
 		return;
-	end	
-	
+	end
+
 	-- append lines beginning with '\\'
 	while (linetostart <= #bnwlist) do
 		if (ParseTimer_IsComment(bnwlist[linetostart])) then
 			-- comment, next line
 			linetostart = linetostart + 1;
-		else	
+		else
 			local token, append = string_match(bnwlist[linetostart], "^[%s%.,]*([\\&%?%*])[%s%.,\\&%?%*]*(.*)");
-			
+
 			if (token) then
 				if (token == "\\") then
 					-- append line
 					curcmd = curcmd .. " " .. append;
-					linetostart = linetostart + 1;			
+					linetostart = linetostart + 1;
 				elseif (token == "&") then
 					boolop = BOOLOP_AND;
 					break;
@@ -159,7 +159,7 @@ function Gnosis:ParseTimer_GetCommand(bnwlist, linetostart)
 					break;
 				elseif (token == "*") then
 					boolop = BOOLOP_OR;
-					break;	
+					break;
 				else
 					break;
 				end
@@ -168,7 +168,7 @@ function Gnosis:ParseTimer_GetCommand(bnwlist, linetostart)
 			end
 		end
 	end
-	
+
 	return curcmd, linetostart, boolop;
 end
 
@@ -290,7 +290,7 @@ function Gnosis:Timers_SpellCD(bar, timer, ti)
 	-- cooldown, player only
 	ti.unit = "player";
 	local s, d = GetSpellCooldown(timer.spell);
-	
+
 	local dur, fin;
 	local cd_info = Gnosis.timer_cds[timer.spell];
 	local curtime = GetTime();
@@ -300,7 +300,7 @@ function Gnosis:Timers_SpellCD(bar, timer, ti)
 	elseif (d and d > 1.5) then
 		-- duration greater than global cd
 		dur, fin = d, s + d;
-		
+
 		if (cd_info) then
 			cd_info.dur = dur;
 			cd_info.fin = fin;
@@ -308,11 +308,11 @@ function Gnosis:Timers_SpellCD(bar, timer, ti)
 			Gnosis.timer_cds[timer.spell] = { dur = dur, fin = fin };
 		end
 	end
-		
+
 	if (dur) then
 		ti.cname = timer.spell;
 		ti.icon = timer.icon or select(3, GetSpellInfo(timer.spell));
-		
+
 		if(timer.brange) then
 			local rem = fin - curtime;
 			ti.ok = in_value_range(rem, rem*100/dur, timer.range_tab);
@@ -329,12 +329,12 @@ end
 
 function Gnosis:Timers_Counter(bar, timer, ti)
 	ti.unit = "player";
-	
+
 	local cnter = Gnosis.counters[timer.spell];
 	if (cnter and cnter.endtime < GetTime()) then
 		cnter = nil;
 	end
-	
+
 	if (cnter) then
 		ti.cname = timer.spell;
 		if (timer.brange) then
@@ -360,14 +360,14 @@ local function GetAura(timer, unit)
 		-- aura id
 		local _, name, ic, sta, d, s, eff1, eff2, eff3, id;
 		local i = 1;
-		
+
 		repeat
 			name, ic, sta, _, d, s, _, _, _, id, _, _, _, _, _, eff1, eff2, eff3 =
 				UnitAura(unit, i, timer.filter);
-						
+
 			if (id and id == timer.spellid) then
 				timer.spell = name;
-				
+
 				if (timer.auraeffect3) then
 					if (eff3 and eff3 > 0) then
 						return ic, sta, timer.auraeffect3, eff3, eff3, true;
@@ -388,11 +388,11 @@ local function GetAura(timer, unit)
 					-- timer bar
 					return ic, sta, d, s, eff, false;
 				end
-				
+
 				-- nothing to return
-				return ic;				
+				return ic;
 			end
-			
+
 			i = i + 1;
 		until id == nil or i > 40;
 
@@ -401,7 +401,7 @@ local function GetAura(timer, unit)
 		-- aura name
 		local _, ic, sta, _, d, s, _, _, _, _, _, _, _, _, _, eff1, eff2, eff3 =
 			AuraUtil_FindAuraByName(timer.spell, unit, timer.filter);
-		
+
 		if (timer.auraeffect3) then
 			if (eff3 and eff3 > 0) then
 				return ic, sta, timer.auraeffect3, eff3, eff3, true;
@@ -422,26 +422,26 @@ local function GetAura(timer, unit)
 			-- timer bar
 			return ic, sta, d, s, eff, false;
 		end
-		
+
 		-- nothing to return
 		return ic;
-	end	
+	end
 end
 
 function Gnosis:Timers_Aura(bar, timer, ti)
 	-- aura == buff or debuff (== hot or dot)
 	ti.unit = timer.unit;
 	local ic, sta, d, s, effect, isspecial = GetAura(timer, timer.unit);
-	
+
 	if (s) then
 		ti.cname = timer.spell;
-		ti.stacks = (sta and sta > 0) and sta or nil;		
+		ti.stacks = (sta and sta > 0) and sta or nil;
 		ti.icon = ic;
-		
+
 		if (isspecial) then
 			ti.unit = timer.unit;
 			ti.bSpecial = true;
-			
+
 			if (timer.brange) then
 				ti.ok = in_value_range(s, s*100/d, timer.range_tab);
 			else
@@ -449,11 +449,11 @@ function Gnosis:Timers_Aura(bar, timer, ti)
 			end
 			set_times(timer, ti, d, s, true);
 		else
-			local rem = 0;		
+			local rem = 0;
 			if (s > 0) then
 				rem = s - GetTime();
 			end
-			
+
 			if (rem > 0) then
 				-- dynamic aura
 				if (timer.brange) then
@@ -487,26 +487,26 @@ end
 
 function Gnosis:Timers_GroupAura(bar, timer, ti)
 	ti.unit = nil;
-	
+
 	-- scan current group for aura, also scan existing pets
 	local _, ic, sta, d, s, effect, isspecial;
-	
+
 	local n = GetNumGroupMembers();
 	if (IsInRaid() and n >= 2) then
 		-- scan raid
 		for i = 1, n do
 			local curunit = "raid" .. i;
 			ic, sta, d, s, effect, isspecial = GetAura(timer, curunit);
-			
+
 			if (s) then
 				ti.unit = curunit;
 				break;
 			end
-			
+
 			curunit = "raidpet" .. i;
 			if (UnitExists(curunit)) then
 				ic, sta, d, s, effect, isspecial = GetAura(timer, curunit);
-			
+
 				if (s) then
 					ti.unit = curunit;
 					break;
@@ -516,30 +516,30 @@ function Gnosis:Timers_GroupAura(bar, timer, ti)
 	elseif (n >= 2) then
 		-- scan player and group members
 		ic, sta, d, s, effect, isspecial = GetAura(timer, "player");
-		
+
 		if (s) then
 			ti.unit = "player";
 		else
 			if (UnitExists("playerpet")) then
 				ic, sta, d, s, effect, isspecial = GetAura(timer, "playerpet");
 			end
-			
+
 			if (s) then
 				ti.unit = "playerpet";
 			else
 				for i = 1, (n - 1) do
 					local curunit = "party" .. i;
 					ic, sta, d, s, effect, isspecial = GetAura(timer, curunit);
-					
+
 					if (s) then
 						ti.unit = curunit;
 						break;
 					end
-					
+
 					curunit = "partypet" .. i;
 					if (UnitExists(curunit)) then
 						ic, sta, d, s, effect, isspecial = GetAura(timer, curunit);
-					
+
 						if (s) then
 							ti.unit = curunit;
 							break;
@@ -551,30 +551,30 @@ function Gnosis:Timers_GroupAura(bar, timer, ti)
 	else
 		-- scan player (player not in group)
 		ic, sta, d, s, effect, isspecial = GetAura(timer, "player");
-		
+
 		if (s) then
 			ti.unit = "player";
 		else
 			if (UnitExists("playerpet")) then
 				ic, sta, d, s, effect, isspecial = GetAura(timer, "playerpet");
-				
+
 				if (s) then
 					ti.unit = "playerpet";
 				end
 			end
 		end
 	end
-	
+
 	if (ti.unit) then
 		ti.cname = timer.spell;
 		ti.stacks = (sta and sta > 0) and sta or nil;
-		ti.effect = effect;	
+		ti.effect = effect;
 		ti.icon = ic;
-		
+
 		if (isspecial) then
 			ti.unit = timer.unit;
 			ti.bSpecial = true;
-			
+
 			if (timer.brange) then
 				ti.ok = in_value_range(s, s*100/d, timer.range_tab);
 			else
@@ -582,11 +582,11 @@ function Gnosis:Timers_GroupAura(bar, timer, ti)
 			end
 			set_times(timer, ti, d, s, true);
 		else
-			local rem = 0;		
+			local rem = 0;
 			if (s > 0) then
 				rem = s - GetTime();
 			end
-			
+
 			if (rem > 0) then
 				-- dynamic aura
 				if (timer.brange) then
@@ -622,25 +622,25 @@ end
 function Gnosis:Timers_SpellRecharge(bar, timer, ti)
 	-- spell charges, player only
 	ti.unit = "player";
-	
+
 	local curcharges, maxcharges, cdstart, cddur = GetSpellCharges(timer.spell);
-		
+
 	if (curcharges == nil) then
 		return;
 	end
-	
+
 	if (timer.chargecnt) then
 		-- display amount of charges
 		ti.cname = timer.spell;
 		ti.icon = timer.icon;
 		ti.bSpecial = true;
-		
+
 		if (timer.brange) then
 			ti.ok = in_value_range(curcharges, curcharges*100/maxcharges, timer.range_tab);
 		else
 			ti.ok = true;
 		end
-		
+
 		set_times(timer, ti, maxcharges, curcharges);
 	else
 		-- recharge cooldown
@@ -652,13 +652,13 @@ function Gnosis:Timers_SpellRecharge(bar, timer, ti)
 			else
 				ti.ok = true;
 			end
-			
+
 			ti.cname = timer.spell;
 			ti.stacks = curcharges;
 			ti.icon = timer.icon;
-			
+
 			set_times(timer, ti, cddur*1000, (cdstart+cddur)*1000, true);
-		elseif (timer.bNot) then			
+		elseif (timer.bNot) then
 			ti.cname = timer.spell;
 			ti.stacks = curcharges;
 			ti.icon = timer.icon;
@@ -701,7 +701,7 @@ function Gnosis:Timers_ItemCD(bar, timer, ti)
 end
 
 function Gnosis:Timers_ItemEquipped(bar, timer, ti)
-	-- item equipped? player only	
+	-- item equipped? player only
 	if (not timer.iid) then
 		local itemname, link, _, _, _, _, _, _, _, itex = GetItemInfo(timer.spell);
 		if (link) then
@@ -710,7 +710,7 @@ function Gnosis:Timers_ItemEquipped(bar, timer, ti)
 			timer.iname = itemname;
 		end
 	end
-	
+
 	if (timer.iname) then
 		ti.unit = "player";
 		if (IsEquippedItem(timer.iname)) then
@@ -730,16 +730,16 @@ end
 function Gnosis:Timers_RuneCD(bar, timer, ti)
 	-- rune cooldown, player only
 	ti.unit = "player";
-	
+
 	-- check for runetype
 	local rune = GetRuneType(timer.spell);
 	if (rune and timer.runetype and timer.runetype ~= rune) then
 		return;
 	end
-	
+
 	-- check cooldown
 	local s, d, rdy = GetRuneCooldown(timer.spell);
-	if (s and (not rdy) and (s+d) >= GetTime()) then	
+	if (s and (not rdy) and (s+d) >= GetTime()) then
 		if (rune) then
 			ti.cname = Gnosis.tRuneName[rune];
 			ti.icon = Gnosis.tRuneTexture[rune];
@@ -800,7 +800,7 @@ function Gnosis:Timers_InnerCD(bar, timer, ti)
 			bExist = true;
 		end
 	end
-	
+
 	if (bExist) then
 		ti.cname = timer.spell;
 		ti.icon = timer.icon;
@@ -887,11 +887,11 @@ end
 function Gnosis:Timers_Range(bar, timer, ti)
 	-- range between player and selected unit
 	local minRange, maxRange;
-	
+
 	if (UnitExists(timer.unit)) then
 		minRange, maxRange = Gnosis.range:GetRange(timer.unit);
 	end
-	
+
 	if (minRange and maxRange) then
 		ti.unit = timer.unit;
 		ti.bSpecial = true;
@@ -903,7 +903,7 @@ function Gnosis:Timers_Range(bar, timer, ti)
 				[4] == stacks upper bound (<=)
 				[5] == value lower bound is in percent (true, nil)
 				[6] == value upper bound is in percent (true, nil) ]]
-			
+
 			if (timer.range_tab[5] or timer.range_tab[6]) then
 				-- percentages of what??? (not allowed)
 				ti.ok = false;
@@ -959,7 +959,7 @@ function Gnosis:Timers_PowerGeneric(bar, timer, ti)
 			s = s / 10;
 			d = d / 10;
 		end
-		
+
 		-- get name and icon of the effect
 		if (not ti.cname or ti.cname == "") then
 			ti.cname =
@@ -982,9 +982,9 @@ function Gnosis:Timers_PowerGeneric(bar, timer, ti)
 					(idx == 14 and 108647) or	-- burning embers
 					(idx == 15 and 104315) or	-- demonic fury
 					nil
-				)); 
+				));
 		end
-		
+
 		ti.unit = timer.unit;
 		ti.bSpecial = true;
 		if (timer.brange) then
@@ -1004,7 +1004,7 @@ end
 function Gnosis:Timers_Experience(bar, timer, ti)
 	local xp = UnitXP("player");
 	local xpmax = UnitXPMax("player");
-	
+
 	if (xp and xpmax) then
 		ti.icon = nil;
 		ti.unit = "player";
@@ -1021,7 +1021,7 @@ end
 function Gnosis:Timers_RestedXP(bar, timer, ti)
 	local rested = GetXPExhaustion();
 	local xpmax = UnitXPMax("player");
-	
+
 	if (rested and xpmax) then
 		ti.icon = nil;
 		ti.unit = "player";
@@ -1031,7 +1031,7 @@ function Gnosis:Timers_RestedXP(bar, timer, ti)
 		else
 			ti.ok = true;
 		end
-		set_times(timer, ti, xpmax, rested, true); 
+		set_times(timer, ti, xpmax, rested, true);
 	end
 end
 
@@ -1147,7 +1147,7 @@ end
 
 function Gnosis:Timers_UnitName(bar, timer, ti)
 	local n = UnitName(timer.unit);
-	
+
 	if (n and (timer.spell == "any" or n == timer.spell)) then
 		ti.cname = n;
 		ti.unit = timer.unit;
@@ -1156,7 +1156,7 @@ function Gnosis:Timers_UnitName(bar, timer, ti)
 		set_times(timer, ti);
 		return;
 	end
-	
+
 	if (timer.bNot) then
 		ti.cname = timer.spell;
 		ti.unit = timer.unit;
@@ -1166,10 +1166,10 @@ end
 
 function Gnosis:Timers_Npc(bar, timer, ti)
 	local guid = UnitGUID(timer.unit);
-	
+
 	if (guid) then
 		local _, _, _, _, _, npc_id, _ = string_split("-", guid);
-		
+
 		if (npc_id and (timer.spell == "any" or npc_id == timer.spell)) then
 			ti.cname = npc_id;
 			ti.unit = timer.unit;
@@ -1179,7 +1179,7 @@ function Gnosis:Timers_Npc(bar, timer, ti)
 			return;
 		end
 	end
-	
+
 	if (timer.bNot) then
 		ti.cname = timer.spell;
 		ti.unit = timer.unit;
@@ -1189,22 +1189,22 @@ end
 
 function Gnosis:Timers_Charspec(bar, timer, ti)
 	local current_spec = self:SafeGetSpecialization();
-	
+
 	if (current_spec) then
 		-- spec active
 		local spec_id, spec_name = GetSpecializationInfo(current_spec);
 		local spell_number = tonumber(timer.spell);
-		
+
 		local matched = false;
 		-- try to compare to specialization id first
 		-- http://www.wowwiki.com/Specialization_IDs
 		if (spell_number and spell_number == spec_id) then
-			matched = true;			
+			matched = true;
 		-- otherwise compare to string
 		elseif (timer.spell == spec_name) then
 			matched = true;
 		end
-		
+
 		if (matched) then
 			ti.cname = spec_name;
 			ti.unit = "player";
@@ -1214,7 +1214,7 @@ function Gnosis:Timers_Charspec(bar, timer, ti)
 		elseif (timer.bNot) then
 			ti.cname = spec_name;
 			ti.unit = "player";
-			set_not(ti);			
+			set_not(ti);
 		end
 	end
 end
@@ -1222,16 +1222,16 @@ end
 function Gnosis:Timers_Talent(bar, timer, ti)
 	if (Gnosis.iCurSpec) then
 		local tier, column = string_split("-", timer.spell);
-		
+
 		if (tier and column) then
 			local tier_num = tonumber(tier);
 			local column_num = tonumber(column);
-			
+
 			if (tier_num and column_num) then
 				--local _, tname, ttex, tsel = GetTalentInfo(tier_num, column_num, Gnosis.iCurSpec);
 				-- bandaid...
 				local _, tname, ttex, tsel = GetTalentInfo(tier_num, column_num, 1);
-				
+
 				-- talent selected?
 				if (tsel) then
 					ti.cname = tname;
@@ -1255,13 +1255,13 @@ function Gnosis:Timers_Glyph(bar, timer, ti)
 	-- check for glyph match
 	local matched, glyph_name, glyph_icon;
 	local spellnum = tonumber(timer.spell);
-	
+
 	for i=1, NUM_GLYPH_SLOTS do
 		local valid, _, _, id = GetGlyphSocketInfo(i);
-		
+
 		if (valid) then
 			glyph_name, _, glyph_icon = GetSpellInfo(id);
-			
+
 			if (spellnum) then
 				if (spellnum == id) then
 					matched = true;
@@ -1273,7 +1273,7 @@ function Gnosis:Timers_Glyph(bar, timer, ti)
 			end
 		end
 	end
-	
+
 	-- glyph found
 	if (matched) then
 		ti.cname = glyph_name;
@@ -1285,10 +1285,10 @@ function Gnosis:Timers_Glyph(bar, timer, ti)
 	-- glyph not found
 	elseif (timer.bNot) then
 		ti.unit = "player";
-		
+
 		if (spellnum) then
 			local sname, _, stex = GetSpellInfo(spellnum);
-			
+
 			if (sname) then
 				ti.cname = sname;
 				ti.icon = stex;
@@ -1297,20 +1297,20 @@ function Gnosis:Timers_Glyph(bar, timer, ti)
 		else
 			ti.cname = timer.spell;
 			set_not(ti);
-		end		
+		end
 	end
 end
 
 function Gnosis:Timers_GlobalCD(bar, timer, ti)
 	local gcd = Gnosis.current_gcd;
 	local rem = gcd and (gcd.finish - GetTime()) or 0;
-	
+
 	if (rem > 0 and (timer.spell == "any" or gcd.spell == timer.spell)) then
 		ti.cname = gcd.spell;
 		ti.unit = "player";
 		ti.icon = timer.icon or select(3, GetSpellInfo(gcd.spellid));
 		if (timer.brange) then
-			ti.ok = in_value_range(rem, rem*100/gcd.cd, timer.range_tab);			
+			ti.ok = in_value_range(rem, rem*100/gcd.cd, timer.range_tab);
 		else
 			ti.ok = true;
 		end
@@ -1440,7 +1440,7 @@ function Gnosis:CreateSingleTimerTable()
 	wipe(self.ti_fl);
 	wipe(self.ti_icd);
 	wipe(self.counters);
-	
+
 	for key, value in pairs(self.castbars) do
 		local conf = Gnosis.s.cbconf[key];
 		local timer_id = 0;
@@ -1457,7 +1457,7 @@ function Gnosis:CreateSingleTimerTable()
 				-- copy of timer command string
 				local str, cmd_boolop;
 				str, curline, cmd_boolop = self:ParseTimer_GetCommand(conf.bnwlist, curline);
-				
+
 				if (not str) then
 					break;
 				end
@@ -1497,60 +1497,60 @@ function Gnosis:CreateSingleTimerTable()
 				specstr, str = self:ExtractRegex(str, "spec=([0-4])", "spec=\"([^\"]+)\"");
 				runetype, str = self:ExtractRegex(str, "runetype=(%d+)", "runetype=\"(%d+)\"");
 				spellid, str = self:ExtractRegex(str, "spellid=(%d+)", "spellid=\"(%d+)\"");
-								
+
 				recast, staticdur, zoom, spellid =
 					recast and (tonumber(recast) * 1000),
 					staticdur and (tonumber(staticdur) * 1000),
 					zoom and (tonumber(zoom) * 1000),
 					spellid and tonumber(spellid);
-				
+
 				local spectab;
 				if (specstr) then
 					spectab = self:CommaSeparatedNumbersToTable(specstr, 1, 4);
 				end
-				
+
 				-- stack/effect value display variable
 				if (aurastacks and tonumber(aurastacks)) then
 					aurastacks = tonumber(aurastacks);
 				else
 					aurastacks = nil;
 				end
-				
+
 				if (auraeffect1 and tonumber(auraeffect1)) then
 					auraeffect1 = tonumber(auraeffect1);
 				else
 					auraeffect1 = nil;
 				end
-				
+
 				if (auraeffect2 and tonumber(auraeffect2)) then
 					auraeffect2 = tonumber(auraeffect2);
 				else
 					auraeffect2 = nil;
 				end
-				
+
 				if (auraeffect3 and tonumber(auraeffect3)) then
 					auraeffect3 = tonumber(auraeffect3);
 				else
 					auraeffect3 = nil;
 				end
-				
+
 				-- runetype
 				if (runetype and tonumber(runetype) and tonumber(runetype) > 0) then
 					runetype = tonumber(runetype);
 				else
 					runetype = nil;
 				end
-				
+
 				-- marker count/size (tick markers for power bars)
 				if (mcnt and tonumber(mcnt)) then
 					mcnt = tonumber(mcnt);
-					
+
 					if (mcnt > 10) then
 						mcnt = 10;
 					elseif (mcnt < 1) then
 						mcnt = 1;
 					end
-					
+
 					if (not msize or not tonumber(msize)) then
 						msize = "1.0";
 					end
@@ -1559,12 +1559,12 @@ function Gnosis:CreateSingleTimerTable()
 				end
 				if (msize) then
 					msize = tonumber(msize);
-					
+
 					if (msize > 1.0 or msize < 0.0) then
 						msize = 1.0;
 					end
 				end
-				
+
 				-- get play interval time
 				local playinterval;
 				if (plays) then
@@ -1581,7 +1581,7 @@ function Gnosis:CreateSingleTimerTable()
 					if (playinterval) then playinterval = tonumber(playinterval); end
 					plays = nil; playm = nil;
 				end
-				
+
 				-- check if playinterval is too short or too long
 				if (playinterval and (playinterval < 0.5 or playinterval > 600)) then
 					playinterval = nil;
@@ -1603,13 +1603,13 @@ function Gnosis:CreateSingleTimerTable()
 						toplay = playf;
 					end
 				end
-				
+
 				-- start/stop count
 				local countstart, countinterval, countstop, countcpy;
 				if (startcnt) then
 					countinterval, countstart =
 						string_match(startcnt, "([+-]?[0-9]*%.?[0-9]*)%-(.+)");
-						
+
 					if (countstart) then
 						countinterval = tonumber(countinterval);
 					else
@@ -1622,11 +1622,11 @@ function Gnosis:CreateSingleTimerTable()
 				if (stopcnt) then
 					countstop = stopcnt;
 				end
-								
+
 				-- icon override, portrait unit
 				local iconoverride = select(3, GetSpellInfo(iconoverride));
 				local ptun = portraitunit;
-				
+
 				local nfs, tfs, colstr, tsbcol, tbcol;
 				-- name format string
 				nfs, str = self:ExtractRegex(str, "nfs=\"([^\"]*)\"", "nfs=(%w+)");
@@ -1713,7 +1713,7 @@ function Gnosis:CreateSingleTimerTable()
 							if (spell_) then
 								spell = spell_;
 								icon__ = icon_;
-							end		
+							end
 							if (spell) then
 								tiType = 8;
 								cfinit = Gnosis.Timers_InnerCD;
@@ -1887,7 +1887,7 @@ function Gnosis:CreateSingleTimerTable()
 				strFilter = strFilter .. (bSelf and "PLAYER" or "");
 				strFilter = strFilter .. (bHarm and (string_len(strFilter) > 0 and "|HARMFUL" or "HARMFUL") or "");
 				strFilter = strFilter .. (bHelp and (string_len(strFilter) > 0 and "|HELPFUL" or "HELPFUL") or "");
-				
+
 				if (tiType) then
 					local tTimer = {
 						type = tiType,
@@ -1936,7 +1936,7 @@ function Gnosis:CreateSingleTimerTable()
 						chargecnt = chargecnt,
 						spellid = spellid,
 					};
-					
+
 					-- targeted unit
 					tTimer.unit = unit and unit or conf.unit;
 
@@ -1949,7 +1949,7 @@ function Gnosis:CreateSingleTimerTable()
 							tTimer.spellid = spellid_;
 						end
 					end
-					
+
 					-- if itemcd try to get item id and texture
 					if (tiType == 3 or tiType == 14) then
 						local itemname, link, _, _, _, _, _, _, _, itex = GetItemInfo(spell);
@@ -1959,12 +1959,12 @@ function Gnosis:CreateSingleTimerTable()
 							tTimer.iname = itemname;
 						end
 					end
-					
+
 					-- inner cooldown/proc (norefresh command)
 					if (tiType == 8) then
 						self.ti_icd[spell].norefresh = norefresh;
 					end
-					
+
 					-- special handling for auras with
 					-- aurastacks/auraeffect commands
 					if (tiType == 2 or tiType == 21) then
@@ -1979,12 +1979,12 @@ function Gnosis:CreateSingleTimerTable()
 					if (tiType == 9 and chargecnt) then
 						tTimer.type = 5001;
 					end
-					
+
 					-- do not check if unit exists for unitname/npc command
 					if (not(tiType == 12 or tiType == 15 or tiType == -1)) then
 						tTimer.unitexistscheck = true;
 					end
-					
+
 					-- insert entry
 					table_insert(value.timers, tTimer);
 				elseif (iSort) then
@@ -2005,24 +2005,24 @@ function Gnosis:InjectTimer(barname, text, cnt, spell, isCast)
 	if (self.castbars and self.castbars[barname]) then
 		local cb = self.castbars[barname];
 		local cfg = cb.conf;
-		
+
 		-- castbar values
 		cb.channel = not isCast;
 		cb.icon:SetTexture(nil);
 		cb.id = 0;
-		
+
 		if (spell) then
 			local name, _, icon = GetSpellInfo(spell);
 			if (name and icon) then
 				cb.castname = name;
 				cb.icon:SetTexture(icon);
 			end
-		end	
+		end
 
 		-- show castbar text
 		cb.ctext:SetText(text);
 		cb.castname = nil;
-		
+
 		cb.duration = cnt * 1000;
 		cb.endTime = fCurTime + cb.duration;
 
@@ -2032,13 +2032,13 @@ function Gnosis:InjectTimer(barname, text, cnt, spell, isCast)
 		cb.bar:SetValue(val);
 		cb:SetAlpha(cfg.alpha);
 		cb:Show();
-		
+
 		-- castbar spark
 		if(cfg.bShowCBS) then
 			cb.cbs:SetPoint("CENTER", cb.bar, "LEFT", val * cb.barwidth, 0);
 			cb.cbs:Show();
 		end
-		
+
 		-- pushback (also vital for clipping test)
 		cb.pushback = 0;
 
@@ -2057,9 +2057,9 @@ function Gnosis:CheckCounter(v, ti)
 			self.counters[v.countstop] = nil;
 		end
 	end
-	
+
 	-- start counter if it's not already running
-	if (v.countinterval) then		
+	if (v.countinterval) then
 		if (self.counters[v.countstart] == nil) then
 			self.counters[v.countstart] = { starttime = GetTime(), endtime = GetTime() + v.countinterval };
 		elseif (self.counters[v.countstart].endtime < GetTime()) then
@@ -2067,7 +2067,7 @@ function Gnosis:CheckCounter(v, ti)
 			self.counters[v.countstart].endtime = self.counters[v.countstart].starttime + v.countinterval;
 		end
 	end
-	
+
 	-- start counter (copying timer duration)
 	if (v.countcpy and ti) then
 		if (self.counters[v.countcpy] == nil) then
@@ -2075,7 +2075,7 @@ function Gnosis:CheckCounter(v, ti)
 		elseif (self.counters[v.countcpy].endtime < GetTime()) then
 			self.counters[v.countcpy].starttime = (ti.fin - ti.dur) / 1000;
 			self.counters[v.countcpy].endtime = ti.fin / 1000;
-		end		
+		end
 	end
 end
 
@@ -2112,7 +2112,7 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 		if (boolop_complete) then
 			-- unmark relaxed and request
 			relaxed_and = nil;
-			
+
 			-- search for first timer entry without boolop
 			if (v.boolop == BOOLOP_NONE) then
 				boolop_complete = false;
@@ -2120,7 +2120,7 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 		else
 			-- compute command?
 			local checkentry = true;
-			
+
 			-- check current spec
 			if (v.spectab and v.spectab[self.iCurSpec] == false) then
 				checkentry = false;
@@ -2140,19 +2140,19 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 					end
 				end
 			end
-						
+
 			-- check entry
 			if (checkentry) then
 				wipe(TimerInfo);
-				
+
 				-- call related timer function (Timers.lua)
 				v:cfinit(bar, v, TimerInfo);
 
 				-- related timer info valid
-				if (TimerInfo.ok and self:UnitRelationSelect(bar.conf.relationsel, TimerInfo.unit)) then						
-					-- start or stop counter?				
+				if (TimerInfo.ok and self:UnitRelationSelect(bar.conf.relationsel, TimerInfo.unit)) then
+					-- start or stop counter?
 					self:CheckCounter(v, TimerInfo);
-						
+
 					-- boolop?
 					if (v.boolop == BOOLOP_RELAXEDAND) then
 						-- '?' (relaxed and, only one match necessary)
@@ -2173,7 +2173,7 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 							-- exit, do not compute further
 							break;
 						end
-				
+
 						if (v.boolop == BOOLOP_OR) then
 							boolop_complete = true;
 						end
@@ -2210,7 +2210,7 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 							SelectedTimerInfo.tiunit = TimerInfo.unit;
 							SelectedTimerInfo.bChannel = TimerInfo.bChannel;
 							SelectedTimerInfo.notInterruptible = TimerInfo.notInterruptible;
-							SelectedTimerInfo.curtimer = v;							
+							SelectedTimerInfo.curtimer = v;
 						end
 
 						if (SelectedTimerInfo.bSpecial or not bar.iTimerSort) then
@@ -2246,11 +2246,11 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 
 		-- play sound/music/file
 		self:PlayBarAudio(SelectedTimerInfo.curtimer, bar.name);
-		
+
 		-- only minor changes to bar necessary?
 		if (bar.bActive and bar.timer_id == SelectedTimerInfo.curtimer.id and
 			bar.castname == SelectedTimerInfo.castname and bar.notInterruptible == SelectedTimerInfo.notInterruptible) then
-			
+
 			local dur = bar.dur and bar.dur or bar.duration;
 			local bRecalcTick = (dur ~= SelectedTimerInfo.duration);
 
@@ -2263,12 +2263,12 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 				bar.tiUnitName = UnitName(bar.tiUnit);
 				bar.ctext:SetText(self:CreateCastname(bar, bar.conf, SelectedTimerInfo.castname, ""));
 			end
-			
+
 			if (SelectedTimerInfo.bSpecial) then
 				if (not SelectedTimerInfo.valIsStatic) then
 					-- power
 					self:SetPowerbarValue(bar, SelectedTimerInfo.endTime, SelectedTimerInfo.duration, SelectedTimerInfo.curtimer.cbs);
-					
+
 					if (SelectedTimerInfo.curtimer.mcnt) then
 						self:SetPowerbarValueMarkers(bar, SelectedTimerInfo.endTime,
 							SelectedTimerInfo.duration, SelectedTimerInfo.curtimer.mcnt,
@@ -2315,12 +2315,12 @@ function Gnosis:ScanTimerbar(bar, fCurTime)
 			bar.tfs = SelectedTimerInfo.curtimer.tfs and SelectedTimerInfo.curtimer.tfs or bar.conf.strTimeFormat;
 
 			-- not interruptible status for 'cast' command
-			bar.notInterruptible = SelectedTimerInfo.notInterruptible; 
-			
+			bar.notInterruptible = SelectedTimerInfo.notInterruptible;
+
 			if (SelectedTimerInfo.bSpecial) then
 				bar.bSpecial = true;
 				self:SetupPowerbar(bar, SelectedTimerInfo);
-				
+
 				if (SelectedTimerInfo.curtimer.mcnt) then
 					self:SetPowerbarValueMarkers(bar, SelectedTimerInfo.endTime,
 						SelectedTimerInfo.duration, SelectedTimerInfo.curtimer.mcnt,
@@ -2350,19 +2350,19 @@ function Gnosis:PlayBarAudio(curtimer, barname)
 		local fplay = curtimer.fplay;
 		local tplay = curtimer.tplay;
 		local toplay = curtimer.toplay;
-		
+
 		if (not tplay[barname]) then
 			tplay[barname] = {};
 		end
-		
+
 		local tp = tplay[barname];
 		if ((not tp[toplay]) or tp[toplay].timer <= GetTime()) then
 			if (tp[toplay] and tp[toplay].handle) then
 				StopSound(tp[toplay].handle);
 			end
-			
+
 			local willPlay, handle = fplay(toplay, self.s.ct.channel and self.tSoundChannels[self.s.ct.channel] or self.tSoundChannels[1]);
-								
+
 			if (willPlay) then
 				if (tp[toplay]) then
 					tp[toplay].handle = handle;

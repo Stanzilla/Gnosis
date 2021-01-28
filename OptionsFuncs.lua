@@ -98,25 +98,25 @@ function Gnosis:CommaSeparatedNumbersToTable(inputString, minNum, maxNum)
 	if (type(inputString) ~= "string") then
 		return {};
 	end
-	
+
 	local retTab = {};
-	
+
 	-- fill table with minNum to maxNum
 	for num=minNum,maxNum do
 		retTab[num] = false;
 	end
-	
+
 	-- set table entries true for matched numbers
 	for num in string_gmatch(inputString, ".-(%d+).-") do
 		if (num) then
 			local number = tonumber(num);
-			
+
 			if (number and number >= minNum and number <= maxNum) then
 				retTab[number] = true;
 			end
 		end
 	end
-	
+
 	return retTab;
 end
 
@@ -132,7 +132,7 @@ function Gnosis:TableToCommaSeparatedNumbers(tabNumbers)
 		end
 	end
 	table_sort(unordererd_tab);
-	
+
 	-- create ordered, comma separated, string
 	local first = true;
 	local str = "";
@@ -140,7 +140,7 @@ function Gnosis:TableToCommaSeparatedNumbers(tabNumbers)
 		str = (first and "" or (str .. ",")) .. val;
 		first = nil;
 	end
-	
+
 	return str;
 end
 
