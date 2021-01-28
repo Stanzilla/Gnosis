@@ -26,7 +26,7 @@ if (wowmainline) then
 		"UNIT_SPELLCAST_FAILED_QUIET",
 		"UNIT_SPELLCAST_SUCCEEDED",
 	};
-	
+
 	Gnosis.tMiscEvents = {
 		"PLAYER_REGEN_DISABLED",
 		"PLAYER_REGEN_ENABLED",
@@ -54,7 +54,7 @@ if (wowclassic) then
 		"UNIT_SPELLCAST_FAILED_QUIET",
 		"UNIT_SPELLCAST_SUCCEEDED",
 	};
-	
+
 	Gnosis.tMiscEvents = {
 		"PLAYER_REGEN_DISABLED",
 		"PLAYER_REGEN_ENABLED",
@@ -201,14 +201,14 @@ function Gnosis:StartupVariables()
 	self.scan = {};			-- units to scan
 	self.counters = {};		-- counters
 	self.timer_cds = {};	-- track player cds
-	
+
 	-- play intervals (audio)
 	self.played = {
 		s = {},
 		m = {},
 		f = {},
 	};
-	
+
 	-- (LibSharedMedia)
 	self.bartexnames = {};
 	self.bartextures = {};
@@ -405,13 +405,13 @@ function Gnosis:StartupVariables()
 		rotatertext = 0,		--
 		rotatelattext = 0,		--
 	};
-	
+
 	self.tIconLikeOverrides = {
 		-- bar geometry
 		width = 40,
 		height = 40,
 		border = 0,
-		
+
 		coord = {
 			castname = { x = 0, y = 0 },
 			casttime = { x = 3, y = 0 },
@@ -419,12 +419,12 @@ function Gnosis:StartupVariables()
 			latency = { x = -1, y = 1 },
 			shadow = { x = 3, y = -3 },
 		},
-		
+
 		-- alignments
 		alignment = "FREE",	-- new alignment options for name and time (v1.30)
 		alignname = "CENTER",		--
 		aligntime = "CENTER", 	--
-		
+
 		-- default bar colors
 		colBar = { 0.15, 0.35, 0.35, 0.0 },
 		colBarNI = { 0.15, 0.35, 0.35, 0.0 },
