@@ -6,7 +6,7 @@ local string_format = string.format;
 -- local variables
 local _;
 
--- mainline or classic
+-- mainline (retail) or classic
 local wowmainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE);
 local wowclassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC);
 
