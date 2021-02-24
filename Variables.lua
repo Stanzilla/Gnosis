@@ -421,8 +421,8 @@ function Gnosis:StartupVariables()
 		},
 
 		-- alignments
-		alignment = "FREE",	-- new alignment options for name and time (v1.30)
-		alignname = "CENTER",		--
+		alignment = "FREE",		-- new alignment options for name and time (v1.30)
+		alignname = "CENTER",	--
 		aligntime = "CENTER", 	--
 
 		-- default bar colors
