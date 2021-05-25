@@ -9,6 +9,7 @@ local _;
 -- mainline (retail) or classic
 local wowmainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE);
 local wowclassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC);
+local wowtbc = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC);
 
 if (wowmainline) then
 	-- global Gnosis event tables
@@ -40,7 +41,7 @@ if (wowmainline) then
 	};
 end
 
-if (wowclassic) then
+if (wowclassic) or (wowtbc) then
 	-- global Gnosis event tables
 	Gnosis.tCastbarEvents = {
 		"UNIT_SPELLCAST_CHANNEL_START",
@@ -174,7 +175,7 @@ Gnosis.tSoundChannels = {
 function Gnosis:StartupVariables()
 	local fCurTime = GetTime() * 1000;
 
-	self.ver = 4.85;
+	self.ver = 4.86;
 	self.optver = 4.62;
 	self.build = "@project-version@";
 	self.addonname = "Gnosis";

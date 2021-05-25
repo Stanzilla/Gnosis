@@ -38,6 +38,7 @@ local _;
 -- mainline or classic
 local wowmainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE);
 local wowclassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC);
+local wowtbc = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC);
 
 -- WOW classic support
 local UnitCastingInfo = UnitCastingInfo;
