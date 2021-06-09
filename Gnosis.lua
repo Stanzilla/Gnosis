@@ -20,7 +20,7 @@ local _;
 -- mainline or classic
 local wowmainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE);
 local wowclassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC);
-local wowtbc = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC);
+local wowbcc = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC);
 
 -- libraries
 Gnosis = LibStub("AceAddon-3.0"):NewAddon("Gnosis", "AceConsole-3.0", "AceEvent-3.0");
@@ -51,6 +51,13 @@ if (wowclassic and Gnosis.libclcno) then
 
 	UnitChannelInfo = function(unit)
 		return Gnosis.libclcno:UnitChannelInfo(unit);
+	end
+end
+
+if (wowbcc) then
+	UnitCastingInfo = function(unit)
+		local name, text, texture, startTimeMS, endTimeMS, isTradeSkill, castID, spellId = UnitCastingInfo(unit)
+		return name, text, texture, startTimeMS, endTimeMS, isTradeSkill, castID, nil, spellId
 	end
 end
 
@@ -434,7 +441,7 @@ function Gnosis:SetupHooks()
 				end
 			);
 		end
-	elseif (wowclassic) or (wowtbc) then
+	elseif (wowclassic) or (wowbcc) then
 		-- tradeskill hooking
 		hooksecurefunc('DoTradeSkill', function(index, num)
 				Gnosis.bNewTradeSkill = tonumber(num) and true or nil;
@@ -745,7 +752,7 @@ function Gnosis:SetupChanneledSpellsTable()
 	-- spellid, #ticks, addticks, #shown ticks, first tick instant, multi mob (no clipping detection), spellschool, isheal, upgrade_num
 
 	-- priest
-	if (wowclassic) or (wowtbc) then
+	if (wowclassic) or (wowbcc) then
 		self:AddChanneledSpellById(15407, 3, false, 4, false, false, "shadow", false, 4);	-- mind flay
 	else
 		self:AddChanneledSpellById(15407, 6, false, 7, false, false, "shadow", false, 3);	-- mind flay
@@ -755,14 +762,14 @@ function Gnosis:SetupChanneledSpellsTable()
 	self:AddChanneledSpellById(64843, 4, false, 15, false, true, "holy", true, 4);		-- divine hymn
 
 	-- mage
-	if (wowclassic) or (wowtbc) then
+	if (wowclassic) or (wowbcc) then
 		self:AddChanneledSpellById(10, 8, false, 15, false, true, "frost", false, 2);		-- blizzard
 	end
 	self:AddChanneledSpellById(5143, 5, false, 6, false, false, "arcane", false, 2);	-- arcane missiles
 	self:AddChanneledSpellById(12051, 6, false, 7, true, false, "arcane", false, 2);	-- evocation
 
 	-- warlock
-	if (wowclassic) or (wowtbc) then
+	if (wowclassic) or (wowbcc) then
 		self:AddChanneledSpellById(689, 6, false, 15, false, false, "shadow", false, 3);	-- drain life
 		self:AddChanneledSpellById(1120, 4, false, 5, false, false, "shadow", false, 4);	-- drain soul
 		self:AddChanneledSpellById(4629, 6, false, 15, false, true, "fire", false, 3);		-- rain of fire
@@ -774,7 +781,7 @@ function Gnosis:SetupChanneledSpellsTable()
 
 	-- druid
 	self:AddChanneledSpellById(740, 4, false, 15, false, true, "nature", true, 3);		-- tranquility
-	if (wowclassic) or (wowtbc) then
+	if (wowclassic) or (wowbcc) then
 		self:AddChanneledSpellById(16914, 10, false, 15, false, true, "nature", false, 2);	-- hurricane
 	end
 

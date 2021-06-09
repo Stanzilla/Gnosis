@@ -38,7 +38,7 @@ local _;
 -- mainline or classic
 local wowmainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE);
 local wowclassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC);
-local wowtbc = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC);
+local wowbcc = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC);
 
 -- WOW classic support
 local UnitCastingInfo = UnitCastingInfo;
@@ -51,6 +51,13 @@ if (wowclassic and Gnosis.libclcno) then
 
 	UnitChannelInfo = function(unit)
 		return Gnosis.libclcno:UnitChannelInfo(unit);
+	end
+end
+
+if (wowbcc) then
+	UnitCastingInfo = function(unit)
+		local name, text, texture, startTimeMS, endTimeMS, isTradeSkill, castID, spellId = UnitCastingInfo(unit)
+		return name, text, texture, startTimeMS, endTimeMS, isTradeSkill, castID, nil, spellId
 	end
 end
 
