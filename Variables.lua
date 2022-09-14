@@ -10,6 +10,7 @@ local _;
 local wowmainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE);
 local wowclassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC);
 local wowbcc = (WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC);
+local wowwc = (WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC);
 
 if (wowmainline) then
 	-- global Gnosis event tables
@@ -39,9 +40,7 @@ if (wowmainline) then
 		"DISPLAY_SIZE_CHANGED",
 		"PLAYER_TALENT_UPDATE",
 	};
-end
-
-if (wowclassic) or (wowbcc) then
+else	-- wow classic (wowclassic or wowbcc or wowwc)
 	-- global Gnosis event tables
 	Gnosis.tCastbarEvents = {
 		"UNIT_SPELLCAST_CHANNEL_START",
