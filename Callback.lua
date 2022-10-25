@@ -437,6 +437,9 @@ function Gnosis:COMBAT_LOG_EVENT_UNFILTERED()
 					-- multistrike
 					selcc.mastery = selcc.mastery + 1;
 					isNormalTick = false;
+					if(selcc.bticksound) then
+						self:PlaySounds();
+					end
 				else
 					-- non multistrike tick
 					selcc.ticks = selcc.ticks + 1;
