@@ -136,7 +136,7 @@ function Gnosis:En(status)
 		self:PLAYER_TALENT_UPDATE();
 
 		-- resize interface options frame
-		if (self.s.bResizeOptions && wowwc) then
+		if (self.s.bResizeOptions and wowwc) then
 			InterfaceOptionsFrame:SetWidth(835);
 		end
 	else
@@ -242,10 +242,10 @@ end
 function Gnosis:HideBlizzardCastbar(status)
 	if (status) then	-- hide castbar
 		for key, value in pairs(self.tBlizzCastbar) do
-			if(wowmainline && PlayerCastingBarFrame:IsEventRegistered(value)) then
+			if(wowmainline and PlayerCastingBarFrame:IsEventRegistered(value)) then
 				table_insert(self.blizzcastbar, value);
 				PlayerCastingBarFrame:UnregisterEvent(value);
-			elseif(CastingBarFrame:IsEventRegistered(value)) then
+			elseif(not wowmainline and CastingBarFrame:IsEventRegistered(value)) then
 				table_insert(self.blizzcastbar, value);
 				CastingBarFrame:UnregisterEvent(value);
 			end
