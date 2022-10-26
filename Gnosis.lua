@@ -136,7 +136,7 @@ function Gnosis:En(status)
 		self:PLAYER_TALENT_UPDATE();
 
 		-- resize interface options frame
-		if (self.s.bResizeOptions) then
+		if (self.s.bResizeOptions && wowwc) then
 			InterfaceOptionsFrame:SetWidth(835);
 		end
 	else
@@ -181,30 +181,54 @@ end
 function Gnosis:OpenOptions()
 	if (not self.iofcalled) then
 		-- call twice the first time
-		InterfaceOptionsFrame_OpenToCategory(Gnosis.optFrame);
+		if (wowmainline) then
+			Settings.OpenToCategory(Gnosis.optFrame);
+		else
+			InterfaceOptionsFrame_OpenToCategory(Gnosis.optFrame);
+		end
 	end
 
-	InterfaceOptionsFrame_OpenToCategory(Gnosis.optFrame);
+	if (wowmainline) then
+		Settings.OpenToCategory(Gnosis.optFrame);
+	else
+		InterfaceOptionsFrame_OpenToCategory(Gnosis.optFrame);
+	end
 	self.iofcalled = true;
 end
 
 function Gnosis:OpenCfgOptions()
 	if (not self.iofcfgcalled) then
 		-- call twice the first time
-		InterfaceOptionsFrame_OpenToCategory(Gnosis.optCfgs);
+		if (wowmainline) then
+			Settings.OpenToCategory(Gnosis.optCfgs);
+		else
+			InterfaceOptionsFrame_OpenToCategory(Gnosis.optCfgs);
+		end
 	end
 
-	InterfaceOptionsFrame_OpenToCategory(Gnosis.optCfgs);
+	if (wowmainline) then
+		Settings.OpenToCategory(Gnosis.optCfgs);
+	else
+		InterfaceOptionsFrame_OpenToCategory(Gnosis.optCfgs);
+	end
 	self.iofcfgcalled = true;
 end
 
 function Gnosis:OpenCastbarOptions()
 	if (not self.iofcbcalled) then
 		-- call twice the first time
-		InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+		if (wowmainline) then
+			Settings.OpenToCategory(Gnosis.optCBs);
+		else
+			InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+		end
 	end
 
-	InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+	if (wowmainline) then
+		Settings.OpenToCategory(Gnosis.optCBs);
+	else
+		InterfaceOptionsFrame_OpenToCategory(Gnosis.optCBs);
+	end
 	self.iofcbcalled = true;
 end
 
