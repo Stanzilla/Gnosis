@@ -242,7 +242,10 @@ end
 function Gnosis:HideBlizzardCastbar(status)
 	if (status) then	-- hide castbar
 		for key, value in pairs(self.tBlizzCastbar) do
-			if(CastingBarFrame:IsEventRegistered(value)) then
+			if(wowmainline && PlayerCastingBarFrame:IsEventRegistered(value)) then
+				table_insert(self.blizzcastbar, value);
+				PlayerCastingBarFrame:UnregisterEvent(value);
+			elseif(CastingBarFrame:IsEventRegistered(value)) then
 				table_insert(self.blizzcastbar, value);
 				CastingBarFrame:UnregisterEvent(value);
 			end
@@ -259,7 +262,11 @@ function Gnosis:HideBlizzardCastbar(status)
 		end
 	else	-- restore castbar events, it might not actually enable the blizzard castbar if another addon hides it
 		for key, value in pairs(self.blizzcastbar) do
-			CastingBarFrame:RegisterEvent(value);
+			if (wowmainline) then
+				PlayerCastingBarFrame:RegisterEvent(value);
+			else
+				CastingBarFrame:RegisterEvent(value);
+			end
 		end
 
 		if (#self.blizzcastbar > 0) then
