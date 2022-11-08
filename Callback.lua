@@ -211,6 +211,23 @@ function Gnosis:UNIT_SPELLCAST_CHANNEL_START(event, unit, _, spellid)
 	end
 end
 
+function Gnosis:UNIT_SPELLCAST_EMPOWER_START(event, unit, _, spellid)
+	local cb = self:FindCB(unit);
+	if (cb) then
+		local fCurTime = GetTime() * 1000.0;
+		repeat
+			self:SetupCastbar(cb, true, fCurTime);
+			cb = self:FindCBNext(unit);
+		until cb == nil;
+	end
+
+	-- clip test
+	if (unit == "player") then
+		-- generate new clip test data
+		self:SetupChannelData();
+	end
+end
+
 function Gnosis:UNIT_SPELLCAST_STOP(event, unit, _, spellid)
 	local cb = self:FindCB(unit);
 	if (cb) then
@@ -258,7 +275,52 @@ function Gnosis:UNIT_SPELLCAST_CHANNEL_STOP(event, unit, _, spellid)
 	end
 end
 
+function Gnosis:UNIT_SPELLCAST_EMPOWER_STOP(event, unit, _, spellid)
+	local cb = self:FindCB(unit);
+	if (cb) then
+		local fCurTime = GetTime() * 1000.0;
+		repeat
+			if (cb.bActive) then
+				local conf = cb.conf;
+				if (conf.bUnlocked or conf.bShowWNC) then
+					self:CleanupCastbar(cb);
+				else
+					self:PrepareCastbarForFadeout(cb, fCurTime);
+				end
+			end
+			cb = self:FindCBNext(unit);
+		until cb == nil;
+	end
+
+	-- clip test
+	if (unit == "player") then
+		-- request unintentional clipping test
+		self:RequestClipTest();
+	end
+end
+
 function Gnosis:UNIT_SPELLCAST_CHANNEL_UPDATE(event, unit)
+	local cb = self:FindCB(unit);
+	if (cb) then
+		repeat
+			if (cb.bActive) then
+				local spell, _, _, startTime, endTime = UnitChannelInfo(unit);
+				if (spell) then
+					self:UpdateCastbar(cb, startTime, endTime, spell);
+				end
+			end
+			cb = self:FindCBNext(unit);
+		until cb == nil;
+	end
+
+	-- clip test
+	if (unit == "player") then
+		-- update clipping test
+		self:UpdateClipTest();
+	end
+end
+
+function Gnosis:UNIT_SPELLCAST_EMPOWER_UPDATE(event, unit)
 	local cb = self:FindCB(unit);
 	if (cb) then
 		repeat

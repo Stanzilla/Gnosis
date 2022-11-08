@@ -1748,7 +1748,7 @@ function Gnosis:SetPowerbarValueMarkers(cb, curpower, maxpower, mcnt, msize)
 			cb.lb[i]:Hide();
 		else
 			local p = (i-1) * marker_pos;
-			if (cfg.bChanAsNorm) then
+			if (cfg.bChanAsNorm or cb.charge) then
 				-- show channel as normal cast
 				cb.lb[i]:ClearAllPoints();
 				if (cfg.orient == 2) then
@@ -2050,14 +2050,21 @@ end
 
 function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 	local barname, cfg = cb.name, cb.conf;
-	local name, displayName, texture, startTime, endTime, isTradeSkill, notInterruptible, id;
+	local name, displayName, texture, startTime, endTime, isTradeSkill, notInterruptible, id, numStages;
 
 	if (bIsChannel) then
-		name, displayName, texture, startTime, endTime, isTradeSkill, notInterruptible = UnitChannelInfo(cfg.unit);
+		name, displayName, texture, startTime, endTime, isTradeSkill, notInterruptible, id, _, numStages = UnitChannelInfo(cfg.unit);
 	else
 		name, displayName, texture, startTime, endTime, isTradeSkill, id, notInterruptible = UnitCastingInfo(cfg.unit);
+		numStages = 0
 	end
-
+	
+	local bIsCharge = numStages > 0
+	
+	if bIsCharge then
+		bIsChannel = false
+	end
+	
 	if (not name) then
 		return;
 	end
@@ -2141,12 +2148,20 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 			self:CleanupCastbar(cb, true);
 		end
 
-		cb.duration = endTime - startTime;
-		cb.endTime = endTime;
+		if bIsCharge then
+			cb.endTime = endTime + GetUnitEmpowerHoldAtMaxTime(cfg.unit);
+			cb.duration = cb.endTime - startTime;
+		else
+			cb.endTime = endTime;
+			cb.duration = endTime - startTime;
+		end
 	end
+
+	self.maxValue = (cb.endTime - startTime) / 1000;
 
 	-- castbar values
 	cb.channel = bIsChannel;
+	cb.charge = bIsCharge;
 	cb.icon:SetTexture(texture);
 	cb.id = id;
 
@@ -2156,7 +2171,7 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 
 	-- set statusbar value
 	local val = (cb.endTime - fCurTime) / (cb.duration);
-	val = (cb.channel and (not cfg.bChanAsNorm)) and val or (1 - val);
+	val = (cb.channel and (not cfg.bChanAsNorm) and (not bIsCharge)) and val or (1 - val);
 	cb.bar:SetValue(val);
 	cb:SetAlpha(cfg.alpha);
 	cb:Show();
@@ -2210,6 +2225,31 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 		cb.shownticks = cfg.bShowTicks and shownticks or 0;
 
 		self:DrawTicks(cb, cfg);
+	elseif (bIsCharge) then
+		local totalticks = numStages+1;
+		local shownticks = numStages;
+		local sumticktime = 0;
+
+		local getStageDuration = function(stage)
+			if stage == numStages+1 then	
+				return GetUnitEmpowerHoldAtMaxTime(cfg.unit);
+			else
+				return GetUnitEmpowerStageDuration(cfg.unit, stage-1);
+			end
+		end;
+
+		-- spell is empowered, store tick information for spell update and possible clip test
+		wipe(cb.ticks);
+		for i = 1, totalticks do
+			cb.channelticktime = getStageDuration(totalticks+1-i);
+			cb.ticks[i] = cb.endTime - sumticktime - cb.channelticktime;
+			sumticktime = sumticktime + cb.channelticktime
+		end
+
+		cb.totalticks = totalticks;
+		cb.shownticks = shownticks;
+
+		self:DrawTicks(cb, cfg);
 	else
 		cb.totalticks = 0;
 		cb.shownticks = 0;
@@ -2223,14 +2263,14 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 			cb.lb[1]:ClearAllPoints();
 			if (cfg.orient == 2) then
 				cb.lb[1]:SetHeight(cb.barheight * max(min(self.lag / cb.duration, cfg.latbarsize), cfg.latbarfixed));
-				local direction = (cb.channel and (not cfg.bChanAsNorm)) and "BOTTOM" or "TOP";
+				local direction = (cb.channel and (not cfg.bChanAsNorm) and (not bIsCharge)) and "BOTTOM" or "TOP";
 				if (cfg.bInvDir) then
 					direction = (direction == "BOTTOM") and "TOP" or "BOTTOM";
 				end
 				cb.lb[1]:SetPoint(direction);
 			else
 				cb.lb[1]:SetWidth(cb.barwidth * max(min(self.lag / cb.duration, cfg.latbarsize), cfg.latbarfixed));
-				local direction = (cb.channel and (not cfg.bChanAsNorm)) and "LEFT" or "RIGHT";
+				local direction = (cb.channel and (not cfg.bChanAsNorm) and (not bIsCharge)) and "LEFT" or "RIGHT";
 				if (cfg.bInvDir) then
 					direction = (direction == "LEFT") and "RIGHT" or "LEFT";
 				end
@@ -2248,13 +2288,13 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 				cb.brtext:SetText(string_format("%d", self.lag));
 			else
 				if (cfg.bInvDir) then
-					if (cb.channel and (not cfg.bChanAsNorm)) then
+					if (cb.channel and (not cfg.bChanAsNorm) and (not bIsCharge)) then
 						cb.brtext:SetText(string_format("%d", self.lag));
 					else
 						cb.bltext:SetText(string_format("%d", self.lag));
 					end
 				else
-					if (cb.channel and (not cfg.bChanAsNorm)) then
+					if (cb.channel and (not cfg.bChanAsNorm) and (not bIsCharge)) then
 						cb.bltext:SetText(string_format("%d", self.lag));
 					else
 						cb.brtext:SetText(string_format("%d", self.lag));
@@ -2359,11 +2399,11 @@ function Gnosis:DrawTicks(cb, cfg)
 				else
 					-- position of marker
 					local p = (cb.endTime-cb.ticks[i]) / cb.duration;
-
+					
 					if (p == 1.0) then
 						-- out of bounds (need special handling since :SetWidth(0) does not work)
 						cb.lb[i]:Hide();
-					elseif (cfg.bChanAsNorm) then
+					elseif (cfg.bChanAsNorm or cb.charge) then
 						-- show channel as normal cast
 						cb.lb[i]:ClearAllPoints();
 						if (cfg.orient == 2) then
