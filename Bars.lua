@@ -2259,7 +2259,7 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 	if (cfg.unit == "player" and self.lag < 10000) then
 		-- latency box, player only
 		-- < 10000ms should filter latency for most summoning stone timers, also hide latency when just too extreme
-		if (not(cs and cs.ben and cfg.bShowTicks) and cfg.bShowLat) then
+		if (not(cs and cs.ben and cfg.bShowTicks) and cfg.bShowLat and not(cb.charge)) then
 			cb.lb[1]:ClearAllPoints();
 			if (cfg.orient == 2) then
 				cb.lb[1]:SetHeight(cb.barheight * max(min(self.lag / cb.duration, cfg.latbarsize), cfg.latbarfixed));
