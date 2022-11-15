@@ -2052,8 +2052,11 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 	local barname, cfg = cb.name, cb.conf;
 	local name, displayName, texture, startTime, endTime, isTradeSkill, notInterruptible, id, numStages;
 
-	if (bIsChannel) then
+	if (bIsChannel and wowmainline) then
 		name, displayName, texture, startTime, endTime, isTradeSkill, notInterruptible, id, _, numStages = UnitChannelInfo(cfg.unit);
+	elseif (bIsChannel) then
+		name, displayName, texture, startTime, endTime, isTradeSkill, notInterruptible, id = UnitChannelInfo(cfg.unit);
+		numStages = 0
 	else
 		name, displayName, texture, startTime, endTime, isTradeSkill, id, notInterruptible = UnitCastingInfo(cfg.unit);
 		numStages = 0
