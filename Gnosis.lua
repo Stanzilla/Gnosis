@@ -784,24 +784,24 @@ function Gnosis:SetupChanneledSpellsTable()
 	-- spellid, #ticks, addticks, #shown ticks, first tick instant, multi mob (no clipping detection), spellschool, isheal, upgrade_num
 
 	-- priest
-	if (wowclassic) or (wowbcc) then
-		self:AddChanneledSpellById(15407, 3, false, 4, false, false, "shadow", false, 4);	-- mind flay
+	if (wowclassic) or (wowbcc) or (wowwc) then
+		self:AddChanneledSpellById(15407, 3, false, 3, false, false, "shadow", false, 4);	-- mind flay
 	else
 		self:AddChanneledSpellById(15407, 6, false, 7, false, false, "shadow", false, 3);	-- mind flay
 	end
 	self:AddChanneledSpellById(48045, 6, false, 7, false, true, "shadow", false, 3); 	-- mind sear
 	self:AddChanneledSpellById(47540, 3, false, 2, true, false, "holy", true, 1);		-- penance, first tick instant
-	self:AddChanneledSpellById(64843, 4, false, 15, false, true, "holy", true, 4);		-- divine hymn
+	self:AddChanneledSpellById(64843, 4, false, 4, false, true, "holy", true, 4);		-- divine hymn
 
 	-- mage
-	if (wowclassic) or (wowbcc) then
+	if (wowclassic) or (wowbcc) or (wowwc) then
 		self:AddChanneledSpellById(10, 8, false, 15, false, true, "frost", false, 2);		-- blizzard
 	end
 	self:AddChanneledSpellById(5143, 5, false, 6, false, false, "arcane", false, 2);	-- arcane missiles
 	self:AddChanneledSpellById(12051, 6, false, 7, true, false, "arcane", false, 2);	-- evocation
 
 	-- warlock
-	if (wowclassic) or (wowbcc) then
+	if (wowclassic) or (wowbcc) or (wowwc) then
 		self:AddChanneledSpellById(689, 6, false, 15, false, false, "shadow", false, 3);	-- drain life
 		self:AddChanneledSpellById(1120, 4, false, 5, false, false, "shadow", false, 4);	-- drain soul
 		self:AddChanneledSpellById(4629, 6, false, 15, false, true, "fire", false, 3);		-- rain of fire
@@ -813,7 +813,7 @@ function Gnosis:SetupChanneledSpellsTable()
 
 	-- druid
 	self:AddChanneledSpellById(740, 4, false, 15, false, true, "nature", true, 3);		-- tranquility
-	if (wowclassic) or (wowbcc) then
+	if (wowclassic) or (wowbcc) or (wowwc) then
 		self:AddChanneledSpellById(16914, 10, false, 15, false, true, "nature", false, 2);	-- hurricane
 	end
 
