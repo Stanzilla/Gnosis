@@ -455,6 +455,18 @@ function Gnosis:SetupHooks()
 			end
 		);
 
+		hooksecurefunc(C_TradeSkillUI, 'CraftSalvage', function(index, num)
+				Gnosis.bNewTradeSkill = tonumber(num) and true or nil;
+				Gnosis.iLastTradeSkillCnt = tonumber(num);
+			end
+		);
+
+		hooksecurefunc(C_TradeSkillUI, 'CraftEnchant', function(index, num)
+				Gnosis.bNewTradeSkill = tonumber(num) and true or nil;
+				Gnosis.iLastTradeSkillCnt = tonumber(num);
+			end
+		);
+
 		hooksecurefunc(C_TradeSkillUI, 'CloseTradeSkill', function()
 				Gnosis.bNewTradeSkill = nil;
 				Gnosis.iLastTradeSkillCnt = nil;
