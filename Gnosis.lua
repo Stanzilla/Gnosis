@@ -449,30 +449,17 @@ end
 function Gnosis:SetupHooks()
 	if (wowmainline) then
 		-- tradeskill hooking
-		hooksecurefunc(C_TradeSkillUI, 'CraftRecipe', function(index, num)
-				Gnosis.bNewTradeSkill = tonumber(num) and true or nil;
-				Gnosis.iLastTradeSkillCnt = tonumber(num);
-			end
-		);
 
-		hooksecurefunc(C_TradeSkillUI, 'CraftSalvage', function(index, num)
-				Gnosis.bNewTradeSkill = tonumber(num) and true or nil;
-				Gnosis.iLastTradeSkillCnt = tonumber(num);
-			end
-		);
-
-		hooksecurefunc(C_TradeSkillUI, 'CraftEnchant', function(index, num)
-				Gnosis.bNewTradeSkill = tonumber(num) and true or nil;
-				Gnosis.iLastTradeSkillCnt = tonumber(num);
-			end
-		);
+		hooksecurefunc(ProfessionsFrame.CraftingPage, "CreateInternal", function(_, recipeID, count, recipeLevel)
+			Gnosis.bNewTradeSkill = tonumber(count) and true or nil;
+			Gnosis.iLastTradeSkillCnt = tonumber(count);
+		end)
 
 		hooksecurefunc(C_TradeSkillUI, 'CloseTradeSkill', function()
-				Gnosis.bNewTradeSkill = nil;
-				Gnosis.iLastTradeSkillCnt = nil;
-				Gnosis:CloseAllTradeskillBars();
-			end
-		);
+			Gnosis.bNewTradeSkill = nil;
+			Gnosis.iLastTradeSkillCnt = nil;
+			Gnosis:CloseAllTradeskillBars();
+		end)
 
 		-- bandaid for LibDialog-1.0 (MINOR <= 8, until it is fixed)
 		local ld_name, ld_ver = LibStub:GetLibrary("LibDialog-1.0");
