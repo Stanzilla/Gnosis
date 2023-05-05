@@ -182,14 +182,14 @@ function Gnosis:OpenOptions()
 	if (not self.iofcalled) then
 		-- call twice the first time
 		if (wowmainline) then
-			Settings.OpenToCategory(Gnosis.optFrame);
+			Settings.OpenToCategory(Gnosis.optFrame.name);
 		else
 			InterfaceOptionsFrame_OpenToCategory(Gnosis.optFrame);
 		end
 	end
 
 	if (wowmainline) then
-		Settings.OpenToCategory(Gnosis.optFrame);
+		Settings.OpenToCategory(Gnosis.optFrame.name);
 	else
 		InterfaceOptionsFrame_OpenToCategory(Gnosis.optFrame);
 	end
