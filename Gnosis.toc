@@ -1,5 +1,5 @@
-## Interface: 100007
-## X-Min-Interface: 100007
+## Interface: 100100
+## X-Min-Interface: 100100
 ## X-Min-Interface-Classic: 11403
 ## X-Min-Interface-BCC: 20504
 ## X-Min-Interface-Wrath: 30400
@@ -14,6 +14,7 @@
 ## DefaultState: enabled
 ## X-Revision: @project-revision@
 ## X-Date: @project-date-iso@
+## IconTexture: 425951
 
 # Libraries
 #@no-lib-strip@

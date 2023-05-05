@@ -821,7 +821,7 @@ function Gnosis:SetupChanneledSpellsTable()
 	self:AddChanneledSpellById(115175, 8, false, 9, false, false, "nature", true, 3);	-- soothing mist
 
 	-- evoker
-	self:AddChanneledSpellById(356995, 4, false, 5, false, false, "spellfrost", false, 3);	-- disintegrate
+	self:AddChanneledSpellById(356995, 4, false, 5, true, false, "spellfrost", false, 3);	-- disintegrate, first tick instant
 end
 
 function Gnosis:CreateColorString(r, g, b, a)
