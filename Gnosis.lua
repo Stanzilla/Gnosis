@@ -330,7 +330,11 @@ function Gnosis:HideBlizzardPetCastbar(status)
 end
 
 function Gnosis:HideBlizzardMirrorCastbar(status)
-	if (status) then	-- hide castbar
+	if (wowmainline and status) then
+		MirrorTimerContainer:Hide()
+	elseif (wowmainline) then
+		MirrorTimerContainer:Show()
+	elseif (status) then	-- hide castbar
 		for key, value in pairs(self.tBlizzMirrorUiParent) do
 			if(UIParent:IsEventRegistered(value)) then
 				table_insert(self.blizzmirroruiparent, value);
@@ -450,6 +454,9 @@ function Gnosis:SetupHooks()
 	if (wowmainline) then
 		-- tradeskill hooking
 
+		if not (ProfessionsFrame) then
+			ProfessionsFrame_LoadUI()
+		end
 		hooksecurefunc(ProfessionsFrame.CraftingPage, "CreateInternal", function(_, recipeID, count, recipeLevel)
 			Gnosis.bNewTradeSkill = tonumber(count) and true or nil;
 			Gnosis.iLastTradeSkillCnt = tonumber(count);
