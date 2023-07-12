@@ -608,13 +608,14 @@ end
 
 function Gnosis:MIRROR_TIMER_STOP(event, timer)
 	local cb = self:FindCB("mirror");
+	local numMirrorTimerTypes = MIRRORTIMER_NUMTIMERS or 3;
 	if (cb) then
 		local fCurTime = GetTime() * 1000;
 		repeat
 			local bDoCleanup = true;
 			local conf = cb.conf;
 			if (cb.castname == timer) then
-				for i = 1, MIRRORTIMER_NUMTIMERS do
+				for i = 1, numMirrorTimerTypes do
 					local timer, init, maxval, scale, paused, label = GetMirrorTimerInfo(i);
 					if (timer and timer ~= cb.castname and init ~= 0 and maxval ~= 0) then
 						local curval = GetMirrorTimerProgress(timer);
