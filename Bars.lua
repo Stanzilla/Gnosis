@@ -198,6 +198,12 @@ function Gnosis:CheckStoredCastbarOptions()
 
 		-- add colBarNI if missing
 		cbopt.colBarNI = cbopt.colBarNI or cbopt.colBar;
+		
+		-- add colOutOfRange if missing (white color by default)
+		cbopt.colOutOfRange = cbopt.colOutOfRange or {1, 1, 1, 1};
+		
+		-- add colChanneled if missing
+		cbopt.colChanneled = cbopt.colChanneled or cbopt.colBar;
 
 		-- add missing option values
 		self:UpgradeTable(cbopt, self.tCastbarDefaults);
@@ -2165,6 +2171,7 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 	-- castbar values
 	cb.channel = bIsChannel;
 	cb.charge = bIsCharge;
+	cb.notInterruptible = notInterruptible;
 	cb.icon:SetTexture(texture);
 	cb.id = id;
 
@@ -2178,24 +2185,11 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 	cb.bar:SetValue(val);
 	cb:SetAlpha(cfg.alpha);
 	cb:Show();
-
 	-- setup strings, including automatic resize of long strings
 	self:SetupBarString(cb, cfg, fCurTime, bDoResize);
 
 	-- non interruptible colors
-	if (notInterruptible) then
-		cb.bar:SetStatusBarColor(unpack(cfg.colBarNI));
-		self:SetBorderColor(cb, cfg.colBorderNI, cfg.colBarBg);
-		if (cfg.bShowShield) then
-			cb.sicon:Show();
-		else
-			cb.sicon:Hide();
-		end
-	else
-		cb.bar:SetStatusBarColor(unpack(cfg.colBar));
-		self:SetBorderColor(cb, cfg.colBorder, cfg.colBarBg);
-		cb.sicon:Hide();
-	end
+	self:activeBarColors(cb);
 
 	-- castbar spark
 	if (cfg.bShowCBS) then
@@ -2317,6 +2311,26 @@ function Gnosis:SetupCastbar(cb, bIsChannel, fCurTime)
 	if (not (cfg.incombatsel == 1 or cfg.incombatsel == self.curincombattype or cfg.bUnlocked)) then
 		cb:Hide();
 		cb.bBarHidden = true;
+	end
+end
+
+function Gnosis:activeBarColors(cb)
+	if (cb.notInterruptible) then
+		cb.bar:SetStatusBarColor(unpack(cb.conf.colBarNI));
+		self:SetBorderColor(cb, cb.conf.colBorderNI, cb.conf.colBarBg);
+		if (cb.conf.bShowShield) then
+			cb.sicon:Show();
+		else
+			cb.sicon:Hide();
+		end
+	else
+		if cb.channel and --[[cb.conf.unit == "player" and]] cb.conf.bartype == "cb" then
+			cb.bar:SetStatusBarColor(unpack(cb.conf.colChanneled));
+		else
+			cb.bar:SetStatusBarColor(unpack(cb.conf.colBar));
+		end
+		self:SetBorderColor(cb, cb.conf.colBorder, cb.conf.colBarBg);
+		cb.sicon:Hide();
 	end
 end
 
@@ -2522,6 +2536,9 @@ function Gnosis:CleanupCastbar(cb, bDoNotSetValue, bDoNotOverwriteNfsTfs)
 	cb.tiUnitName = nil;
 	cb.tiType = nil;
 	cb.dur = nil;
+	
+	-- reset range switch
+	cb.outOfRangeColorApplied = nil;
 
 	-- default format strings
 	if (not bDoNotOverwriteNfsTfs) then

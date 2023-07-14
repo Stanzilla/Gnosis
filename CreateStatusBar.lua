@@ -72,6 +72,10 @@ function Gnosis:CreateStatusBar(parent)
 	sbf.SetStatusBarColor = function(this, r, g, b, a)
 		this.t:SetVertexColor(r, g, b, a);
 	end
+	
+	sbf.GetStatusBarColor = function(this)
+		return {this.t:GetVertexColor()};
+	end
 
 	sbf.SizeChanged = function(this)
 		if(this.orient == "VERTICAL") then

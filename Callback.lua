@@ -12,6 +12,7 @@ local abs = abs;
 
 -- local variables
 local _;
+local rangeCheckTarget, rangeCheckSpell;
 
 -- mainline or classic
 local wowmainline = (WOW_PROJECT_ID == WOW_PROJECT_MAINLINE);
@@ -55,10 +56,13 @@ end
 function Gnosis:StartTimerUpdate(fCurTime, bForce)
 	if((fCurTime - self.lastTimerScan) > self.s.iTimerScanEvery or bForce) then
 		self.lastTimerScan = fCurTime;
-
+		self.rangeCheck = true;  --using the timer method for limiting the castbar rangecheck update rate
+		
 		for key, value in ipairs(self.ti_fl) do
 			self:ScanTimerbar(value, fCurTime);
 		end
+	else
+		self.rangeCheck = false;
 	end
 end
 
@@ -107,6 +111,12 @@ function Gnosis:Update()
 				value:Hide();
 				value.bBarHidden = true;
 			end
+			
+			--range check
+			if self.rangeCheck then
+				self:playerCastbarRangeCheck(value);
+			end
+			
 		else
 			-- cleanup/fade out gcd castbars
 			if (conf.bUnlocked or conf.bShowWNC) then
@@ -148,6 +158,22 @@ function Gnosis:Update()
 
 end
 
+function Gnosis:playerCastbarRangeCheck(cb)
+	if cb.conf.bRangeCheck and cb.conf.unit == "player" and cb.conf.bartype == "cb" then
+		if IsSpellInRange(rangeCheckSpell, rangeCheckTarget) == 0 then
+			if not cb.outOfRangeColorApplied then
+				cb.bar:SetStatusBarColor(unpack(cb.conf.colOutOfRange));
+				cb.outOfRangeColorApplied = true;
+			end
+		else
+			if cb.outOfRangeColorApplied then
+				self:activeBarColors(cb);
+				cb.outOfRangeColorApplied = false;
+			end
+		end
+	end
+end
+
 -- events
 function Gnosis:UNIT_SPELLCAST_SUCCEEDED(event, unit, _, spellid)
 	if (unit == "player") then
@@ -184,6 +210,9 @@ function Gnosis:UNIT_SPELLCAST_START(event, unit, _, spellid)
 	if (unit == "player") then
 		local spell = GetSpellInfo(spellid);
 		local fCurTime = GetTime() * 1000.0;
+		
+		--set up variables for the range check
+		rangeCheckSpell = spell;
 
 		self:FindGCDBars(spell, fCurTime, spellid);
 
@@ -206,6 +235,9 @@ function Gnosis:UNIT_SPELLCAST_CHANNEL_START(event, unit, _, spellid)
 
 	-- clip test
 	if (unit == "player") then
+		--set up variables for the range check
+		rangeCheckSpell = GetSpellInfo(spellid);
+		
 		-- generate new clip test data
 		self:SetupChannelData();
 	end
@@ -571,7 +603,26 @@ function Gnosis:UNIT_SPELLCAST_SENT(event, unit, target)
 	-- latency estimation
 	self.strLastTarget = (target and target ~= "") and target or nil;
 	self.lag = select(4, GetNetStats());
-
+	
+	if (unit == "player") then
+		--set up variables for the range check
+		if target then
+			if target == UnitName("player") then
+				rangeCheckTarget = "player"
+			elseif target == UnitName("target") then
+				rangeCheckTarget = "target"
+			elseif target == UnitName("focus") then
+				rangeCheckTarget = "focus"
+			elseif target == UnitName("mouseover") then
+				rangeCheckTarget = "mouseover"
+			else
+				rangeCheckTarget = nil
+			end
+		else
+			rangeCheckTarget = nil
+		end
+	end
+	
 	-- grab unit class of target if possible
 	if (self.strLastTarget) then
 		local _, class = UnitClass(target);

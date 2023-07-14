@@ -468,7 +468,7 @@ function Gnosis:SetupHooks()
 			Gnosis:CloseAllTradeskillBars();
 		end)
 
-	elseif (wowclassic) or (wowbcc) then
+	elseif (wowclassic) or (wowbcc) or (wowwc) then
 		-- tradeskill hooking
 		hooksecurefunc('DoTradeSkill', function(index, num)
 				Gnosis.bNewTradeSkill = tonumber(num) and true or nil;

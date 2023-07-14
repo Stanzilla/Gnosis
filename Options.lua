@@ -1408,6 +1408,7 @@ function Gnosis:CreateCastbarsOpt()
 					order = self:GetNextTableIndex(),
 					args = {
 						colBarGrp = Gnosis:OptColorGroup_Entry(key, self:GetNextTableIndexInner(1), Gnosis.L["OptCBCBColor"], "colBar"),
+						colChanneledGrp = Gnosis:OptColorGroup_Entry(key, self:GetNextTableIndexInner(), Gnosis.L["OptCBChannelColor"], "colChanneled"),
 						colBarNIGrp = Gnosis:OptColorGroup_Entry(key, self:GetNextTableIndexInner(), Gnosis.L["OptCBCBNIColor"], "colBarNI"),
 						colInterruptedGrp = Gnosis:OptColorGroup_Entry(key, self:GetNextTableIndexInner(), Gnosis.L["OptCBCBColInt"], "colInterrupted"),
 						colFailedGrp = Gnosis:OptColorGroup_Entry(key, self:GetNextTableIndexInner(), Gnosis.L["OptCBCBColFail"], "colFailed"),
@@ -1423,6 +1424,9 @@ function Gnosis:CreateCastbarsOpt()
 						colSuccessGrp = Gnosis:OptColorGroup_Entry(key, self:GetNextTableIndexInner(), Gnosis.L["OptCBCBSucColor"], "colSuccess"),
 						buseshadow = Gnosis:OptToggle_Entry(key, self:GetNextTableIndexInner(), Gnosis.L["OptCBEnShCol"], "", "bEnShadowCol"),
 						colShadowGrp = Gnosis:OptColorGroup_Entry(key, self:GetNextTableIndexInner(), Gnosis.L["OptCBCBShColor"], "colShadow"),
+						bRangeCheckEnabled = Gnosis:OptSimpleToggle(key, self:GetNextTableIndexInner(), Gnosis.L["OptCBEnRC"], Gnosis.L["OptCBEnRCDesc"], "bRangeCheck"),
+						colOutOfRangeGrp = Gnosis:OptColorGroup_Entry(key, self:GetNextTableIndexInner(), Gnosis.L["OptCBRangeColor"], "colOutOfRange"),
+						
 					},
 				},
 				fontgrp = {
