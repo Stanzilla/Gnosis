@@ -350,6 +350,7 @@ function Gnosis:StartupVariables()
 
 		-- default bar colors
 		colBar = { 0.15, 0.35, 0.35, 0.70 },
+		colChanneled = { 0.15, 0.35, 0.35, 0.70 },
 		colBarNI = { 0.15, 0.35, 0.35, 0.70 },
 		colBarBg = { 0.15, 0.42, 0.42, 0.65 },
 		colLagBar  = { 0.90, 0.85, 0.70, 0.65 },
@@ -363,6 +364,9 @@ function Gnosis:StartupVariables()
 		colSpark = { 1.00, 1.00, 1.00, 1.00 },
 		colSuccess = { 0.15, 0.25, 0.10, 0.70 },
 		colShadow = { 0.00, 0.00, 0.00, 0.70 },
+		
+		colOutOfRange = {1, 1, 1, 1},
+		
 
 		-- default statusbar texture
 		bartexture = "Gnosis_Plain",
@@ -447,6 +451,7 @@ function Gnosis:StartupVariables()
 
 		-- default bar colors
 		colBar = { 0.15, 0.35, 0.35, 0.0 },
+		colChanneled = { 0.15, 0.35, 0.35, 0.0 },
 		colBarNI = { 0.15, 0.35, 0.35, 0.0 },
 		colBarBg = { 0.15, 0.42, 0.42, 0.0 },
 		colLagBar  = { 0.90, 0.85, 0.70, 0.0 },
@@ -460,6 +465,7 @@ function Gnosis:StartupVariables()
 		colSpark = { 1.00, 1.00, 1.00, 0 },
 		colSuccess = { 0.15, 0.25, 0.10, 0 },
 		colShadow = { 0.00, 0.00, 0.00, 0.70 },
+		colOutOfRange = {1, 1, 1, 1},
 
 		-- bar settings
 		bShowLat = false,		-- show latency box
