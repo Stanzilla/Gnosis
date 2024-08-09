@@ -25,14 +25,14 @@ Libs\AceDB-3.0\AceDB-3.0.xml
 Libs\AceEvent-3.0\AceEvent-3.0.xml
 Libs\LibSharedMedia-3.0\lib.xml
 Libs\AceGUI-3.0-SharedMediaWidgets\widget.xml
-Libs\LibRangeCheck-2.0\LibRangeCheck-2.0.lua
+Libs\LibRangeCheck-3.0\LibRangeCheck-3.0.lua
 Libs\LibDialog-1.0\lib.xml
 Libs\AceSerializer-3.0\AceSerializer-3.0.xml
 Libs\LibCompress\lib.xml
 Libs\LibClassicCasterino\LibClassicCasterino.lua
 Libs\LibClassicDurations\LibClassicDurations.xml
 
-## X-Embeds: Ace3, AceGUI-3.0-SharedMediaWidgets, LibBetterBlizzOptions-1.0, LibClassicCasterino, LibClassicDurations, LibCompress, LibDialog-1.0, LibRangeCheck-2.0, LibSharedMedia-3.0
+## X-Embeds: Ace3, AceGUI-3.0-SharedMediaWidgets, LibBetterBlizzOptions-1.0, LibClassicCasterino, LibClassicDurations, LibCompress, LibDialog-1.0, LibRangeCheck-3.0, LibSharedMedia-3.0
 #@end-no-lib-strip@
 
 # xml
