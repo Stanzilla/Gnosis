@@ -1,6 +1,15 @@
 -- local functions
 local pairs = pairs;
-local GetSpellInfo = GetSpellInfo;
+local GetSpellInfo = GetSpellInfo or function(spellID)
+	if not spellID then
+	  return nil;
+	end
+  
+	local spellInfo = C_Spell.GetSpellInfo(spellID);
+	if spellInfo then
+	  return spellInfo.name, nil, spellInfo.iconID, spellInfo.castTime, spellInfo.minRange, spellInfo.maxRange, spellInfo.spellID, spellInfo.originalIconID;
+	end
+end
 local string_format = string.format;
 
 -- local variables
@@ -223,7 +232,7 @@ Gnosis.tSoundChannels = {
 function Gnosis:StartupVariables()
 	local fCurTime = GetTime() * 1000;
 
-	self.ver = 5.13;
+	self.ver = 5.14;
 	self.optver = 4.62;
 	self.build = "@project-version@";
 	self.addonname = "Gnosis";

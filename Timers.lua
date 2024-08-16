@@ -1,9 +1,36 @@
-local GetItemInfo = GetItemInfo;
-local GetSpellInfo = GetSpellInfo;
-local GetSpellCooldown = GetSpellCooldown;
-local GetSpellCharges = GetSpellCharges;
+local GetItemInfo = C_Item.GetItemInfo or GetItemInfo;
+local GetSpellInfo = GetSpellInfo or function(spellID)
+	if not spellID then
+		return nil;
+	end
+
+	local spellInfo = C_Spell.GetSpellInfo(spellID);
+	if spellInfo then
+		return spellInfo.name, nil, spellInfo.iconID, spellInfo.castTime, spellInfo.minRange, spellInfo.maxRange, spellInfo.spellID, spellInfo.originalIconID;
+	end
+end
+local GetSpellCooldown = GetSpellCooldown or function(spellID)
+	if not spellID then
+	  return nil;
+	end
+  
+	local spellCooldownInfo = C_Spell.GetSpellCooldown(spellID);
+	if spellCooldownInfo then
+	  return spellCooldownInfo.startTime, spellCooldownInfo.duration, spellCooldownInfo.isEnabled, spellCooldownInfo.modRate;
+	end
+end
+local GetSpellCharges = GetSpellCharges or function(spellID)
+	if not spellID then
+	  return nil;
+	end
+  
+	local chargeInfo = C_Spell.GetSpellCharges(spellID);
+	if chargeInfo then
+	  return chargeInfo.currentCharges, chargeInfo.maxCharges, chargeInfo.cooldownStartTime, chargeInfo.cooldownDuration, chargeInfo.chargeModRate;
+	end
+end
 local GetTime = GetTime;
-local GetItemCooldown = GetItemCooldown;
+local GetItemCooldown = C_Item.GetItemCooldown or GetItemCooldown;
 local GetRuneCooldown = GetRuneCooldown;
 local GetRuneType = GetRuneType;
 local GetTotemInfo = GetTotemInfo;
